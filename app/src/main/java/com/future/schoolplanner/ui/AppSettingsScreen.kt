@@ -53,8 +53,8 @@ fun AppSettingsScreen(
 
             item {
                 SettingsCategory(
-                    title = "Theme",
-                    description = "Einstellungen für Farbtheme und Darstellung",
+                    title = "Aussehen",
+                    description = "Einstellungen für Aussehen und Darstellung",
                     onClick = onNavigateToThemeSettings
                 )
             }

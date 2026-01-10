@@ -19,8 +19,15 @@ class MainActivity : ComponentActivity() {
             val viewModel: GradeViewModel = viewModel()
             val isDarkTheme by viewModel.isDarkTheme.collectAsState()
             val useDynamicColors by viewModel.useDynamicColors.collectAsState()
+            val useAmoledTheme by viewModel.useAmoledTheme.collectAsState()
+            val customAccentColor by viewModel.customAccentColor.collectAsState()
 
-            SchoolplannerTheme(darkTheme = isDarkTheme, dynamicColor = useDynamicColors) {
+            SchoolplannerTheme(
+                darkTheme = isDarkTheme,
+                dynamicColor = useDynamicColors,
+                amoledTheme = useAmoledTheme,
+                customAccentColor = customAccentColor
+            ) {
                 SchoolPlannerApp()
             }
         }

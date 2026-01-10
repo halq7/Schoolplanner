@@ -47,6 +47,12 @@ class GradeViewModel : ViewModel() {
     private val _useDynamicColors = MutableStateFlow(true)
     val useDynamicColors: StateFlow<Boolean> = _useDynamicColors.asStateFlow()
 
+    private val _useAmoledTheme = MutableStateFlow(false)
+    val useAmoledTheme: StateFlow<Boolean> = _useAmoledTheme.asStateFlow()
+
+    private val _customAccentColor = MutableStateFlow(Color(0xFF4CAF50)) // Default green
+    val customAccentColor: StateFlow<Color> = _customAccentColor.asStateFlow()
+
     private val _lessons = MutableStateFlow<List<Lesson>>(emptyList())
     val lessons: StateFlow<List<Lesson>> = _lessons.asStateFlow()
 
@@ -303,6 +309,22 @@ class GradeViewModel : ViewModel() {
 
     fun setUseDynamicColors(enabled: Boolean) {
         _useDynamicColors.value = enabled
+        // Disable AMOLED mode when dynamic colors are enabled
+        if (enabled) {
+            _useAmoledTheme.value = false
+        }
+    }
+
+    fun setUseAmoledTheme(enabled: Boolean) {
+        _useAmoledTheme.value = enabled
+        // Disable dynamic colors when AMOLED mode is enabled
+        if (enabled) {
+            _useDynamicColors.value = false
+        }
+    }
+
+    fun setCustomAccentColor(color: Color) {
+        _customAccentColor.value = color
     }
 
     fun calculateOverallAverage(): Double {
