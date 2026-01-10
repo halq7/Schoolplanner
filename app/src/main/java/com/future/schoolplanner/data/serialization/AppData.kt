@@ -22,7 +22,7 @@ data class AppSettings(
     val gradeInputMethod: String = "DECIMAL",
     val showTeachers: Boolean = true,
     val showRooms: Boolean = true,
-    val isDarkTheme: Boolean = false,
+    val isDarkTheme: Boolean = true,
     val useDynamicColors: Boolean = true,
     val useAmoledTheme: Boolean = false,
     val customAccentColor: Int = 0xFF4CAF50.toInt(), // Default green
