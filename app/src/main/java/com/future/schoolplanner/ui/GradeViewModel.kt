@@ -65,6 +65,9 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
     private val _tasksTabEnabled = MutableStateFlow(false)
     val tasksTabEnabled: StateFlow<Boolean> = _tasksTabEnabled.asStateFlow()
 
+    private val _defaultSubjectAlpha = MutableStateFlow(1.0f)
+    val defaultSubjectAlpha: StateFlow<Float> = _defaultSubjectAlpha.asStateFlow()
+
     private val _weekTypeEvenWeeks = MutableStateFlow(WeekType.A)
     val weekTypeEvenWeeks: StateFlow<WeekType> = _weekTypeEvenWeeks.asStateFlow()
 
@@ -133,6 +136,7 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
                     _customAccentColor.value = Color(savedData.settings.customAccentColor)
                     _tasksTabEnabled.value = savedData.settings.tasksTabEnabled
                     _weekTypeEvenWeeks.value = WeekType.valueOf(savedData.settings.weekTypeEvenWeeks)
+                    _defaultSubjectAlpha.value = savedData.settings.defaultSubjectAlpha
 
                     Log.d("GradeViewModel", "Data loaded successfully from persistence")
                 } else {
@@ -240,7 +244,8 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
                     useAmoledTheme = _useAmoledTheme.value,
                     customAccentColor = _customAccentColor.value.toArgb(),
                     tasksTabEnabled = _tasksTabEnabled.value,
-                    weekTypeEvenWeeks = _weekTypeEvenWeeks.value.name
+                    weekTypeEvenWeeks = _weekTypeEvenWeeks.value.name,
+                    defaultSubjectAlpha = _defaultSubjectAlpha.value
                 )
                 Log.d("GradeViewModel", "Data saved successfully")
             } catch (e: Exception) {
@@ -407,19 +412,11 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
 
     fun setUseDynamicColors(enabled: Boolean) {
         _useDynamicColors.value = enabled
-        // Disable AMOLED mode when dynamic colors are enabled
-        if (enabled) {
-            _useAmoledTheme.value = false
-        }
         saveData()
     }
 
     fun setUseAmoledTheme(enabled: Boolean) {
         _useAmoledTheme.value = enabled
-        // Disable dynamic colors when AMOLED mode is enabled
-        if (enabled) {
-            _useDynamicColors.value = false
-        }
         saveData()
     }
 
@@ -435,6 +432,11 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
 
     fun setWeekTypeEvenWeeks(weekType: WeekType) {
         _weekTypeEvenWeeks.value = weekType
+        saveData()
+    }
+
+    fun setDefaultSubjectAlpha(alpha: Float) {
+        _defaultSubjectAlpha.value = alpha
         saveData()
     }
 
@@ -844,6 +846,7 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
             _customAccentColor.value = Color(appData.settings.customAccentColor)
             _tasksTabEnabled.value = appData.settings.tasksTabEnabled
             _weekTypeEvenWeeks.value = WeekType.valueOf(appData.settings.weekTypeEvenWeeks)
+            _defaultSubjectAlpha.value = appData.settings.defaultSubjectAlpha
 
             // Clear simulated grades
             _simulatedGrades.value = emptyMap()

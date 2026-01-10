@@ -161,7 +161,8 @@ fun ScheduleScreen(
                                 lesson = lesson,
                                 viewModel = viewModel,
                                 onEdit = { onEditLesson(it) },
-                                onAdd = { onAddLesson(day, hour, selectedWeekType) }
+                                onAdd = { onAddLesson(day, hour, selectedWeekType) },
+                                defaultSubjectAlpha = viewModel.defaultSubjectAlpha.value
                             )
                         }
                     }
@@ -182,7 +183,8 @@ fun ScheduleCell(
     viewModel: GradeViewModel,
     onEdit: (String) -> Unit,
     onAdd: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    defaultSubjectAlpha: Float = 1.0f
 ) {
     val subject = lesson?.let { viewModel.getSubjectById(it.subjectId) }
     val showTeachers by viewModel.showTeachers.collectAsState()
@@ -196,7 +198,7 @@ fun ScheduleCell(
             .height(60.dp)
             .border(1.dp, Color.Gray)
             .background(
-                color = if (subject != null) subject.color.copy(alpha = 1f) else Color.Transparent
+                color = if (subject != null) subject.color.copy(alpha = defaultSubjectAlpha) else Color.Transparent
             )
             .combinedClickable(
                 onClick = {
@@ -215,7 +217,7 @@ fun ScheduleCell(
         contentAlignment = Alignment.Center
     ) {
         if (subject != null) {
-            val effectiveBackgroundColor = subject.color.copy(alpha = 0.2f).blendOver(MaterialTheme.colorScheme.surface)
+            val effectiveBackgroundColor = subject.color.copy(alpha = 0.2f * defaultSubjectAlpha).blendOver(MaterialTheme.colorScheme.surface)
             val textColor = effectiveBackgroundColor.getContrastingTextColor()
 
             Column(

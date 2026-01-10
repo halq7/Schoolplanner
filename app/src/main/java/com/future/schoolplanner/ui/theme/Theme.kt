@@ -153,15 +153,26 @@ fun SchoolplannerTheme(
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
-        darkTheme && amoledTheme -> createCustomAmoledColorScheme(customAccentColor)
+        darkTheme && amoledTheme && !dynamicColor -> createCustomAmoledColorScheme(customAccentColor)
         darkTheme && !dynamicColor -> createCustomDarkColorScheme(customAccentColor)
         !darkTheme && !dynamicColor -> createCustomLightColorScheme(customAccentColor)
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context)
+            val baseScheme = if (darkTheme) dynamicDarkColorScheme(context)
             else dynamicLightColorScheme(context)
+
+            if (darkTheme && amoledTheme) {
+                // Apply AMOLED to dynamic colors: keep accent colors but make backgrounds black
+                baseScheme.copy(
+                    background = Color.Black,
+                    surface = Color.Black,
+                    surfaceVariant = baseScheme.surfaceVariant.copy(alpha = 0.5f) // Slightly adjust surfaceVariant for contrast
+                )
+            } else {
+                baseScheme
+            }
         }
-        darkTheme -> DarkColorScheme
+        darkTheme -> if (amoledTheme) AmoledColorScheme else DarkColorScheme
         else -> LightColorScheme
     }
 

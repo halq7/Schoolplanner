@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -22,6 +23,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.future.schoolplanner.ui.theme.getContrastingTextColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -33,13 +35,14 @@ fun ThemeSettingsScreen(
     val useDynamicColors by viewModel.useDynamicColors.collectAsState()
     val useAmoledTheme by viewModel.useAmoledTheme.collectAsState()
     val customAccentColor by viewModel.customAccentColor.collectAsState()
+    val defaultSubjectAlpha by viewModel.defaultSubjectAlpha.collectAsState()
     var showCustomColorDialog by remember { mutableStateOf(false) }
     var originalColor by remember { mutableStateOf(Color.Transparent) }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Theme-Einstellungen") },
+                title = { Text("Aussehen") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.Default.ArrowBack, "Zurück")
@@ -56,18 +59,16 @@ fun ThemeSettingsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp),
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                text = "Theme-Auswahl",
+                text = "Theme-Einstellungen",
                 style = MaterialTheme.typography.titleLarge
             )
 
-            Text(
-                text = "Wählen Sie zwischen Hell- und Dunkelmodus:",
-                style = MaterialTheme.typography.bodyMedium
-            )
+
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -231,6 +232,63 @@ fun ThemeSettingsScreen(
                         Text("Standard")
                     }
                 }
+            }
+
+            // Default subject alpha slider
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = "Standardmäßige Transparenz für Fächer",
+                style = MaterialTheme.typography.titleMedium
+            )
+
+            Text(
+                text = "Stellen Sie die Transparenz der Fachfarben ein (im Noten-Tab und Stundenplan):",
+                style = MaterialTheme.typography.bodyMedium
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Transparenz: ${(defaultSubjectAlpha * 100).toInt()}%",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+
+            Slider(
+                value = defaultSubjectAlpha,
+                onValueChange = { viewModel.setDefaultSubjectAlpha(it) },
+                valueRange = 0.0f..1.0f,
+                steps = 19, // 5% steps
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            // Preview box showing the effect
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp)
+                    .background(
+                        color = Color(0xFF2196F3).copy(alpha = defaultSubjectAlpha),
+                        shape = MaterialTheme.shapes.medium
+                    )
+                    .border(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.outline,
+                        shape = MaterialTheme.shapes.medium
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Vorschau",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color(0xFF2196F3).copy(alpha = defaultSubjectAlpha).getContrastingTextColor()
+                )
             }
 
             if (showCustomColorDialog) {

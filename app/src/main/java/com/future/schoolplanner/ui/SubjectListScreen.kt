@@ -150,7 +150,8 @@ fun SubjectListScreen(
                             selectedSubject = subject
                             showSubjectActionDialog = true
                         },
-                        viewModel = viewModel
+                        viewModel = viewModel,
+                        defaultSubjectAlpha = viewModel.defaultSubjectAlpha.value
                     )
                 }
 
@@ -241,7 +242,8 @@ fun SubjectCard(
     subject: Subject,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
-    viewModel: GradeViewModel
+    viewModel: GradeViewModel,
+    defaultSubjectAlpha: Float
 ) {
     val simulatedGrades = viewModel.simulatedGrades.collectAsState()
     val simulatedGrade = simulatedGrades.value[subject.id]
@@ -254,7 +256,7 @@ fun SubjectCard(
                 onLongClick = onLongClick
             ),
         colors = CardDefaults.cardColors(
-            containerColor = subject.color.copy(alpha = 1f)
+            containerColor = subject.color.copy(alpha = defaultSubjectAlpha)
         ),
     ) {
         Column(
