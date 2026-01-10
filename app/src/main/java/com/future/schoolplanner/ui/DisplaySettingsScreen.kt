@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.future.schoolplanner.data.WeekType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -21,6 +22,7 @@ fun DisplaySettingsScreen(
 ) {
     val showTeachers by viewModel.showTeachers.collectAsState()
     val showRooms by viewModel.showRooms.collectAsState()
+    val weekTypeEvenWeeks by viewModel.weekTypeEvenWeeks.collectAsState()
 
     Scaffold(
         topBar = {
@@ -50,12 +52,8 @@ fun DisplaySettingsScreen(
                 style = MaterialTheme.typography.titleLarge
             )
 
-            Text(
-                text = "Wählen Sie, welche Informationen im Stundenplan angezeigt werden sollen:",
-                style = MaterialTheme.typography.bodyMedium
-            )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
             // Teacher toggle
             Row(
@@ -108,6 +106,81 @@ fun DisplaySettingsScreen(
                     onCheckedChange = { viewModel.setShowRooms(it) }
                 )
             }
+
+            // Week type configuration
+            Text(
+                text = "Wochen-Konfiguration",
+                style = MaterialTheme.typography.titleMedium
+            )
+
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                FilterChip(
+                    selected = weekTypeEvenWeeks == WeekType.A,
+                    onClick = { viewModel.setWeekTypeEvenWeeks(WeekType.A) },
+                    label = { Text("A-Wochen = gerade") }
+                )
+                FilterChip(
+                    selected = weekTypeEvenWeeks == WeekType.B,
+                    onClick = { viewModel.setWeekTypeEvenWeeks(WeekType.B) },
+                    label = { Text("B-Wochen = gerade") }
+                )
+            }
+            
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = "Wochen kopieren",
+                style = MaterialTheme.typography.titleMedium
+            )
+
+            Text(
+                text = "Kopieren Sie den Stundenplan einer Woche in die andere:",
+                style = MaterialTheme.typography.bodyMedium
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                OutlinedButton(
+                    onClick = { viewModel.copyWeekLessons(WeekType.A, WeekType.B) },
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(48.dp)
+                ) {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        Text("A → B kopieren")
+                    }
+                }
+                OutlinedButton(
+                    onClick = { viewModel.copyWeekLessons(WeekType.B, WeekType.A) },
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(48.dp)
+                ) {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        Text("B → A kopieren")
+                    }
+                }
+            }
+
+            Text(
+                text = "Hinweis: Bestehende Stunden in der Zielwoche werden überschrieben.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+            )
         }
     }
 }

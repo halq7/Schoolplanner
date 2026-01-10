@@ -2,7 +2,7 @@ package com.future.schoolplanner.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -20,6 +20,9 @@ import com.future.schoolplanner.data.WeekType
 import com.future.schoolplanner.data.Lesson
 import com.future.schoolplanner.ui.theme.blendOver
 import com.future.schoolplanner.ui.theme.getContrastingTextColor
+import java.time.LocalDate
+import java.time.temporal.WeekFields
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,7 +32,24 @@ fun ScheduleScreen(
     viewModel: GradeViewModel
 ) {
     val lessons = viewModel.lessonsForCurrentYear.collectAsState()
-    var selectedWeekType by remember { mutableStateOf(WeekType.A) }
+    val weekTypeEvenWeeks by viewModel.weekTypeEvenWeeks.collectAsState()
+
+    // Calculate current week type based on settings
+    val currentWeekType = remember(weekTypeEvenWeeks) {
+        val currentDate = LocalDate.now()
+        val weekFields = WeekFields.of(Locale.getDefault())
+        val weekOfYear = currentDate.get(weekFields.weekOfYear())
+        val isEvenWeek = weekOfYear % 2 == 0
+
+        if ((weekTypeEvenWeeks == WeekType.A && isEvenWeek) ||
+            (weekTypeEvenWeeks == WeekType.B && !isEvenWeek)) {
+            WeekType.A
+        } else {
+            WeekType.B
+        }
+    }
+
+    var selectedWeekType by remember(currentWeekType) { mutableStateOf(currentWeekType) }
 
     val daysOfWeek = listOf("Mo", "Di", "Mi", "Do", "Fr") // Short names for table
     val maxHours = maxOf(lessons.value.maxOfOrNull { it.hour } ?: 8, 8)
@@ -153,6 +173,7 @@ fun ScheduleScreen(
             }
         }
     }
+
 }
 
 @Composable
@@ -167,21 +188,30 @@ fun ScheduleCell(
     val showTeachers by viewModel.showTeachers.collectAsState()
     val showRooms by viewModel.showRooms.collectAsState()
 
+    var showDeleteDialog by remember { mutableStateOf(false) }
+
     Box(
         modifier = modifier
             .width(64.dp)
             .height(60.dp)
             .border(1.dp, Color.Gray)
             .background(
-                color = if (subject != null) subject.color.copy(alpha = 0.2f) else Color.Transparent
+                color = if (subject != null) subject.color.copy(alpha = 1f) else Color.Transparent
             )
-            .clickable {
-                if (lesson != null) {
-                    onEdit(lesson.id)
-                } else {
-                    onAdd()
+            .combinedClickable(
+                onClick = {
+                    if (lesson != null) {
+                        onEdit(lesson.id)
+                    } else {
+                        onAdd()
+                    }
+                },
+                onLongClick = {
+                    if (lesson != null) {
+                        showDeleteDialog = true
+                    }
                 }
-            },
+            ),
         contentAlignment = Alignment.Center
     ) {
         if (subject != null) {
@@ -218,5 +248,31 @@ fun ScheduleCell(
                 }
             }
         }
+    }
+
+    // Delete confirmation dialog
+    if (showDeleteDialog && lesson != null) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text("Stunde löschen") },
+            text = {
+                Text("Möchten Sie diese Stunde wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.deleteLesson(lesson.id)
+                        showDeleteDialog = false
+                    }
+                ) {
+                    Text("Löschen")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text("Abbrechen")
+                }
+            }
+        )
     }
 }

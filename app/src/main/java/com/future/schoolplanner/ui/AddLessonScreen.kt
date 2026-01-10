@@ -196,19 +196,6 @@ fun AddLessonScreen(
                 singleLine = true
             )
 
-            // Visibility
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Checkbox(
-                    checked = isVisible,
-                    onCheckedChange = { isVisible = it }
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Im Stundenplan anzeigen")
-            }
-
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(

@@ -26,7 +26,8 @@ data class AppSettings(
     val useDynamicColors: Boolean = true,
     val useAmoledTheme: Boolean = false,
     val customAccentColor: Int = 0xFF4CAF50.toInt(), // Default green
-    val tasksTabEnabled: Boolean = false
+    val tasksTabEnabled: Boolean = false,
+    val weekTypeEvenWeeks: String = "A" // Which week type corresponds to even weeks
 )
 
 // Serializable versions of data classes

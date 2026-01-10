@@ -65,6 +65,9 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
     private val _tasksTabEnabled = MutableStateFlow(false)
     val tasksTabEnabled: StateFlow<Boolean> = _tasksTabEnabled.asStateFlow()
 
+    private val _weekTypeEvenWeeks = MutableStateFlow(WeekType.A)
+    val weekTypeEvenWeeks: StateFlow<WeekType> = _weekTypeEvenWeeks.asStateFlow()
+
     private val _lessons = MutableStateFlow<List<Lesson>>(emptyList())
     val lessons: StateFlow<List<Lesson>> = _lessons.asStateFlow()
 
@@ -129,6 +132,7 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
                     _useAmoledTheme.value = savedData.settings.useAmoledTheme
                     _customAccentColor.value = Color(savedData.settings.customAccentColor)
                     _tasksTabEnabled.value = savedData.settings.tasksTabEnabled
+                    _weekTypeEvenWeeks.value = WeekType.valueOf(savedData.settings.weekTypeEvenWeeks)
 
                     Log.d("GradeViewModel", "Data loaded successfully from persistence")
                 } else {
@@ -235,7 +239,8 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
                     useDynamicColors = _useDynamicColors.value,
                     useAmoledTheme = _useAmoledTheme.value,
                     customAccentColor = _customAccentColor.value.toArgb(),
-                    tasksTabEnabled = _tasksTabEnabled.value
+                    tasksTabEnabled = _tasksTabEnabled.value,
+                    weekTypeEvenWeeks = _weekTypeEvenWeeks.value.name
                 )
                 Log.d("GradeViewModel", "Data saved successfully")
             } catch (e: Exception) {
@@ -428,6 +433,11 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
         saveData()
     }
 
+    fun setWeekTypeEvenWeeks(weekType: WeekType) {
+        _weekTypeEvenWeeks.value = weekType
+        saveData()
+    }
+
     fun calculateOverallAverage(): Double {
         val currentSubjects = getSubjectsForCurrentYear()
         val subjectsWithGrades = currentSubjects.filter { it.grades.isNotEmpty() || _simulatedGrades.value.containsKey(it.id) }
@@ -540,6 +550,39 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
     fun deleteLesson(lessonId: String) {
         viewModelScope.launch {
             _lessons.value = _lessons.value.filter { it.id != lessonId }
+            saveData()
+        }
+    }
+
+    fun copyWeekLessons(fromWeekType: WeekType, toWeekType: WeekType) {
+        viewModelScope.launch {
+            val currentYearId = _currentSchoolYearId.value ?: return@launch
+
+            // Get all lessons
+            val allLessons = _lessons.value.toMutableList()
+
+            // First, remove ALL lessons from the target week for current year
+            allLessons.removeIf { lesson ->
+                lesson.schoolYearId == currentYearId && lesson.weekType == toWeekType
+            }
+
+            // Get lessons from the source week for current year
+            val sourceLessons = _lessons.value.filter {
+                it.schoolYearId == currentYearId && it.weekType == fromWeekType
+            }
+
+            // Create copies of all source lessons for the target week
+            val targetLessons = sourceLessons.map { sourceLesson ->
+                sourceLesson.copy(
+                    id = java.util.UUID.randomUUID().toString(),
+                    weekType = toWeekType
+                )
+            }
+
+            // Add all target lessons
+            allLessons.addAll(targetLessons)
+
+            _lessons.value = allLessons
             saveData()
         }
     }
@@ -800,6 +843,7 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
             _useAmoledTheme.value = appData.settings.useAmoledTheme
             _customAccentColor.value = Color(appData.settings.customAccentColor)
             _tasksTabEnabled.value = appData.settings.tasksTabEnabled
+            _weekTypeEvenWeeks.value = WeekType.valueOf(appData.settings.weekTypeEvenWeeks)
 
             // Clear simulated grades
             _simulatedGrades.value = emptyMap()

@@ -33,7 +33,8 @@ class DataPersistenceManager(private val context: Context) {
         useDynamicColors: Boolean,
         useAmoledTheme: Boolean,
         customAccentColor: Int,
-        tasksTabEnabled: Boolean
+        tasksTabEnabled: Boolean,
+        weekTypeEvenWeeks: String = "A"
     ) {
         try {
             val appData = AppData(
@@ -51,7 +52,8 @@ class DataPersistenceManager(private val context: Context) {
                     useDynamicColors = useDynamicColors,
                     useAmoledTheme = useAmoledTheme,
                     customAccentColor = customAccentColor,
-                    tasksTabEnabled = tasksTabEnabled
+                    tasksTabEnabled = tasksTabEnabled,
+                    weekTypeEvenWeeks = weekTypeEvenWeeks
                 )
             )
 
