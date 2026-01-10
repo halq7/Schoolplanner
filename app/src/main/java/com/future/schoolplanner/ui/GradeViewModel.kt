@@ -1,7 +1,9 @@
 package com.future.schoolplanner.ui
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.future.schoolplanner.data.Grade
@@ -13,6 +15,8 @@ import com.future.schoolplanner.data.SchoolYear
 import com.future.schoolplanner.data.Subject
 import com.future.schoolplanner.data.Task
 import com.future.schoolplanner.data.WeekType
+import com.future.schoolplanner.data.persistence.DataPersistenceManager
+import com.future.schoolplanner.data.serialization.toDomain
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -28,6 +32,8 @@ data class SimulatedGrade(
 )
 
 class GradeViewModel(context: Context? = null) : ViewModel() {
+    private val persistenceManager = context?.let { DataPersistenceManager(it) }
+    private var isInitialized = false
 
     private val _subjects = MutableStateFlow<List<Subject>>(emptyList())
     val subjects: StateFlow<List<Subject>> = _subjects.asStateFlow()
@@ -98,7 +104,46 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     init {
-        // Initialize with default school year and subjects
+        loadData()
+    }
+
+    private fun loadData() {
+        viewModelScope.launch {
+            try {
+                val savedData = persistenceManager?.loadAppData()
+                if (savedData != null) {
+                    // Load saved data
+                    _subjects.value = savedData.subjects.map { it.toDomain() }
+                    _schoolYears.value = savedData.schoolYears.map { it.toDomain() }
+                    _currentSchoolYearId.value = savedData.currentSchoolYearId
+                    _lessons.value = savedData.lessons.map { it.toDomain() }
+                    _reports.value = savedData.reports.map { it.toDomain() }
+                    _tasks.value = savedData.tasks.map { it.toDomain() }
+
+                    // Load settings
+                    _gradeInputMethod.value = GradeInputMethod.valueOf(savedData.settings.gradeInputMethod)
+                    _showTeachers.value = savedData.settings.showTeachers
+                    _showRooms.value = savedData.settings.showRooms
+                    _isDarkTheme.value = savedData.settings.isDarkTheme
+                    _useDynamicColors.value = savedData.settings.useDynamicColors
+                    _useAmoledTheme.value = savedData.settings.useAmoledTheme
+                    _customAccentColor.value = Color(savedData.settings.customAccentColor)
+                    _tasksTabEnabled.value = savedData.settings.tasksTabEnabled
+
+                    Log.d("GradeViewModel", "Data loaded successfully from persistence")
+                } else {
+                    // Initialize with default data if no saved data exists
+                    initializeDefaultData()
+                }
+                isInitialized = true
+            } catch (e: Exception) {
+                Log.e("GradeViewModel", "Error loading data, initializing with defaults", e)
+                initializeDefaultData()
+            }
+        }
+    }
+
+    private fun initializeDefaultData() {
         viewModelScope.launch {
             val defaultSchoolYearId = UUID.randomUUID().toString()
             val defaultSchoolYear = SchoolYear(
@@ -171,6 +216,34 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
         }
     }
 
+    private fun saveData() {
+        if (!isInitialized || persistenceManager == null) return
+
+        viewModelScope.launch {
+            try {
+                persistenceManager.saveAppData(
+                    subjects = _subjects.value,
+                    schoolYears = _schoolYears.value,
+                    currentSchoolYearId = _currentSchoolYearId.value,
+                    lessons = _lessons.value,
+                    reports = _reports.value,
+                    tasks = _tasks.value,
+                    gradeInputMethod = _gradeInputMethod.value,
+                    showTeachers = _showTeachers.value,
+                    showRooms = _showRooms.value,
+                    isDarkTheme = _isDarkTheme.value,
+                    useDynamicColors = _useDynamicColors.value,
+                    useAmoledTheme = _useAmoledTheme.value,
+                    customAccentColor = _customAccentColor.value.toArgb(),
+                    tasksTabEnabled = _tasksTabEnabled.value
+                )
+                Log.d("GradeViewModel", "Data saved successfully")
+            } catch (e: Exception) {
+                Log.e("GradeViewModel", "Error saving data", e)
+            }
+        }
+    }
+
     fun selectSubject(subject: Subject) {
         _selectedSubject.value = subject
     }
@@ -191,12 +264,14 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
             if (_selectedSubject.value?.id == subjectId) {
                 _selectedSubject.value = updatedSubjects.find { it.id == subjectId }
             }
+            saveData()
         }
     }
 
     fun addSubject(subject: Subject) {
         viewModelScope.launch {
             _subjects.value = _subjects.value + subject
+            saveData()
         }
     }
 
@@ -228,6 +303,7 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
             if (_selectedSubject.value?.id == subjectId) {
                 _selectedSubject.value = updatedSubjects.find { it.id == subjectId }
             }
+            saveData()
         }
     }
 
@@ -242,6 +318,7 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
             if (_selectedSubject.value?.id == subject.id) {
                 _selectedSubject.value = subject
             }
+            saveData()
         }
     }
 
@@ -253,6 +330,7 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
             if (_selectedSubject.value?.id == subjectId) {
                 _selectedSubject.value = null
             }
+            saveData()
         }
     }
 
@@ -278,6 +356,7 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
             if (_selectedSubject.value?.id == subjectId) {
                 _selectedSubject.value = updatedSubjects.find { it.id == subjectId }
             }
+            saveData()
         }
     }
 
@@ -297,23 +376,28 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
             if (_selectedSubject.value?.id == subjectId) {
                 _selectedSubject.value = updatedSubjects.find { it.id == subjectId }
             }
+            saveData()
         }
     }
 
     fun setGradeInputMethod(method: GradeInputMethod) {
         _gradeInputMethod.value = method
+        saveData()
     }
 
     fun setShowTeachers(show: Boolean) {
         _showTeachers.value = show
+        saveData()
     }
 
     fun setShowRooms(show: Boolean) {
         _showRooms.value = show
+        saveData()
     }
 
     fun setDarkTheme(enabled: Boolean) {
         _isDarkTheme.value = enabled
+        saveData()
     }
 
     fun setUseDynamicColors(enabled: Boolean) {
@@ -322,6 +406,7 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
         if (enabled) {
             _useAmoledTheme.value = false
         }
+        saveData()
     }
 
     fun setUseAmoledTheme(enabled: Boolean) {
@@ -330,14 +415,17 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
         if (enabled) {
             _useDynamicColors.value = false
         }
+        saveData()
     }
 
     fun setCustomAccentColor(color: Color) {
         _customAccentColor.value = color
+        saveData()
     }
 
     fun setTasksTabEnabled(enabled: Boolean) {
         _tasksTabEnabled.value = enabled
+        saveData()
     }
 
     fun calculateOverallAverage(): Double {
@@ -435,6 +523,7 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
     fun addLesson(lesson: Lesson) {
         viewModelScope.launch {
             _lessons.value = _lessons.value + lesson
+            saveData()
         }
     }
 
@@ -444,17 +533,20 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
                 if (it.id == lesson.id) lesson else it
             }
             _lessons.value = updatedLessons
+            saveData()
         }
     }
 
     fun deleteLesson(lessonId: String) {
         viewModelScope.launch {
             _lessons.value = _lessons.value.filter { it.id != lessonId }
+            saveData()
         }
     }
 
-    fun getLessonsForDayAndWeek(dayOfWeek: Int, weekType: WeekType): List<Lesson> {
-        return getLessonsForCurrentYear().filter { it.dayOfWeek == dayOfWeek && it.weekType == weekType && it.isVisible }
+    fun setCurrentSchoolYear(schoolYearId: String) {
+        _currentSchoolYearId.value = schoolYearId
+        saveData()
     }
 
     fun getSubjectById(subjectId: String): Subject? {
@@ -481,6 +573,7 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
     fun addSchoolYear(schoolYear: SchoolYear) {
         viewModelScope.launch {
             _schoolYears.value = _schoolYears.value + schoolYear
+            saveData()
         }
     }
 
@@ -490,6 +583,7 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
                 if (it.id == schoolYear.id) schoolYear else it
             }
             _schoolYears.value = updatedSchoolYears
+            saveData()
         }
     }
 
@@ -500,11 +594,8 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
             if (_currentSchoolYearId.value == schoolYearId) {
                 _currentSchoolYearId.value = _schoolYears.value.firstOrNull()?.id
             }
+            saveData()
         }
-    }
-
-    fun setCurrentSchoolYear(schoolYearId: String) {
-        _currentSchoolYearId.value = schoolYearId
     }
 
     fun getCurrentSchoolYear(): SchoolYear? {
@@ -534,6 +625,7 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
     fun addReport(report: Report) {
         viewModelScope.launch {
             _reports.value = _reports.value + report
+            saveData()
         }
     }
 
@@ -543,12 +635,14 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
                 if (it.id == report.id) report else it
             }
             _reports.value = updatedReports
+            saveData()
         }
     }
 
     fun deleteReport(reportId: String) {
         viewModelScope.launch {
             _reports.value = _reports.value.filter { it.id != reportId }
+            saveData()
         }
     }
 
@@ -592,6 +686,7 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
                 }
             }
             _reports.value = updatedReports
+            saveData()
         }
     }
 
@@ -612,6 +707,7 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
                 }
             }
             _reports.value = updatedReports
+            saveData()
         }
     }
 
@@ -626,6 +722,7 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
                 }
             }
             _reports.value = updatedReports
+            saveData()
         }
     }
 
@@ -633,6 +730,7 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
     fun addTask(task: Task) {
         viewModelScope.launch {
             _tasks.value = _tasks.value + task
+            saveData()
         }
     }
 
@@ -642,12 +740,14 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
                 if (it.id == task.id) task else it
             }
             _tasks.value = updatedTasks
+            saveData()
         }
     }
 
     fun deleteTask(taskId: String) {
         viewModelScope.launch {
             _tasks.value = _tasks.value.filter { it.id != taskId }
+            saveData()
         }
     }
 
@@ -677,7 +777,7 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
                 }
             }
             _tasks.value = updatedTasks
+            saveData()
         }
     }
 }
-
