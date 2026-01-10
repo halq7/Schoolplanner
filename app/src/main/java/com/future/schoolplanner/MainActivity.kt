@@ -12,11 +12,13 @@ import com.future.schoolplanner.ui.GradeViewModel
 import com.future.schoolplanner.ui.theme.SchoolplannerTheme
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
         setContent {
-            val viewModel: GradeViewModel = viewModel()
+            val viewModel: GradeViewModel = viewModel { GradeViewModel(this@MainActivity) }
             val isDarkTheme by viewModel.isDarkTheme.collectAsState()
             val useDynamicColors by viewModel.useDynamicColors.collectAsState()
             val useAmoledTheme by viewModel.useAmoledTheme.collectAsState()
@@ -33,3 +35,4 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+

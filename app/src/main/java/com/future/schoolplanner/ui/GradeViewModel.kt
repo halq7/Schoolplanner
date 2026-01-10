@@ -1,5 +1,6 @@
 package com.future.schoolplanner.ui
 
+import android.content.Context
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,6 +11,7 @@ import com.future.schoolplanner.data.Report
 import com.future.schoolplanner.data.ReportSubject
 import com.future.schoolplanner.data.SchoolYear
 import com.future.schoolplanner.data.Subject
+import com.future.schoolplanner.data.Task
 import com.future.schoolplanner.data.WeekType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -25,7 +27,8 @@ data class SimulatedGrade(
     val weight: Double = 1.0
 )
 
-class GradeViewModel : ViewModel() {
+class GradeViewModel(context: Context? = null) : ViewModel() {
+
     private val _subjects = MutableStateFlow<List<Subject>>(emptyList())
     val subjects: StateFlow<List<Subject>> = _subjects.asStateFlow()
 
@@ -53,6 +56,9 @@ class GradeViewModel : ViewModel() {
     private val _customAccentColor = MutableStateFlow(Color(0xFF4CAF50)) // Default green
     val customAccentColor: StateFlow<Color> = _customAccentColor.asStateFlow()
 
+    private val _tasksTabEnabled = MutableStateFlow(false)
+    val tasksTabEnabled: StateFlow<Boolean> = _tasksTabEnabled.asStateFlow()
+
     private val _lessons = MutableStateFlow<List<Lesson>>(emptyList())
     val lessons: StateFlow<List<Lesson>> = _lessons.asStateFlow()
 
@@ -67,6 +73,9 @@ class GradeViewModel : ViewModel() {
 
     private val _reports = MutableStateFlow<List<Report>>(emptyList())
     val reports: StateFlow<List<Report>> = _reports.asStateFlow()
+
+    private val _tasks = MutableStateFlow<List<Task>>(emptyList())
+    val tasks: StateFlow<List<Task>> = _tasks.asStateFlow()
 
     val subjectsForCurrentYear: StateFlow<List<Subject>> = combine<List<Subject>, String?, List<Subject>>(
         _subjects, _currentSchoolYearId
@@ -325,6 +334,10 @@ class GradeViewModel : ViewModel() {
 
     fun setCustomAccentColor(color: Color) {
         _customAccentColor.value = color
+    }
+
+    fun setTasksTabEnabled(enabled: Boolean) {
+        _tasksTabEnabled.value = enabled
     }
 
     fun calculateOverallAverage(): Double {
@@ -615,4 +628,56 @@ class GradeViewModel : ViewModel() {
             _reports.value = updatedReports
         }
     }
+
+    // Task functions
+    fun addTask(task: Task) {
+        viewModelScope.launch {
+            _tasks.value = _tasks.value + task
+        }
+    }
+
+    fun updateTask(task: Task) {
+        viewModelScope.launch {
+            val updatedTasks = _tasks.value.map {
+                if (it.id == task.id) task else it
+            }
+            _tasks.value = updatedTasks
+        }
+    }
+
+    fun deleteTask(taskId: String) {
+        viewModelScope.launch {
+            _tasks.value = _tasks.value.filter { it.id != taskId }
+        }
+    }
+
+    fun getTaskById(taskId: String): Task? {
+        return _tasks.value.find { it.id == taskId }
+    }
+
+    fun getTasksForCurrentYear(): StateFlow<List<Task>> {
+        return combine<List<Task>, String?, List<Task>>(
+            _tasks, _currentSchoolYearId
+        ) { tasks, currentYearId ->
+            if (currentYearId != null) {
+                tasks.filter { it.schoolYearId == currentYearId }
+            } else {
+                emptyList()
+            }
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    }
+
+    fun toggleTaskCompletion(taskId: String) {
+        viewModelScope.launch {
+            val updatedTasks = _tasks.value.map { task ->
+                if (task.id == taskId) {
+                    task.copy(isCompleted = !task.isCompleted)
+                } else {
+                    task
+                }
+            }
+            _tasks.value = updatedTasks
+        }
+    }
 }
+

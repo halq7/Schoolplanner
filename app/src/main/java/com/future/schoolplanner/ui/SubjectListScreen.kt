@@ -17,8 +17,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -28,10 +31,15 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -54,6 +62,10 @@ fun SubjectListScreen(
 ) {
     val subjects = viewModel.subjectsForCurrentYear.collectAsState()
     val simulatedGrades = viewModel.simulatedGrades.collectAsState()
+
+    var selectedSubject by remember { mutableStateOf<Subject?>(null) }
+    var showSubjectActionDialog by remember { mutableStateOf(false) }
+    var showDeleteSubjectDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -135,7 +147,8 @@ fun SubjectListScreen(
                         subject = subject,
                         onClick = { onSubjectSelected(subject) },
                         onLongClick = {
-                            onSubjectSettings(subject)
+                            selectedSubject = subject
+                            showSubjectActionDialog = true
                         },
                         viewModel = viewModel
                     )
@@ -146,6 +159,80 @@ fun SubjectListScreen(
                 }
             }
         }
+    }
+
+    // Subject Action Dialog (Edit/Delete options)
+    if (showSubjectActionDialog && selectedSubject != null) {
+        AlertDialog(
+            onDismissRequest = { showSubjectActionDialog = false },
+            title = { Text("Aktion für ${selectedSubject!!.name}") },
+            text = {
+                Column {
+                    Text("Wählen Sie eine Aktion:")
+                }
+            },
+            confirmButton = {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    TextButton(
+                        onClick = {
+                            showSubjectActionDialog = false
+                            onSubjectSettings(selectedSubject!!)
+                        }
+                    ) {
+                        Icon(Icons.Default.Edit, contentDescription = null)
+                        Spacer(modifier = Modifier.size(4.dp))
+                        Text("Bearbeiten")
+                    }
+                    TextButton(
+                        onClick = {
+                            showSubjectActionDialog = false
+                            showDeleteSubjectDialog = true
+                        }
+                    ) {
+                        Icon(Icons.Default.Delete, contentDescription = null)
+                        Spacer(modifier = Modifier.size(4.dp))
+                        Text("Löschen")
+                    }
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showSubjectActionDialog = false }
+                ) {
+                    Text("Abbrechen")
+                }
+            }
+        )
+    }
+
+    // Delete Subject Confirmation Dialog
+    if (showDeleteSubjectDialog && selectedSubject != null) {
+        AlertDialog(
+            onDismissRequest = { showDeleteSubjectDialog = false },
+            title = { Text("Fach löschen") },
+            text = {
+                Text("Möchten Sie dieses Fach wirklich löschen? Alle Noten werden ebenfalls gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.deleteSubject(selectedSubject!!.id)
+                        showDeleteSubjectDialog = false
+                    }
+                ) {
+                    Text("Löschen", color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showDeleteSubjectDialog = false }
+                ) {
+                    Text("Abbrechen")
+                }
+            }
+        )
     }
 }
 

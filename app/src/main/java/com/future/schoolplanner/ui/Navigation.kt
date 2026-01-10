@@ -2,6 +2,7 @@ package com.future.schoolplanner.ui
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Menu
@@ -20,13 +21,19 @@ import com.future.schoolplanner.data.Subject
 fun SchoolPlannerApp() {
     val navController = rememberNavController()
     val viewModel: GradeViewModel = viewModel()
+    val tasksTabEnabled by viewModel.tasksTabEnabled.collectAsState()
     var selectedTabIndex by remember { mutableIntStateOf(0) }
 
-    val tabs = listOf(
+    val baseTabs = listOf(
         TabItem("Noten", Icons.Default.List),
-        TabItem("Stundenplan", Icons.Default.DateRange),
-        TabItem("Mehr", Icons.Default.Menu)
+        TabItem("Stundenplan", Icons.Default.DateRange)
     )
+
+    val tasksTab = if (tasksTabEnabled) listOf(TabItem("Aufgaben", Icons.Default.CheckCircle)) else emptyList()
+
+    val moreTab = listOf(TabItem("Mehr", Icons.Default.Menu))
+
+    val tabs = baseTabs + tasksTab + moreTab
 
     Scaffold(
         bottomBar = {
@@ -42,10 +49,17 @@ fun SchoolPlannerApp() {
             }
         }
     ) { paddingValues ->
+        val tasksIndex = if (tasksTabEnabled) 2 else -1
+        val moreIndex = if (tasksTabEnabled) 3 else 2
+
         when (selectedTabIndex) {
             0 -> GradesTab(navController, viewModel, paddingValues)
             1 -> ScheduleTab(navController, viewModel, paddingValues)
-            2 -> MoreTab(navController, viewModel, paddingValues)
+            tasksIndex -> if (tasksTabEnabled) TasksTab(navController, viewModel, paddingValues, onAddTask = {
+                navController.navigate("addTask")
+            })
+            moreIndex -> MoreTab(navController, viewModel, paddingValues)
+            else -> MoreTab(navController, viewModel, paddingValues) // fallback
         }
     }
 }
@@ -227,6 +241,58 @@ fun ScheduleTab(navController: NavHostController, viewModel: GradeViewModel, pad
 }
 
 @Composable
+fun TasksTab(navController: NavHostController, viewModel: GradeViewModel, paddingValues: androidx.compose.foundation.layout.PaddingValues, onAddTask: () -> Unit) {
+    NavHost(
+        navController = navController,
+        startDestination = "tasks",
+        modifier = Modifier.padding(bottom = paddingValues.calculateBottomPadding())
+    ) {
+        composable("tasks") {
+            TasksScreen(
+                onBack = { navController.popBackStack() },
+                onAddTask = onAddTask,
+                onEditTask = { taskId ->
+                    navController.navigate("editTask/$taskId")
+                },
+                viewModel = viewModel
+            )
+        }
+
+        composable("addTask") {
+            AddTaskScreen(
+                onBack = { navController.popBackStack() },
+                onTaskAdded = { task ->
+                    viewModel.addTask(task)
+                    navController.popBackStack()
+                },
+                viewModel = viewModel
+            )
+        }
+
+        composable("editTask/{taskId}") { backStackEntry ->
+            val taskId = backStackEntry.arguments?.getString("taskId") ?: ""
+            val task = viewModel.getTaskById(taskId)
+
+            if (task != null) {
+                AddTaskScreen(
+                    onBack = { navController.popBackStack() },
+                    onTaskAdded = { updatedTask ->
+                        viewModel.updateTask(updatedTask)
+                        navController.popBackStack()
+                    },
+                    viewModel = viewModel,
+                    taskToEdit = task
+                )
+            } else {
+                navController.navigate("tasks") {
+                    popUpTo("tasks") { inclusive = true }
+                }
+            }
+        }
+    }
+}
+
+@Composable
 fun MoreTab(navController: NavHostController, viewModel: GradeViewModel, paddingValues: androidx.compose.foundation.layout.PaddingValues) {
     NavHost(
         navController = navController,
@@ -237,7 +303,8 @@ fun MoreTab(navController: NavHostController, viewModel: GradeViewModel, padding
             MoreMenuScreen(
                 onNavigateToSchoolYears = { navController.navigate("schoolYears") },
                 onNavigateToReports = { navController.navigate("reports") },
-                onNavigateToSettings = { navController.navigate("mainSettings") }
+                onNavigateToSettings = { navController.navigate("mainSettings") },
+                onNavigateToExtensions = { navController.navigate("extensions") }
             )
         }
 
@@ -416,6 +483,13 @@ fun MoreTab(navController: NavHostController, viewModel: GradeViewModel, padding
 
         composable("developerOptions") {
             DeveloperOptionsScreen(
+                onBack = { navController.popBackStack() },
+                viewModel = viewModel
+            )
+        }
+
+        composable("extensions") {
+            ExtensionsScreen(
                 onBack = { navController.popBackStack() },
                 viewModel = viewModel
             )
