@@ -21,6 +21,17 @@ fun Color.luminance(): Float {
     return 0.2126f * r + 0.7152f * g + 0.0722f * b
 }
 
+// Blend this color (foreground) over a background color
+fun Color.blendOver(background: Color): Color {
+    val alpha = this.alpha
+    return Color(
+        red = this.red * alpha + background.red * (1 - alpha),
+        green = this.green * alpha + background.green * (1 - alpha),
+        blue = this.blue * alpha + background.blue * (1 - alpha),
+        alpha = 1f
+    )
+}
+
 // Get appropriate text color (black or white) for a given background color
 fun Color.getContrastingTextColor(): Color {
     return if (luminance() > 0.5f) Color.Black else Color.White

@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.future.schoolplanner.data.WeekType
 import com.future.schoolplanner.data.Lesson
+import com.future.schoolplanner.ui.theme.blendOver
 import com.future.schoolplanner.ui.theme.getContrastingTextColor
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -184,6 +185,9 @@ fun ScheduleCell(
         contentAlignment = Alignment.Center
     ) {
         if (subject != null) {
+            val effectiveBackgroundColor = subject.color.copy(alpha = 0.2f).blendOver(MaterialTheme.colorScheme.surface)
+            val textColor = effectiveBackgroundColor.getContrastingTextColor()
+
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
@@ -193,7 +197,7 @@ fun ScheduleCell(
                     style = MaterialTheme.typography.bodySmall,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
-                    color = subject.color.getContrastingTextColor()
+                    color = textColor
                 )
 
                 // Show teacher and room info if enabled
@@ -208,7 +212,7 @@ fun ScheduleCell(
                             style = MaterialTheme.typography.bodySmall,
                             fontSize = MaterialTheme.typography.bodySmall.fontSize * 0.8,
                             textAlign = TextAlign.Center,
-                            color = subject.color.getContrastingTextColor()
+                            color = textColor
                         )
                     }
                 }
@@ -216,4 +220,3 @@ fun ScheduleCell(
         }
     }
 }
-
