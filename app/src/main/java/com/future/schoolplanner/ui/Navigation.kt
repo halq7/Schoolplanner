@@ -382,12 +382,40 @@ fun MoreTab(navController: NavHostController, viewModel: GradeViewModel, padding
                 onNavigateToThemeSettings = {
                     navController.navigate("themeSettings")
                 },
+                onNavigateToPrivacySettings = {
+                    navController.navigate("privacySettings")
+                },
+                onNavigateToAboutScreen = {
+                    navController.navigate("aboutScreen")
+                },
                 viewModel = viewModel
             )
         }
 
         composable("themeSettings") {
             ThemeSettingsScreen(
+                onBack = { navController.popBackStack() },
+                viewModel = viewModel
+            )
+        }
+
+        composable("privacySettings") {
+            PrivacyScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable("aboutScreen") {
+            AboutScreen(
+                onBack = { navController.popBackStack() },
+                onNavigateToDeveloperOptions = {
+                    navController.navigate("developerOptions")
+                }
+            )
+        }
+
+        composable("developerOptions") {
+            DeveloperOptionsScreen(
                 onBack = { navController.popBackStack() },
                 viewModel = viewModel
             )

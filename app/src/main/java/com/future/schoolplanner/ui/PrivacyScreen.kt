@@ -1,31 +1,23 @@
 package com.future.schoolplanner.ui
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppSettingsScreen(
-    onBack: () -> Unit,
-    onNavigateToThemeSettings: () -> Unit,
-    onNavigateToPrivacySettings: () -> Unit,
-    onNavigateToAboutScreen: () -> Unit,
-    viewModel: GradeViewModel = viewModel()
+fun PrivacyScreen(
+    onBack: () -> Unit
 ) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("App-Einstellungen") },
+                title = { Text("Datenschutz") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.Default.ArrowBack, "Zurück")
@@ -47,36 +39,32 @@ fun AppSettingsScreen(
         ) {
             item {
                 Text(
-                    text = "App-Einstellungen",
+                    text = "Datenschutz",
                     style = MaterialTheme.typography.headlineMedium,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
             }
 
             item {
-                SettingsCategory(
-                    title = "Aussehen",
-                    description = "Einstellungen für Aussehen und Darstellung",
-                    onClick = onNavigateToThemeSettings
-                )
-            }
+                Card(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            text = "Datenschutzerklärung",
+                            style = MaterialTheme.typography.titleLarge
+                        )
 
-            item {
-                SettingsCategory(
-                    title = "Datenschutz",
-                    description = "Datenschutzeinstellungen und Berechtigungen",
-                    onClick = onNavigateToPrivacySettings
-                )
-            }
-
-            item {
-                SettingsCategory(
-                    title = "Über die App",
-                    description = "Informationen über die App und Version",
-                    onClick = onNavigateToAboutScreen
-                )
+                        Text(
+                            text = "Diese App sammelt keine Daten, Nutzungsstatistiken oder Ähnliches, NICHTS.",
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                }
             }
         }
     }
 }
-
