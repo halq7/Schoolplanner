@@ -309,7 +309,8 @@ fun MoreTab(builder: NavGraphBuilder, navController: NavHostController, viewMode
             onNavigateToSchoolYears = { navController.navigate("schoolYears") },
             onNavigateToReports = { navController.navigate("reports") },
             onNavigateToSettings = { navController.navigate("mainSettings") },
-            onNavigateToExtensions = { navController.navigate("extensions") }
+            onNavigateToExtensions = { navController.navigate("extensions") },
+            onNavigateToImportExport = { navController.navigate("importExport") }
         )
     }
 
@@ -495,6 +496,28 @@ fun MoreTab(builder: NavGraphBuilder, navController: NavHostController, viewMode
 
     builder.composable("extensions") {
         ExtensionsScreen(
+            onBack = { navController.popBackStack() },
+            viewModel = viewModel
+        )
+    }
+
+    builder.composable("importExport") {
+        ImportExportScreen(
+            onNavigateToImport = { navController.navigate("import") },
+            onNavigateToExport = { navController.navigate("export") },
+            onBack = { navController.popBackStack() }
+        )
+    }
+
+    builder.composable("import") {
+        ImportScreen(
+            onBack = { navController.popBackStack() },
+            viewModel = viewModel
+        )
+    }
+
+    builder.composable("export") {
+        ExportScreen(
             onBack = { navController.popBackStack() },
             viewModel = viewModel
         )

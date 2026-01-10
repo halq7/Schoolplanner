@@ -780,4 +780,32 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
             saveData()
         }
     }
+
+    fun loadAppData(appData: com.future.schoolplanner.data.serialization.AppData) {
+        viewModelScope.launch {
+            // Load data from AppData
+            _subjects.value = appData.subjects.map { it.toDomain() }
+            _schoolYears.value = appData.schoolYears.map { it.toDomain() }
+            _currentSchoolYearId.value = appData.currentSchoolYearId
+            _lessons.value = appData.lessons.map { it.toDomain() }
+            _reports.value = appData.reports.map { it.toDomain() }
+            _tasks.value = appData.tasks.map { it.toDomain() }
+
+            // Load settings
+            _gradeInputMethod.value = GradeInputMethod.valueOf(appData.settings.gradeInputMethod)
+            _showTeachers.value = appData.settings.showTeachers
+            _showRooms.value = appData.settings.showRooms
+            _isDarkTheme.value = appData.settings.isDarkTheme
+            _useDynamicColors.value = appData.settings.useDynamicColors
+            _useAmoledTheme.value = appData.settings.useAmoledTheme
+            _customAccentColor.value = Color(appData.settings.customAccentColor)
+            _tasksTabEnabled.value = appData.settings.tasksTabEnabled
+
+            // Clear simulated grades
+            _simulatedGrades.value = emptyMap()
+
+            isInitialized = true
+            saveData()
+        }
+    }
 }

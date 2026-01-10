@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.ImportExport
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
@@ -34,7 +35,8 @@ fun MoreMenuScreen(
     onNavigateToSchoolYears: () -> Unit,
     onNavigateToReports: () -> Unit,
     onNavigateToSettings: () -> Unit,
-    onNavigateToExtensions: () -> Unit
+    onNavigateToExtensions: () -> Unit,
+    onNavigateToImportExport: () -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -89,25 +91,6 @@ fun MoreMenuScreen(
                     Text("Zeugnisse")
                 }
             }
-
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable(onClick = onNavigateToSettings),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant
-                )
-            ) {
-                Row(
-                    modifier = Modifier.padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(Icons.Default.Settings, contentDescription = null)
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Text("Einstellungen")
-                }
-            }
-
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -123,6 +106,42 @@ fun MoreMenuScreen(
                     Icon(Icons.Default.Build, contentDescription = null)
                     Spacer(modifier = Modifier.width(16.dp))
                     Text("Erweiterungen")
+                }
+            }
+
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(onClick = onNavigateToImportExport),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                )
+            ) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(Icons.Filled.ImportExport, contentDescription = null)
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Text("Daten verwalten")
+                }
+            }
+            
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(onClick = onNavigateToSettings),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                )
+            ) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(Icons.Default.Settings, contentDescription = null)
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Text("Einstellungen")
                 }
             }
         }
