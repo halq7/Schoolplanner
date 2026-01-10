@@ -14,6 +14,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.UUID
 
+data class SimulatedGrade(
+    val value: Double,
+    val weight: Double = 1.0
+)
+
 class GradeViewModel : ViewModel() {
     private val _subjects = MutableStateFlow<List<Subject>>(emptyList())
     val subjects: StateFlow<List<Subject>> = _subjects.asStateFlow()
@@ -38,6 +43,9 @@ class GradeViewModel : ViewModel() {
 
     private val _lessons = MutableStateFlow<List<Lesson>>(emptyList())
     val lessons: StateFlow<List<Lesson>> = _lessons.asStateFlow()
+
+    private val _simulatedGrades = MutableStateFlow<Map<String, SimulatedGrade>>(emptyMap())
+    val simulatedGrades: StateFlow<Map<String, SimulatedGrade>> = _simulatedGrades.asStateFlow()
 
     init {
         // Initialize with some default subjects
@@ -128,11 +136,16 @@ class GradeViewModel : ViewModel() {
         }
     }
 
-    fun calculateAverage(subject: Subject): Double {
-        if (subject.grades.isEmpty()) return 0.0
+    fun calculateAverage(subject: Subject, simulatedGrade: SimulatedGrade? = null): Double {
+        val allGrades = subject.grades.toMutableList()
+        simulatedGrade?.let {
+            allGrades.add(Grade(id = "simulated", value = it.value, weight = it.weight))
+        }
 
-        val weightedSum = subject.grades.sumOf { it.value * it.weight }
-        val totalWeight = subject.grades.sumOf { it.weight }
+        if (allGrades.isEmpty()) return 0.0
+
+        val weightedSum = allGrades.sumOf { it.value * it.weight }
+        val totalWeight = allGrades.sumOf { it.weight }
         return weightedSum / totalWeight
     }
 
@@ -244,10 +257,13 @@ class GradeViewModel : ViewModel() {
     }
 
     fun calculateOverallAverage(): Double {
-        val subjectsWithGrades = _subjects.value.filter { it.grades.isNotEmpty() }
+        val subjectsWithGrades = _subjects.value.filter { it.grades.isNotEmpty() || _simulatedGrades.value.containsKey(it.id) }
         if (subjectsWithGrades.isEmpty()) return 0.0
 
-        val subjectAverages = subjectsWithGrades.map { calculateAverage(it) }
+        val subjectAverages = subjectsWithGrades.map { subject ->
+            val simulated = _simulatedGrades.value[subject.id]
+            calculateAverage(subject, simulated)
+        }
         return subjectAverages.average()
     }
 
@@ -337,5 +353,21 @@ class GradeViewModel : ViewModel() {
 
     fun getSubjectById(subjectId: String): Subject? {
         return _subjects.value.find { it.id == subjectId }
+    }
+
+    fun setSimulatedGrade(subjectId: String, simulatedGrade: SimulatedGrade?) {
+        viewModelScope.launch {
+            if (simulatedGrade != null) {
+                _simulatedGrades.value = _simulatedGrades.value + (subjectId to simulatedGrade)
+            } else {
+                _simulatedGrades.value = _simulatedGrades.value - subjectId
+            }
+        }
+    }
+
+    fun clearSimulatedGrade(subjectId: String) {
+        viewModelScope.launch {
+            _simulatedGrades.value = _simulatedGrades.value - subjectId
+        }
     }
 }

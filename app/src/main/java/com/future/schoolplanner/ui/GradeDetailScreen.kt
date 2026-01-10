@@ -12,9 +12,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
@@ -63,6 +67,7 @@ fun GradeDetailScreen(
     var showGradeActionDialog by remember { mutableStateOf(false) }
     var showEditGradeDialog by remember { mutableStateOf(false) }
     var showDeleteGradeDialog by remember { mutableStateOf(false) }
+    var showSimulation by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -71,6 +76,11 @@ fun GradeDetailScreen(
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.Default.ArrowBack, "Zurück")
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { showSimulation = !showSimulation }) {
+                        Icon(Icons.Default.Build, "Simulation")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -85,12 +95,17 @@ fun GradeDetailScreen(
             }
         }
     ) { paddingValues ->
+        val scrollState = rememberScrollState()
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
                 .padding(16.dp)
+                .verticalScroll(scrollState)
         ) {
+            val simulatedGrades = viewModel.simulatedGrades.collectAsState()
+            val simulatedGrade = simulatedGrades.value[currentSubject.id]
+
             // Subject info and average
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -111,10 +126,15 @@ fun GradeDetailScreen(
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    if (currentSubject.grades.isNotEmpty()) {
-                        val average = String.format("%.2f", viewModel.calculateAverage(currentSubject))
+                    if (currentSubject.grades.isNotEmpty() || simulatedGrade != null) {
+                        val average = String.format("%.2f", viewModel.calculateAverage(currentSubject, simulatedGrade))
+                        val averageText = if (simulatedGrade != null) {
+                            "Simulierter Durchschnitt: $average"
+                        } else {
+                            "Aktueller Durchschnitt: $average"
+                        }
                         Text(
-                            text = "Aktueller Durchschnitt: $average",
+                            text = averageText,
                             style = MaterialTheme.typography.headlineSmall,
                             color = getGradeColor(average.toDouble())
                         )
@@ -122,6 +142,13 @@ fun GradeDetailScreen(
                             text = "${currentSubject.grades.size} Noten",
                             style = MaterialTheme.typography.bodyMedium
                         )
+                        if (simulatedGrade != null) {
+                            Text(
+                                text = "Simuliert: ${simulatedGrade.value} (Gewichtung: ${simulatedGrade.weight})",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                            )
+                        }
                     } else {
                         Text(
                             text = "Keine Noten vorhanden",
@@ -133,6 +160,47 @@ fun GradeDetailScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Simulation section
+            if (showSimulation) {
+                SimulationCard(
+                    subjectId = currentSubject.id,
+                    viewModel = viewModel
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Overall average with simulation
+                val overallAverage = viewModel.calculateOverallAverage()
+                if (overallAverage > 0.0) {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer
+                        )
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = "Simulierter Gesamtschnitt (alle Fächer)",
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                            Text(
+                                text = String.format("%.2f", overallAverage),
+                                style = MaterialTheme.typography.displayMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = getGradeColor(overallAverage)
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
             // Grades list
             if (currentSubject.grades.isNotEmpty()) {
                 Text(
@@ -141,11 +209,10 @@ fun GradeDetailScreen(
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
 
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.weight(1f)
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    items(currentSubject.grades) { grade ->
+                    currentSubject.grades.forEach { grade ->
                         GradeItem(
                             grade = grade,
                             onLongClick = {
@@ -254,6 +321,113 @@ fun GradeDetailScreen(
                         }
                     }
                 )
+            }
+        }
+    }
+}
+
+@Composable
+fun SimulationCard(
+    subjectId: String,
+    viewModel: GradeViewModel
+) {
+    val gradeInputMethod by viewModel.gradeInputMethod.collectAsState()
+    val simulatedGrades = viewModel.simulatedGrades.collectAsState()
+    val simulatedGrade = simulatedGrades.value[subjectId]
+
+    var simGradeValue by remember { mutableStateOf("") }
+    var simWeight by remember { mutableStateOf("1.0") }
+    var showSimError by remember { mutableStateOf(false) }
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Text(
+                text = "Noten-Simulation",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "Simuliere eine Note, um zu sehen, wie sich der Durchschnitt ändert. Die simulierte Note wird nicht gespeichert.",
+                style = MaterialTheme.typography.bodySmall
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            val labelText = when (gradeInputMethod) {
+                GradeInputMethod.WHOLE -> "Note (1-6)"
+                GradeInputMethod.DECIMAL -> "Note (1.0-6.0)"
+                GradeInputMethod.TENDENCY -> "Note (z.B. 2-)"
+                GradeInputMethod.FIFTEEN_POINT -> "Punkte (0-15)"
+                else -> "Note"
+            }
+
+            OutlinedTextField(
+                value = simGradeValue,
+                onValueChange = { simGradeValue = it },
+                label = { Text(labelText) },
+                modifier = Modifier.fillMaxWidth(),
+                isError = showSimError,
+                supportingText = {
+                    if (showSimError) {
+                        Text("Ungültige Note")
+                    }
+                }
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = simWeight,
+                onValueChange = { simWeight = it },
+                label = { Text("Gewichtung") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Button(
+                    onClick = {
+                        val parsedValue = viewModel.parseGradeInput(simGradeValue, gradeInputMethod)
+                        val weightValue = simWeight.toDoubleOrNull() ?: 1.0
+                        if (parsedValue != null) {
+                            viewModel.setSimulatedGrade(subjectId, SimulatedGrade(parsedValue, weightValue))
+                            showSimError = false
+                        } else {
+                            showSimError = true
+                        }
+                    },
+                    enabled = simGradeValue.isNotBlank()
+                ) {
+                    Text("Simulieren")
+                }
+
+                if (simulatedGrade != null) {
+                    IconButton(
+                        onClick = {
+                            viewModel.clearSimulatedGrade(subjectId)
+                            simGradeValue = ""
+                            simWeight = "1.0"
+                        }
+                    ) {
+                        Icon(Icons.Default.Clear, "Simulation löschen")
+                    }
+                }
             }
         }
     }

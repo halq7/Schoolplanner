@@ -53,6 +53,7 @@ fun SubjectListScreen(
     viewModel: GradeViewModel
 ) {
     val subjects = viewModel.subjects.collectAsState()
+    val simulatedGrades = viewModel.simulatedGrades.collectAsState()
 
     Scaffold(
         topBar = {
@@ -88,6 +89,7 @@ fun SubjectListScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 val overallAverage = viewModel.calculateOverallAverage()
+                val hasSimulatedGrades = simulatedGrades.value.isNotEmpty()
                 if (overallAverage > 0.0) {
                     item {
                         Card(
@@ -103,7 +105,7 @@ fun SubjectListScreen(
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Text(
-                                    text = "Gesamtschnitt",
+                                    text = if (hasSimulatedGrades) "Simulierter Gesamtschnitt" else "Gesamtschnitt",
                                     style = MaterialTheme.typography.titleMedium
                                 )
                                 Text(
@@ -112,6 +114,13 @@ fun SubjectListScreen(
                                     fontWeight = FontWeight.Bold,
                                     color = getGradeColor(overallAverage)
                                 )
+                                if (hasSimulatedGrades) {
+                                    Text(
+                                        text = "Enthält simulierte Noten",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                                    )
+                                }
                             }
                         }
                     }
@@ -143,6 +152,9 @@ fun SubjectCard(
     onLongClick: () -> Unit,
     viewModel: GradeViewModel
 ) {
+    val simulatedGrades = viewModel.simulatedGrades.collectAsState()
+    val simulatedGrade = simulatedGrades.value[subject.id]
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -190,10 +202,15 @@ fun SubjectCard(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            if (subject.grades.isNotEmpty()) {
-                val average = String.format("%.2f", viewModel.calculateAverage(subject))
+            if (subject.grades.isNotEmpty() || simulatedGrade != null) {
+                val average = String.format("%.2f", viewModel.calculateAverage(subject, simulatedGrade))
+                val averageText = if (simulatedGrade != null) {
+                    "Simulierter Durchschnitt: $average"
+                } else {
+                    "Durchschnitt: $average"
+                }
                 Text(
-                    text = "Durchschnitt: $average",
+                    text = averageText,
                     style = MaterialTheme.typography.bodyLarge,
                     color = subject.color.getContrastingTextColor()
                 )
@@ -202,6 +219,13 @@ fun SubjectCard(
                     style = MaterialTheme.typography.bodyMedium,
                     color = subject.color.getContrastingTextColor().copy(alpha = 0.7f)
                 )
+                if (simulatedGrade != null) {
+                    Text(
+                        text = "Simuliert: ${simulatedGrade.value} (Gewichtung: ${simulatedGrade.weight})",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = subject.color.getContrastingTextColor().copy(alpha = 0.7f)
+                    )
+                }
             } else {
                 Text(
                     text = "Keine Noten vorhanden",
