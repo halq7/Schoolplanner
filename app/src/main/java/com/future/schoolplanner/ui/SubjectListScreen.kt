@@ -167,7 +167,8 @@ fun SubjectCard(
                 Text(
                     text = subject.name,
                     style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = subject.color.getContrastingTextColor()
                 )
                 Box(
                     modifier = Modifier
@@ -193,18 +194,19 @@ fun SubjectCard(
                 val average = String.format("%.2f", viewModel.calculateAverage(subject))
                 Text(
                     text = "Durchschnitt: $average",
-                    style = MaterialTheme.typography.bodyLarge
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = subject.color.getContrastingTextColor()
                 )
                 Text(
                     text = "${subject.grades.size} Noten",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                    color = subject.color.getContrastingTextColor().copy(alpha = 0.7f)
                 )
             } else {
                 Text(
                     text = "Keine Noten vorhanden",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                    color = subject.color.getContrastingTextColor().copy(alpha = 0.7f)
                 )
             }
         }

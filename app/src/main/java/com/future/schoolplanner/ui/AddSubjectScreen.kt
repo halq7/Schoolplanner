@@ -48,6 +48,7 @@ import androidx.compose.ui.graphics.Color as ComposeColor
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import com.future.schoolplanner.data.Subject
+import com.future.schoolplanner.ui.theme.getContrastingTextColor
 import java.util.UUID
 import kotlin.math.max
 import kotlin.math.min
@@ -128,7 +129,7 @@ fun ColorPicker(
         ) {
             Text(
                 text = hexText,
-                color = ComposeColor.White,
+                color = hsv.toColor().getContrastingTextColor(),
                 style = MaterialTheme.typography.bodyLarge
             )
         }
