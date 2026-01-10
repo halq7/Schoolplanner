@@ -54,7 +54,11 @@ fun SchoolYearsScreen(
                     .padding(paddingValues),
                 contentAlignment = Alignment.Center
             ) {
-                Text("Keine Schuljahre vorhanden. Füge ein neues Schuljahr hinzu.")
+               Text(
+                    text = "Keine Schuljahre vorhanden",
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         } else {
             LazyColumn(

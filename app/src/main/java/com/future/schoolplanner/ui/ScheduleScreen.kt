@@ -77,7 +77,11 @@ fun ScheduleScreen(
                     .padding(paddingValues),
                 contentAlignment = Alignment.Center
             ) {
-                Text("Keine Fächer vorhanden. Fügen Sie zuerst Fächer in den Noten hinzu.")
+               Text(
+                    text = "Keine Fächer vorhanden",
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         } else {
             LazyColumn(

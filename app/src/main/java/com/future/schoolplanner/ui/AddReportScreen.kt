@@ -187,11 +187,11 @@ fun AddReportScreen(
                 )
 
                 if (subjectsForYear.isEmpty()) {
-                    Text(
-                        text = "Keine Fächer für dieses Schuljahr gefunden",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+               Text(
+                    text = "Keine Fächer für dieses Schuljahr vorhanden",
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
                 } else {
                     subjectsForYear.forEachIndexed { index, subject ->
                         val average = viewModel.calculateAverage(subject)

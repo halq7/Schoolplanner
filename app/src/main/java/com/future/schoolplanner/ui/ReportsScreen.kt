@@ -86,12 +86,6 @@ fun ReportsScreen(
                     style = MaterialTheme.typography.headlineSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                Text(
-                    text = "Tippen Sie auf das + Symbol, um ein neues Zeugnis zu erstellen",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
             }
         } else {
             LazyColumn(
