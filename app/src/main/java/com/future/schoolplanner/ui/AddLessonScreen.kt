@@ -30,7 +30,7 @@ fun AddLessonScreen(
     fixedHour: Boolean = false,
     fixedWeekType: Boolean = false
 ) {
-    val subjects = viewModel.subjects.collectAsState()
+    val subjects = viewModel.subjectsForCurrentYear.collectAsState()
 
     var selectedSubjectId by remember { mutableStateOf(lessonToEdit?.subjectId ?: "") }
     var selectedDay by remember { mutableStateOf(lessonToEdit?.dayOfWeek ?: initialDay ?: 1) }
@@ -214,25 +214,29 @@ fun AddLessonScreen(
             Button(
                 onClick = {
                     if (selectedSubjectId.isNotEmpty()) {
-                        val lesson = lessonToEdit?.copy(
-                            subjectId = selectedSubjectId,
-                            dayOfWeek = selectedDay,
-                            hour = selectedHour,
-                            weekType = selectedWeekType,
-                            teacher = teacher,
-                            room = room,
-                            isVisible = isVisible
-                        ) ?: Lesson(
-                            id = UUID.randomUUID().toString(),
-                            subjectId = selectedSubjectId,
-                            dayOfWeek = selectedDay,
-                            hour = selectedHour,
-                            weekType = selectedWeekType,
-                            teacher = teacher,
-                            room = room,
-                            isVisible = isVisible
-                        )
-                        onLessonAdded(lesson)
+                        val currentSchoolYearId = viewModel.currentSchoolYearId.value
+                        if (currentSchoolYearId != null) {
+                            val lesson = lessonToEdit?.copy(
+                                subjectId = selectedSubjectId,
+                                dayOfWeek = selectedDay,
+                                hour = selectedHour,
+                                weekType = selectedWeekType,
+                                teacher = teacher,
+                                room = room,
+                                isVisible = isVisible
+                            ) ?: Lesson(
+                                id = UUID.randomUUID().toString(),
+                                subjectId = selectedSubjectId,
+                                dayOfWeek = selectedDay,
+                                hour = selectedHour,
+                                weekType = selectedWeekType,
+                                teacher = teacher,
+                                room = room,
+                                isVisible = isVisible,
+                                schoolYearId = currentSchoolYearId
+                            )
+                            onLessonAdded(lesson)
+                        }
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),

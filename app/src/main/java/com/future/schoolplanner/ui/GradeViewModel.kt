@@ -6,11 +6,17 @@ import androidx.lifecycle.viewModelScope
 import com.future.schoolplanner.data.Grade
 import com.future.schoolplanner.data.GradeInputMethod
 import com.future.schoolplanner.data.Lesson
+import com.future.schoolplanner.data.Report
+import com.future.schoolplanner.data.ReportSubject
+import com.future.schoolplanner.data.SchoolYear
 import com.future.schoolplanner.data.Subject
 import com.future.schoolplanner.data.WeekType
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.util.UUID
 
@@ -47,9 +53,49 @@ class GradeViewModel : ViewModel() {
     private val _simulatedGrades = MutableStateFlow<Map<String, SimulatedGrade>>(emptyMap())
     val simulatedGrades: StateFlow<Map<String, SimulatedGrade>> = _simulatedGrades.asStateFlow()
 
+    private val _schoolYears = MutableStateFlow<List<SchoolYear>>(emptyList())
+    val schoolYears: StateFlow<List<SchoolYear>> = _schoolYears.asStateFlow()
+
+    private val _currentSchoolYearId = MutableStateFlow<String?>(null)
+    val currentSchoolYearId: StateFlow<String?> = _currentSchoolYearId.asStateFlow()
+
+    private val _reports = MutableStateFlow<List<Report>>(emptyList())
+    val reports: StateFlow<List<Report>> = _reports.asStateFlow()
+
+    val subjectsForCurrentYear: StateFlow<List<Subject>> = combine<List<Subject>, String?, List<Subject>>(
+        _subjects, _currentSchoolYearId
+    ) { subjects, currentYearId ->
+        if (currentYearId != null) {
+            subjects.filter { it.schoolYearId == currentYearId }
+        } else {
+            emptyList()
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val lessonsForCurrentYear: StateFlow<List<Lesson>> = combine<List<Lesson>, String?, List<Lesson>>(
+        _lessons, _currentSchoolYearId
+    ) { lessons, currentYearId ->
+        if (currentYearId != null) {
+            lessons.filter { it.schoolYearId == currentYearId }
+        } else {
+            emptyList()
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
     init {
-        // Initialize with some default subjects
+        // Initialize with default school year and subjects
         viewModelScope.launch {
+            val defaultSchoolYearId = UUID.randomUUID().toString()
+            val defaultSchoolYear = SchoolYear(
+                id = defaultSchoolYearId,
+                name = "2024/2025",
+                description = "Aktuelles Schuljahr",
+                startDate = "2024-09-01",
+                endDate = "2025-06-30"
+            )
+            _schoolYears.value = listOf(defaultSchoolYear)
+            _currentSchoolYearId.value = defaultSchoolYearId
+
             val defaultSubjects = listOf(
                 Subject(
                     id = UUID.randomUUID().toString(),
@@ -66,7 +112,8 @@ class GradeViewModel : ViewModel() {
                             description = "1. Schulaufgabe",
                             date = "2024-10-15"
                         )
-                    )
+                    ),
+                    schoolYearId = defaultSchoolYearId
                 ),
                 Subject(
                     id = UUID.randomUUID().toString(),
@@ -83,7 +130,8 @@ class GradeViewModel : ViewModel() {
                             description = "Aufsatz",
                             date = "2024-09-28"
                         )
-                    )
+                    ),
+                    schoolYearId = defaultSchoolYearId
                 ),
                 Subject(
                     id = UUID.randomUUID().toString(),
@@ -100,7 +148,8 @@ class GradeViewModel : ViewModel() {
                             description = "Vocabulary Test",
                             date = "2024-10-05"
                         )
-                    )
+                    ),
+                    schoolYearId = defaultSchoolYearId
                 )
             )
             _subjects.value = defaultSubjects
@@ -257,7 +306,8 @@ class GradeViewModel : ViewModel() {
     }
 
     fun calculateOverallAverage(): Double {
-        val subjectsWithGrades = _subjects.value.filter { it.grades.isNotEmpty() || _simulatedGrades.value.containsKey(it.id) }
+        val currentSubjects = getSubjectsForCurrentYear()
+        val subjectsWithGrades = currentSubjects.filter { it.grades.isNotEmpty() || _simulatedGrades.value.containsKey(it.id) }
         if (subjectsWithGrades.isEmpty()) return 0.0
 
         val subjectAverages = subjectsWithGrades.map { subject ->
@@ -325,6 +375,27 @@ class GradeViewModel : ViewModel() {
         }
     }
 
+    // Format grade for reports - always round to nearest tendency
+    fun formatGradeForReport(value: Double): String {
+        val rounded = kotlin.math.round(value * 2) / 2.0 // Round to nearest 0.5
+        val base = rounded.toInt()
+        val remainder = rounded - base
+
+        val tendency = when {
+            remainder >= 0.25 -> "-"  // 2.25+ becomes 2-
+            remainder <= -0.25 -> "+" // 1.75- becomes 2+
+            else -> ""               // Exactly 2.0 stays 2
+        }
+
+        val finalBase = when (tendency) {
+            "-" -> base
+            "+" -> base - 1
+            else -> base
+        }
+
+        return "$finalBase$tendency"
+    }
+
     // Schedule functions
     fun addLesson(lesson: Lesson) {
         viewModelScope.launch {
@@ -348,7 +419,7 @@ class GradeViewModel : ViewModel() {
     }
 
     fun getLessonsForDayAndWeek(dayOfWeek: Int, weekType: WeekType): List<Lesson> {
-        return _lessons.value.filter { it.dayOfWeek == dayOfWeek && it.weekType == weekType && it.isVisible }
+        return getLessonsForCurrentYear().filter { it.dayOfWeek == dayOfWeek && it.weekType == weekType && it.isVisible }
     }
 
     fun getSubjectById(subjectId: String): Subject? {
@@ -368,6 +439,158 @@ class GradeViewModel : ViewModel() {
     fun clearSimulatedGrade(subjectId: String) {
         viewModelScope.launch {
             _simulatedGrades.value = _simulatedGrades.value - subjectId
+        }
+    }
+
+    // School Year functions
+    fun addSchoolYear(schoolYear: SchoolYear) {
+        viewModelScope.launch {
+            _schoolYears.value = _schoolYears.value + schoolYear
+        }
+    }
+
+    fun updateSchoolYear(schoolYear: SchoolYear) {
+        viewModelScope.launch {
+            val updatedSchoolYears = _schoolYears.value.map {
+                if (it.id == schoolYear.id) schoolYear else it
+            }
+            _schoolYears.value = updatedSchoolYears
+        }
+    }
+
+    fun deleteSchoolYear(schoolYearId: String) {
+        viewModelScope.launch {
+            _schoolYears.value = _schoolYears.value.filter { it.id != schoolYearId }
+            // If we deleted the current school year, set to first available
+            if (_currentSchoolYearId.value == schoolYearId) {
+                _currentSchoolYearId.value = _schoolYears.value.firstOrNull()?.id
+            }
+        }
+    }
+
+    fun setCurrentSchoolYear(schoolYearId: String) {
+        _currentSchoolYearId.value = schoolYearId
+    }
+
+    fun getCurrentSchoolYear(): SchoolYear? {
+        return _schoolYears.value.find { it.id == _currentSchoolYearId.value }
+    }
+
+    // Filtered data functions
+    fun getSubjectsForCurrentYear(): List<Subject> {
+        val currentYearId = _currentSchoolYearId.value
+        return if (currentYearId != null) {
+            _subjects.value.filter { it.schoolYearId == currentYearId }
+        } else {
+            emptyList()
+        }
+    }
+
+    fun getLessonsForCurrentYear(): List<Lesson> {
+        val currentYearId = _currentSchoolYearId.value
+        return if (currentYearId != null) {
+            _lessons.value.filter { it.schoolYearId == currentYearId }
+        } else {
+            emptyList()
+        }
+    }
+
+    // Report functions
+    fun addReport(report: Report) {
+        viewModelScope.launch {
+            _reports.value = _reports.value + report
+        }
+    }
+
+    fun updateReport(report: Report) {
+        viewModelScope.launch {
+            val updatedReports = _reports.value.map {
+                if (it.id == report.id) report else it
+            }
+            _reports.value = updatedReports
+        }
+    }
+
+    fun deleteReport(reportId: String) {
+        viewModelScope.launch {
+            _reports.value = _reports.value.filter { it.id != reportId }
+        }
+    }
+
+    fun getReportById(reportId: String): Report? {
+        return _reports.value.find { it.id == reportId }
+    }
+
+    fun getReportsForSchoolYear(schoolYearId: String): List<Report> {
+        return _reports.value.filter { it.schoolYearId == schoolYearId }
+    }
+
+    fun createReportFromSubjects(schoolYearId: String, reportName: String): Report {
+        val subjects = getSubjectsForCurrentYear()
+        val reportSubjects = subjects.map { subject ->
+            val average = calculateAverage(subject)
+            ReportSubject(
+                id = UUID.randomUUID().toString(),
+                name = subject.name,
+                abbreviation = subject.abbreviation,
+                finalGrade = if (average > 0) formatGradeForReport(average) else null,
+                isExtraSubject = false,
+                description = subject.description
+            )
+        }
+        return Report(
+            id = UUID.randomUUID().toString(),
+            schoolYearId = schoolYearId,
+            name = reportName,
+            reportSubjects = reportSubjects
+        )
+    }
+
+    fun addReportSubject(reportId: String, reportSubject: ReportSubject) {
+        viewModelScope.launch {
+            val updatedReports = _reports.value.map { report ->
+                if (report.id == reportId) {
+                    val updatedSubjects = report.reportSubjects + reportSubject
+                    report.copy(reportSubjects = updatedSubjects)
+                } else {
+                    report
+                }
+            }
+            _reports.value = updatedReports
+        }
+    }
+
+    fun updateReportSubject(reportId: String, reportSubjectId: String, finalGrade: String?) {
+        viewModelScope.launch {
+            val updatedReports = _reports.value.map { report ->
+                if (report.id == reportId) {
+                    val updatedSubjects = report.reportSubjects.map { subject ->
+                        if (subject.id == reportSubjectId) {
+                            subject.copy(finalGrade = finalGrade)
+                        } else {
+                            subject
+                        }
+                    }
+                    report.copy(reportSubjects = updatedSubjects)
+                } else {
+                    report
+                }
+            }
+            _reports.value = updatedReports
+        }
+    }
+
+    fun deleteReportSubject(reportId: String, reportSubjectId: String) {
+        viewModelScope.launch {
+            val updatedReports = _reports.value.map { report ->
+                if (report.id == reportId) {
+                    val updatedSubjects = report.reportSubjects.filter { it.id != reportSubjectId }
+                    report.copy(reportSubjects = updatedSubjects)
+                } else {
+                    report
+                }
+            }
+            _reports.value = updatedReports
         }
     }
 }

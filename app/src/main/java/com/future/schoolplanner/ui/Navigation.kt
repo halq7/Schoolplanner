@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -25,7 +25,7 @@ fun SchoolPlannerApp() {
     val tabs = listOf(
         TabItem("Noten", Icons.Default.List),
         TabItem("Stundenplan", Icons.Default.DateRange),
-        TabItem("Einstellungen", Icons.Default.Settings)
+        TabItem("Mehr", Icons.Default.Menu)
     )
 
     Scaffold(
@@ -45,66 +45,12 @@ fun SchoolPlannerApp() {
         when (selectedTabIndex) {
             0 -> GradesTab(navController, viewModel, paddingValues)
             1 -> ScheduleTab(navController, viewModel, paddingValues)
-            2 -> SettingsTab(navController, viewModel, paddingValues)
+            2 -> MoreTab(navController, viewModel, paddingValues)
         }
     }
 }
 
-@Composable
-fun SettingsTab(navController: NavHostController, viewModel: GradeViewModel, paddingValues: androidx.compose.foundation.layout.PaddingValues) {
-    NavHost(
-        navController = navController,
-        startDestination = "mainSettings",
-        modifier = Modifier.padding(bottom = paddingValues.calculateBottomPadding())
-    ) {
-        composable("mainSettings") {
-            MainSettingsScreen(
-                onBack = { /* No back action for main settings */ },
-                onNavigateToGradeSettings = {
-                    navController.navigate("gradeSettings")
-                },
-                onNavigateToDisplaySettings = {
-                    navController.navigate("displaySettings")
-                },
-                onNavigateToAppSettings = {
-                    navController.navigate("appSettings")
-                },
-                viewModel = viewModel
-            )
-        }
 
-        composable("gradeSettings") {
-            GradeSettingsScreen(
-                onBack = { navController.popBackStack() },
-                viewModel = viewModel
-            )
-        }
-
-        composable("displaySettings") {
-            DisplaySettingsScreen(
-                onBack = { navController.popBackStack() },
-                viewModel = viewModel
-            )
-        }
-
-        composable("appSettings") {
-            AppSettingsScreen(
-                onBack = { navController.popBackStack() },
-                onNavigateToThemeSettings = {
-                    navController.navigate("themeSettings")
-                },
-                viewModel = viewModel
-            )
-        }
-
-        composable("themeSettings") {
-            ThemeSettingsScreen(
-                onBack = { navController.popBackStack() },
-                viewModel = viewModel
-            )
-        }
-    }
-}
 
 data class TabItem(val title: String, val icon: androidx.compose.ui.graphics.vector.ImageVector)
 
@@ -161,7 +107,8 @@ fun GradesTab(navController: NavHostController, viewModel: GradeViewModel, paddi
                 onSubjectAdded = { subject ->
                     viewModel.addSubject(subject)
                     navController.popBackStack()
-                }
+                },
+                viewModel = viewModel
             )
         }
 
@@ -275,6 +222,175 @@ fun ScheduleTab(navController: NavHostController, viewModel: GradeViewModel, pad
                     popUpTo("schedule") { inclusive = true }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun MoreTab(navController: NavHostController, viewModel: GradeViewModel, paddingValues: androidx.compose.foundation.layout.PaddingValues) {
+    NavHost(
+        navController = navController,
+        startDestination = "moreMenu",
+        modifier = Modifier.padding(bottom = paddingValues.calculateBottomPadding())
+    ) {
+        composable("moreMenu") {
+            MoreMenuScreen(
+                onNavigateToSchoolYears = { navController.navigate("schoolYears") },
+                onNavigateToReports = { navController.navigate("reports") },
+                onNavigateToSettings = { navController.navigate("mainSettings") }
+            )
+        }
+
+        composable("schoolYears") {
+            SchoolYearsScreen(
+                onBack = { navController.popBackStack() },
+                onAddSchoolYear = { navController.navigate("addSchoolYear") },
+                onEditSchoolYear = { schoolYearId ->
+                    navController.navigate("editSchoolYear/$schoolYearId")
+                },
+                viewModel = viewModel
+            )
+        }
+
+        composable("addSchoolYear") {
+            AddSchoolYearScreen(
+                onBack = { navController.popBackStack() },
+                onSchoolYearAdded = { schoolYear ->
+                    viewModel.addSchoolYear(schoolYear)
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable("editSchoolYear/{schoolYearId}") { backStackEntry ->
+            val schoolYearId = backStackEntry.arguments?.getString("schoolYearId") ?: ""
+            val schoolYear = viewModel.schoolYears.value.find { it.id == schoolYearId }
+
+            if (schoolYear != null) {
+                EditSchoolYearScreen(
+                    schoolYear = schoolYear,
+                    onBack = { navController.popBackStack() },
+                    onSchoolYearUpdated = { updatedSchoolYear ->
+                        viewModel.updateSchoolYear(updatedSchoolYear)
+                        navController.popBackStack()
+                    }
+                )
+            } else {
+                navController.navigate("schoolYears") {
+                    popUpTo("schoolYears") { inclusive = true }
+                }
+            }
+        }
+
+        composable("reports") {
+            ReportsScreen(
+                onBack = { navController.popBackStack() },
+                onAddReport = { navController.navigate("addReport") },
+                onViewReport = { reportId ->
+                    navController.navigate("viewReport/$reportId")
+                },
+                onEditReport = { reportId ->
+                    navController.navigate("editReport/$reportId")
+                },
+                viewModel = viewModel
+            )
+        }
+
+        composable("viewReport/{reportId}") { backStackEntry ->
+            val reportId = backStackEntry.arguments?.getString("reportId") ?: ""
+            val report = viewModel.getReportById(reportId)
+
+            if (report != null) {
+                ViewReportScreen(
+                    report = report,
+                    onBack = { navController.popBackStack() },
+                    onEdit = { navController.navigate("editReport/$reportId") },
+                    viewModel = viewModel
+                )
+            } else {
+                navController.navigate("reports") {
+                    popUpTo("reports") { inclusive = true }
+                }
+            }
+        }
+
+        composable("addReport") {
+            AddReportScreen(
+                onBack = { navController.popBackStack() },
+                onReportAdded = { report ->
+                    viewModel.addReport(report)
+                    navController.popBackStack()
+                },
+                viewModel = viewModel
+            )
+        }
+
+        composable("editReport/{reportId}") { backStackEntry ->
+            val reportId = backStackEntry.arguments?.getString("reportId") ?: ""
+            val report = viewModel.getReportById(reportId)
+
+            if (report != null) {
+                EditReportScreen(
+                    report = report,
+                    onBack = { navController.popBackStack() },
+                    onReportUpdated = { updatedReport ->
+                        viewModel.updateReport(updatedReport)
+                        navController.popBackStack()
+                    },
+                    viewModel = viewModel
+                )
+            } else {
+                navController.navigate("reports") {
+                    popUpTo("reports") { inclusive = true }
+                }
+            }
+        }
+
+        composable("mainSettings") {
+            MainSettingsScreen(
+                onBack = { navController.popBackStack() },
+                onNavigateToGradeSettings = {
+                    navController.navigate("gradeSettings")
+                },
+                onNavigateToDisplaySettings = {
+                    navController.navigate("displaySettings")
+                },
+                onNavigateToAppSettings = {
+                    navController.navigate("appSettings")
+                },
+                viewModel = viewModel
+            )
+        }
+
+        composable("gradeSettings") {
+            GradeSettingsScreen(
+                onBack = { navController.popBackStack() },
+                viewModel = viewModel
+            )
+        }
+
+        composable("displaySettings") {
+            DisplaySettingsScreen(
+                onBack = { navController.popBackStack() },
+                viewModel = viewModel
+            )
+        }
+
+        composable("appSettings") {
+            AppSettingsScreen(
+                onBack = { navController.popBackStack() },
+                onNavigateToThemeSettings = {
+                    navController.navigate("themeSettings")
+                },
+                viewModel = viewModel
+            )
+        }
+
+        composable("themeSettings") {
+            ThemeSettingsScreen(
+                onBack = { navController.popBackStack() },
+                viewModel = viewModel
+            )
         }
     }
 }

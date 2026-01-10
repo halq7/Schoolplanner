@@ -18,7 +18,8 @@ data class Subject(
     val room: String = "",
     val description: String = "",
     val color: Color,
-    val grades: List<Grade> = emptyList()
+    val grades: List<Grade> = emptyList(),
+    val schoolYearId: String
 ) {
     fun toArgb(): Int = color.toArgb()
 }

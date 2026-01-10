@@ -27,8 +27,7 @@ fun ScheduleScreen(
     onEditLesson: (String) -> Unit,
     viewModel: GradeViewModel
 ) {
-    val lessons = viewModel.lessons.collectAsState()
-    val subjects = viewModel.subjects.collectAsState()
+    val lessons = viewModel.lessonsForCurrentYear.collectAsState()
     var selectedWeekType by remember { mutableStateOf(WeekType.A) }
 
     val daysOfWeek = listOf("Mo", "Di", "Mi", "Do", "Fr") // Short names for table
@@ -71,7 +70,7 @@ fun ScheduleScreen(
             }
         }
     ) { paddingValues ->
-        if (subjects.value.isEmpty()) {
+        if (viewModel.subjectsForCurrentYear.collectAsState().value.isEmpty()) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()

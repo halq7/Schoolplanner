@@ -12,5 +12,6 @@ data class Lesson(
     val weekType: WeekType,
     val teacher: String = "",
     val room: String = "",
-    val isVisible: Boolean = true
+    val isVisible: Boolean = true,
+    val schoolYearId: String
 )

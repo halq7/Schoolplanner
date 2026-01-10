@@ -52,7 +52,7 @@ fun SubjectListScreen(
     onSubjectSettings: (Subject) -> Unit = {},
     viewModel: GradeViewModel
 ) {
-    val subjects = viewModel.subjects.collectAsState()
+    val subjects = viewModel.subjectsForCurrentYear.collectAsState()
     val simulatedGrades = viewModel.simulatedGrades.collectAsState()
 
     Scaffold(

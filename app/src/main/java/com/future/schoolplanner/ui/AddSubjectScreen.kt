@@ -286,7 +286,8 @@ fun ComposeColor.toArgbInt(): Int = ((alpha * 255).toInt() shl 24) or ((red * 25
 @Composable
 fun AddSubjectScreen(
     onBack: () -> Unit,
-    onSubjectAdded: (Subject) -> Unit
+    onSubjectAdded: (Subject) -> Unit,
+    viewModel: GradeViewModel
 ) {
     var subjectName by remember { mutableStateOf("") }
     var abbreviation by remember { mutableStateOf("") }
@@ -460,18 +461,22 @@ fun AddSubjectScreen(
                     }
 
                     if (!hasError) {
-                        val newSubject = Subject(
-                            id = UUID.randomUUID().toString(),
-                            name = subjectName.trim(),
-                            abbreviation = abbreviation.trim(),
-                            teacher = teacher.trim(),
-                            room = room.trim(),
-                            description = description.trim(),
-                            color = selectedColor,
-                            grades = emptyList()
-                        )
+                        val currentSchoolYearId = viewModel.currentSchoolYearId.value
+                        if (currentSchoolYearId != null) {
+                            val newSubject = Subject(
+                                id = UUID.randomUUID().toString(),
+                                name = subjectName.trim(),
+                                abbreviation = abbreviation.trim(),
+                                teacher = teacher.trim(),
+                                room = room.trim(),
+                                description = description.trim(),
+                                color = selectedColor,
+                                grades = emptyList(),
+                                schoolYearId = currentSchoolYearId
+                            )
 
-                        onSubjectAdded(newSubject)
+                            onSubjectAdded(newSubject)
+                        }
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
