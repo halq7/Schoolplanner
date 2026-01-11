@@ -10,8 +10,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.future.schoolplanner.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -20,15 +22,16 @@ fun AppSettingsScreen(
     onNavigateToThemeSettings: () -> Unit,
     onNavigateToPrivacySettings: () -> Unit,
     onNavigateToAboutScreen: () -> Unit,
+    onNavigateToLanguageSettings: () -> Unit,
     viewModel: GradeViewModel = viewModel()
 ) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("App-Einstellungen") },
+                title = { Text(stringResource(R.string.app_settings)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, "Zurück")
+                        Icon(Icons.Default.ArrowBack, stringResource(R.string.back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -45,38 +48,39 @@ fun AppSettingsScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+
+
             item {
-                Text(
-                    text = "App-Einstellungen",
-                    style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier.padding(bottom = 8.dp)
+                SettingsCategory(
+                    title = stringResource(R.string.language),
+                    description = stringResource(R.string.language),
+                    onClick = onNavigateToLanguageSettings
                 )
             }
 
             item {
                 SettingsCategory(
-                    title = "Aussehen",
-                    description = "Einstellungen für Aussehen und Darstellung",
+                    title = stringResource(R.string.appearance),
+                    description = stringResource(R.string.appearance_description),
                     onClick = onNavigateToThemeSettings
                 )
             }
 
             item {
                 SettingsCategory(
-                    title = "Datenschutz",
-                    description = "Datenschutzeinstellungen und Berechtigungen",
+                    title = stringResource(R.string.privacy),
+                    description = stringResource(R.string.privacy_description),
                     onClick = onNavigateToPrivacySettings
                 )
             }
 
             item {
                 SettingsCategory(
-                    title = "Über die App",
-                    description = "Informationen über die App und Version",
+                    title = stringResource(R.string.about_app),
+                    description = stringResource(R.string.about_app_description),
                     onClick = onNavigateToAboutScreen
                 )
             }
         }
     }
 }
-

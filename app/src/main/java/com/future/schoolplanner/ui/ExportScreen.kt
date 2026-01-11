@@ -12,9 +12,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
+import com.future.schoolplanner.R
 import com.future.schoolplanner.data.serialization.*
 import kotlinx.serialization.json.Json
 import java.io.File
@@ -32,12 +34,12 @@ fun ExportScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Daten exportieren") },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Zurück")
-                    }
+            title = { Text(stringResource(R.string.export_data)) },
+            navigationIcon = {
+                IconButton(onClick = onBack) {
+                    Icon(Icons.Default.ArrowBack, stringResource(R.string.back))
                 }
+            }
             )
         }
     ) { paddingValues ->
@@ -50,7 +52,7 @@ fun ExportScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Ihre Daten werden als JSON-Datei exportiert und können geteilt werden.",
+                text = stringResource(R.string.export_description),
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.padding(bottom = 24.dp)
             )
@@ -71,16 +73,16 @@ fun ExportScreen(
                         color = MaterialTheme.colorScheme.onPrimary
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Exportiere...")
+                    Text(stringResource(R.string.exporting))
                 } else {
-                    Text("Daten exportieren")
+                    Text(stringResource(R.string.export_data))
                 }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Die exportierte Datei enthält alle Fächer, Noten, Schuljahre, Aufgaben und Einstellungen.",
+                text = stringResource(R.string.export_details),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -102,7 +104,7 @@ private fun exportData(
             lessons = viewModel.lessons.value.map { it.toSerializable() },
             reports = viewModel.reports.value.map { it.toSerializable() },
             tasks = viewModel.tasks.value.map { it.toSerializable() },
-            settings = com.future.schoolplanner.data.serialization.AppSettings(
+            settings = AppSettings(
                 gradeInputMethod = viewModel.gradeInputMethod.value.name,
                 showTeachers = viewModel.showTeachers.value,
                 showRooms = viewModel.showRooms.value,
@@ -110,7 +112,9 @@ private fun exportData(
                 useDynamicColors = viewModel.useDynamicColors.value,
                 useAmoledTheme = viewModel.useAmoledTheme.value,
                 customAccentColor = viewModel.customAccentColor.value.toArgb(),
-                tasksTabEnabled = viewModel.tasksTabEnabled.value
+                tasksTabEnabled = viewModel.tasksTabEnabled.value,
+                weekTypeEvenWeeks = viewModel.weekTypeEvenWeeks.value.name,
+                defaultSubjectAlpha = viewModel.defaultSubjectAlpha.value
             )
         )
 
@@ -136,18 +140,18 @@ private fun exportData(
         )
 
         val shareIntent = Intent(Intent.ACTION_SEND).apply {
-            type = "application/json"
+            setType("application/json")
             putExtra(Intent.EXTRA_STREAM, uri)
-            putExtra(Intent.EXTRA_SUBJECT, "Schoolplanner Daten Export")
+            putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.export_subject))
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
 
-        val chooserIntent = Intent.createChooser(shareIntent, "Daten exportieren")
+        val chooserIntent = Intent.createChooser(shareIntent, context.getString(R.string.export_chooser_title))
         context.startActivity(chooserIntent)
 
-        Toast.makeText(context, "Daten erfolgreich exportiert", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, context.getString(R.string.export_success), Toast.LENGTH_SHORT).show()
     } catch (e: Exception) {
-        Toast.makeText(context, "Fehler beim Exportieren: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, context.getString(R.string.export_error, e.localizedMessage), Toast.LENGTH_SHORT).show()
     } finally {
         onComplete()
     }

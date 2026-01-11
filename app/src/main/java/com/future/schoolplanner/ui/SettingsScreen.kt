@@ -29,6 +29,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.future.schoolplanner.data.GradeInputMethod
+import androidx.compose.ui.res.stringResource
+import com.future.schoolplanner.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,10 +43,10 @@ fun GradeSettingsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Einstellungen") },
+                title = { Text(stringResource(R.string.tab_grades)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, "Zurück")
+                        Icon(Icons.Filled.ArrowBack, stringResource(R.string.back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -61,19 +63,10 @@ fun GradeSettingsScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(
-                text = "Noteneingabe-Methode",
-                style = MaterialTheme.typography.titleLarge
-            )
-
-            Text(
-                text = "Wählen Sie die Methode zur Eingabe von Noten:",
-                style = MaterialTheme.typography.bodyMedium
-            )
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            GradeInputMethod.values().forEach { method ->
+            GradeInputMethod.entries.forEach { method ->
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -89,19 +82,19 @@ fun GradeSettingsScreen(
                     Column {
                         Text(
                             text = when (method) {
-                                GradeInputMethod.WHOLE -> "Ganze Noten"
-                                GradeInputMethod.DECIMAL -> "Mit Komma"
-                                GradeInputMethod.TENDENCY -> "Mit Tendenz"
-                                GradeInputMethod.FIFTEEN_POINT -> "15-Punktesystem"
+                                GradeInputMethod.WHOLE -> stringResource(R.string.absolute_grade)
+                                GradeInputMethod.DECIMAL -> stringResource(R.string.decimal_grade)
+                                GradeInputMethod.TENDENCY -> stringResource(R.string.tendency_grade)
+                                GradeInputMethod.FIFTEEN_POINT -> stringResource(R.string.fifteen_points)
                             },
                             style = MaterialTheme.typography.bodyLarge
                         )
                         Text(
                             text = when (method) {
-                                GradeInputMethod.WHOLE -> "z.B. 2"
-                                GradeInputMethod.DECIMAL -> "z.B. 1.5"
-                                GradeInputMethod.TENDENCY -> "z.B. 2-"
-                                GradeInputMethod.FIFTEEN_POINT -> "z.B. 13 (von 15 Punkten)"
+                                GradeInputMethod.WHOLE -> "${stringResource(R.string.eg)} 2"
+                                GradeInputMethod.DECIMAL -> "${stringResource(R.string.eg)} 1.5"
+                                GradeInputMethod.TENDENCY -> "${stringResource(R.string.eg)} 2-"
+                                GradeInputMethod.FIFTEEN_POINT -> "${stringResource(R.string.eg)} 13"
                             },
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)

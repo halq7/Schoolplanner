@@ -40,6 +40,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.future.schoolplanner.data.Report
+import androidx.compose.ui.res.stringResource
+import com.future.schoolplanner.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,7 +58,7 @@ fun ReportsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Zeugnisse") },
+                title = { Text(stringResource(R.string.reports)) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary
@@ -68,7 +70,7 @@ fun ReportsScreen(
                 onClick = onAddReport,
                 containerColor = MaterialTheme.colorScheme.primary
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Zeugnis hinzufügen")
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.create_report))
             }
         }
     ) { paddingValues ->
@@ -82,7 +84,7 @@ fun ReportsScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Keine Zeugnisse vorhanden",
+                    text = stringResource(R.string.no_reports),
                     style = MaterialTheme.typography.headlineSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -99,7 +101,7 @@ fun ReportsScreen(
                     val schoolYear = schoolYears.value.find { it.id == report.schoolYearId }
                     ReportCard(
                         report = report,
-                        schoolYearName = schoolYear?.name ?: "Unbekanntes Schuljahr",
+                        schoolYearName = schoolYear?.name ?: stringResource(R.string.unknown_year),
                         onView = { onViewReport(report.id) },
                         onDelete = { viewModel.deleteReport(report.id) },
                         onEdit = { onEditReport(report.id) }
@@ -124,8 +126,8 @@ fun ReportCard(
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            title = { Text("Zeugnis löschen") },
-            text = { Text("Möchten Sie das Zeugnis \"${report.name}\" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.") },
+            title = { Text(stringResource(R.string.delete_year)) },
+            text = { "${stringResource(R.string.delete)} \"${report.name}\"? ${stringResource(R.string.undone)}" },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -133,12 +135,12 @@ fun ReportCard(
                         showDeleteDialog = false
                     }
                 ) {
-                    Text("Löschen", color = MaterialTheme.colorScheme.error)
+                    Text(stringResource(R.string.delete), color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("Abbrechen")
+                    Text(stringResource(R.string.cancel),)
                 }
             }
         )
@@ -178,7 +180,7 @@ fun ReportCard(
                 )
                 if (report.date.isNotEmpty()) {
                     Text(
-                        text = "Ausgestellt: ${report.date}",
+                        text = "${stringResource(R.string.issue_date)}: ${report.date}",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -188,7 +190,7 @@ fun ReportCard(
             IconButton(onClick = onEdit) {
                 Icon(
                     imageVector = Icons.Default.Edit,
-                    contentDescription = "Bearbeiten",
+                    contentDescription = stringResource(R.string.edit),
                     tint = MaterialTheme.colorScheme.primary
                 )
             }

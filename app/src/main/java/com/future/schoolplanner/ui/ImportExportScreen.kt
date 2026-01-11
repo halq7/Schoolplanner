@@ -8,6 +8,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.future.schoolplanner.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -19,10 +21,10 @@ fun ImportExportScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Daten verwalten") },
+                title = { Text(stringResource(R.string.manage_data)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Zurück")
+                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -33,13 +35,12 @@ fun ImportExportScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
                 .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Text(
-                text = "Importieren und Exportieren",
-                style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier.padding(bottom = 8.dp)
+            verticalArrangement = Arrangement.spacedBy(
+                space = 16.dp,
+                alignment = Alignment.CenterVertically
             )
+
+        ) {
 
 
             Card(
@@ -56,7 +57,7 @@ fun ImportExportScreen(
                         onClick = onNavigateToExport,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("Daten exportieren")
+                        Text(stringResource(R.string.export_data))
                     }
                 }
             }
@@ -75,7 +76,7 @@ fun ImportExportScreen(
                         onClick = onNavigateToImport,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("Daten importieren")
+                        Text(stringResource(R.string.import_data))
                     }
                 }
             }

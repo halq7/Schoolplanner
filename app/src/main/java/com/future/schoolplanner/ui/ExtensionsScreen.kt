@@ -12,6 +12,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.res.stringResource
+import com.future.schoolplanner.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -24,10 +26,10 @@ fun ExtensionsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Erweiterungen") },
+                title = { Text(stringResource(R.string.extensions)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, "Zurück")
+                        Icon(Icons.Default.ArrowBack, stringResource(R.string.back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -44,11 +46,6 @@ fun ExtensionsScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(
-                text = "Erweiterungen",
-                style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
 
             // Tasks tab toggle
             Row(
@@ -61,11 +58,11 @@ fun ExtensionsScreen(
             ) {
                 Column {
                     Text(
-                        text = "Aufgaben-Tab",
+                        text = stringResource(R.string.tasks_tab),
                         style = MaterialTheme.typography.bodyLarge
                     )
                     Text(
-                        text = "Aktiviert einen Tab zum Verwalten von Aufgaben",
+                        text = stringResource(R.string.tasks_tab_description),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                     )

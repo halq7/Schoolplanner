@@ -9,6 +9,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.future.schoolplanner.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -16,14 +18,19 @@ fun DeveloperOptionsScreen(
     onBack: () -> Unit,
     viewModel: GradeViewModel
 ) {
+    var showClearSubjectsDialog by remember { mutableStateOf(false) }
+    var showClearGradesDialog by remember { mutableStateOf(false) }
+    var showClearReportsDialog by remember { mutableStateOf(false) }
+    var showClearSchoolYearsDialog by remember { mutableStateOf(false) }
+    var showClearLessonsDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Developer Options") },
+                title = { Text(stringResource(R.string.developer_options)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, "Zurück")
+                        Icon(Icons.Default.ArrowBack, stringResource(R.string.back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -40,24 +47,6 @@ fun DeveloperOptionsScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            item {
-                Text(
-                    text = "Developer Options",
-                    style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-            }
-
-            item {
-                Text(
-                    text = "⚠️ Diese Aktionen löschen Daten unwiderruflich!",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-            }
-
-
 
             item {
                 Card(
@@ -68,39 +57,225 @@ fun DeveloperOptionsScreen(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Text(
-                            text = "Debug Informationen",
+                            text = stringResource(R.string.debug_info),
                             style = MaterialTheme.typography.titleLarge
                         )
 
                         val totalGrades = viewModel.subjects.value.sumOf { it.grades.size }
 
                         Text(
-                            text = "Anzahl Fächer: ${viewModel.subjects.value.size}",
+                            text = "${stringResource(R.string.subjects_count)} ${viewModel.subjects.value.size}",
                             style = MaterialTheme.typography.bodyMedium
                         )
 
                         Text(
-                            text = "Anzahl Noten: $totalGrades",
+                            text = "${stringResource(R.string.tab_grades)}: $totalGrades",
                             style = MaterialTheme.typography.bodyMedium
                         )
 
                         Text(
-                            text = "Anzahl Zeugnisse: ${viewModel.reports.value.size}",
+                            text = "${stringResource(R.string.reports_count)} ${viewModel.reports.value.size}",
                             style = MaterialTheme.typography.bodyMedium
                         )
 
                         Text(
-                            text = "Anzahl Schuljahre: ${viewModel.schoolYears.value.size}",
+                            text = "${stringResource(R.string.school_years_count)} ${viewModel.schoolYears.value.size}",
                             style = MaterialTheme.typography.bodyMedium
                         )
 
                         Text(
-                            text = "Anzahl Stunden: ${viewModel.lessons.value.size}",
+                            text = "${stringResource(R.string.lessons_count)} ${viewModel.lessons.value.size}",
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
                 }
             }
+
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.dangerous_actions),
+                            style = MaterialTheme.typography.titleLarge,
+                            color = MaterialTheme.colorScheme.onErrorContainer
+                        )
+
+                        Button(
+                            onClick = { showClearSubjectsDialog = true },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.error
+                            )
+                        ) {
+                            Text(stringResource(R.string.delete_all_subjects))
+                        }
+
+                        Button(
+                            onClick = { showClearGradesDialog = true },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.error
+                            )
+                        ) {
+                            Text(stringResource(R.string.delete_all_grades))
+                        }
+
+                        Button(
+                            onClick = { showClearReportsDialog = true },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.error
+                            )
+                        ) {
+                            Text(stringResource(R.string.delete_all_reports))
+                        }
+
+                        Button(
+                            onClick = { showClearSchoolYearsDialog = true },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.error
+                            )
+                        ) {
+                            Text(stringResource(R.string.delete_all_school_years))
+                        }
+
+                        Button(
+                            onClick = { showClearLessonsDialog = true },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.error
+                            )
+                        ) {
+                            Text(stringResource(R.string.delete_all_lessons))
+                        }
+                    }
+                }
+            }
         }
+    }
+
+    // Confirmation dialogs
+    if (showClearSubjectsDialog) {
+        AlertDialog(
+            onDismissRequest = { showClearSubjectsDialog = false },
+            title = { Text(stringResource(R.string.delete_all_subjects)) },
+            text = { Text("Möchten Sie wirklich alle Fächer löschen? Diese Aktion kann nicht rückgängig gemacht werden!") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.clearAllSubjects()
+                        showClearSubjectsDialog = false
+                    }
+                ) {
+                    Text(stringResource(R.string.delete))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showClearSubjectsDialog = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
+
+    if (showClearGradesDialog) {
+        AlertDialog(
+            onDismissRequest = { showClearGradesDialog = false },
+            title = { Text(stringResource(R.string.delete_all_grades)) },
+            text = { Text("Möchten Sie wirklich alle Noten löschen? Diese Aktion kann nicht rückgängig gemacht werden!") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.clearAllGrades()
+                        showClearGradesDialog = false
+                    }
+                ) {
+                    Text(stringResource(R.string.delete))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showClearGradesDialog = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
+
+    if (showClearReportsDialog) {
+        AlertDialog(
+            onDismissRequest = { showClearReportsDialog = false },
+            title = { Text(stringResource(R.string.delete_all_reports)) },
+            text = { Text("Möchten Sie wirklich alle Zeugnisse löschen? Diese Aktion kann nicht rückgängig gemacht werden!") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.clearAllReports()
+                        showClearReportsDialog = false
+                    }
+                ) {
+                    Text(stringResource(R.string.delete))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showClearReportsDialog = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
+
+    if (showClearSchoolYearsDialog) {
+        AlertDialog(
+            onDismissRequest = { showClearSchoolYearsDialog = false },
+            title = { Text(stringResource(R.string.delete_all_school_years)) },
+            text = { Text("Möchten Sie wirklich alle Schuljahre löschen? Diese Aktion kann nicht rückgängig gemacht werden!") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.clearAllSchoolYears()
+                        showClearSchoolYearsDialog = false
+                    }
+                ) {
+                    Text(stringResource(R.string.delete))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showClearSchoolYearsDialog = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
+
+    if (showClearLessonsDialog) {
+        AlertDialog(
+            onDismissRequest = { showClearLessonsDialog = false },
+            title = { Text(stringResource(R.string.delete_all_lessons)) },
+            text = { Text("Möchten Sie wirklich alle Stunden löschen? Diese Aktion kann nicht rückgängig gemacht werden!") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.clearAllLessons()
+                        showClearLessonsDialog = false
+                    }
+                ) {
+                    Text(stringResource(R.string.delete))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showClearLessonsDialog = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
     }
 }

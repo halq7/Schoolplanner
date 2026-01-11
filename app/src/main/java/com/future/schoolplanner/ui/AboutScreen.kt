@@ -18,9 +18,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.future.schoolplanner.R
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.plugins.contentnegotiation.*
@@ -98,7 +100,7 @@ fun AboutScreen(
         if (showDeveloperToast) {
             android.widget.Toast.makeText(
                 context,
-                "Developer Options entsperrt!",
+                context.getString(R.string.developer_options_unlocked),
                 android.widget.Toast.LENGTH_SHORT
             ).show()
             onNavigateToDeveloperOptions()
@@ -147,7 +149,7 @@ fun AboutScreen(
                 isLoading = false
                 client.close()
             } catch (e: Exception) {
-                error = "Fehler beim Laden der Updates: ${e.message}"
+                error = context.getString(R.string.update_load_error, e.message)
                 isLoading = false
             }
         }
@@ -178,12 +180,12 @@ fun AboutScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Über die App") },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, "Zurück")
-                    }
-                },
+            title = { Text(stringResource(R.string.about_title)) },
+            navigationIcon = {
+                IconButton(onClick = onBack) {
+                    Icon(Icons.Default.ArrowBack, stringResource(R.string.back))
+                }
+            },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary
@@ -198,13 +200,7 @@ fun AboutScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            item {
-                Text(
-                    text = "Über die App",
-                    style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-            }
+
 
             item {
                 Card(
@@ -215,12 +211,12 @@ fun AboutScreen(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Text(
-                            text = "School Planner",
+                            text = stringResource(R.string.app_name_full),
                             style = MaterialTheme.typography.titleLarge
                         )
 
                         Text(
-                            text = "Version: $currentVersion",
+                            text = stringResource(R.string.version, currentVersion),
                             style = MaterialTheme.typography.bodyLarge,
                             modifier = Modifier.clickable {
                                 versionClickCount++
@@ -243,7 +239,7 @@ fun AboutScreen(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Text(
-                            text = "Updates",
+                            text = stringResource(R.string.updates),
                             style = MaterialTheme.typography.titleLarge
                         )
 
@@ -253,7 +249,7 @@ fun AboutScreen(
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 CircularProgressIndicator(modifier = Modifier.size(20.dp))
-                                Text("Prüfe auf Updates...", style = MaterialTheme.typography.bodyMedium)
+                                Text(stringResource(R.string.checking_updates), style = MaterialTheme.typography.bodyMedium)
                             }
                         } else if (error != null) {
                             Text(
@@ -266,14 +262,14 @@ fun AboutScreen(
                             val isUpdateAvailable = compareVersions(currentVersion, latestVersion) < 0
 
                             Text(
-                                text = "Neueste Version: $latestVersion",
+                                text = stringResource(R.string.latest_version, latestVersion),
                                 style = MaterialTheme.typography.bodyLarge
                             )
 
                             if (isDownloading) {
                                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                                     Text(
-                                        text = "Download läuft...",
+                                        text = stringResource(R.string.download_running),
                                         style = MaterialTheme.typography.bodyMedium,
                                         color = MaterialTheme.colorScheme.primary
                                     )
@@ -285,7 +281,7 @@ fun AboutScreen(
                             } else if (isUpdateAvailable) {
                                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                                     Text(
-                                        text = "Ein Update ist verfügbar!",
+                                        text = stringResource(R.string.update_available),
                                         style = MaterialTheme.typography.bodyMedium,
                                         color = MaterialTheme.colorScheme.primary
                                     )
@@ -293,19 +289,19 @@ fun AboutScreen(
                                         onClick = { downloadAndInstallUpdate() },
                                         modifier = Modifier.fillMaxWidth()
                                     ) {
-                                        Text("Update herunterladen")
+                                        Text(stringResource(R.string.download_update))
                                     }
                                 }
                             } else {
                                 Text(
-                                    text = "Ihre Version ist aktuell.",
+                                    text = stringResource(R.string.version_current),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                                 )
                             }
                         } else {
                             Text(
-                                text = "Keine Releases gefunden.",
+                                text = stringResource(R.string.no_releases),
                                 style = MaterialTheme.typography.bodyMedium
                             )
                         }
@@ -365,7 +361,12 @@ private fun installApk(context: Context, apkUri: Uri) {
             // If all else fails, show a toast
             android.widget.Toast.makeText(
                 context,
-                "APK konnte nicht installiert werden. Bitte manuell aus Downloads installieren.",
+                context.getString(R.string.developer_options_unlocked),
+                android.widget.Toast.LENGTH_SHORT
+            ).show()
+            android.widget.Toast.makeText(
+                context,
+                context.getString(R.string.apk_install_error),
                 android.widget.Toast.LENGTH_LONG
             ).show()
         }

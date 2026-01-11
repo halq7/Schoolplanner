@@ -24,6 +24,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.future.schoolplanner.ui.theme.getContrastingTextColor
+import androidx.compose.ui.res.stringResource
+import com.future.schoolplanner.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,7 +44,7 @@ fun ThemeSettingsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Aussehen") },
+                title = { Text(stringResource(R.string.appearance)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.Default.ArrowBack, "Zurück")
@@ -63,14 +65,6 @@ fun ThemeSettingsScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(
-                text = "Theme-Einstellungen",
-                style = MaterialTheme.typography.titleLarge
-            )
-
-
-
-            Spacer(modifier = Modifier.height(8.dp))
 
             // Theme toggle
             Row(
@@ -83,13 +77,8 @@ fun ThemeSettingsScreen(
             ) {
                 Column {
                     Text(
-                        text = "Dunkelmodus",
+                        text = stringResource(R.string.dark_mode),
                         style = MaterialTheme.typography.bodyLarge
-                    )
-                    Text(
-                        text = "Aktiviert den Dunkelmodus für die gesamte App",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                     )
                 }
                 Switch(
@@ -109,13 +98,8 @@ fun ThemeSettingsScreen(
             ) {
                 Column {
                     Text(
-                        text = "Dynamische Farben",
+                        text = stringResource(R.string.dynamic_colors),
                         style = MaterialTheme.typography.bodyLarge
-                    )
-                    Text(
-                        text = "Verwendet die Farben des Systems",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                     )
                 }
                 Switch(
@@ -135,13 +119,8 @@ fun ThemeSettingsScreen(
             ) {
                 Column {
                     Text(
-                        text = "AMOLED Modus",
+                        text = stringResource(R.string.amoled_mode),
                         style = MaterialTheme.typography.bodyLarge
-                    )
-                    Text(
-                        text = "Rein schwarzer Hintergrund für AMOLED-Displays",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                     )
                 }
                 Switch(
@@ -156,14 +135,10 @@ fun ThemeSettingsScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "Akzentfarbe",
+                    text = stringResource(R.string.accent_color),
                     style = MaterialTheme.typography.titleMedium
                 )
 
-                Text(
-                    text = "Wählen Sie eine benutzerdefinierte Akzentfarbe:",
-                    style = MaterialTheme.typography.bodyMedium
-                )
 
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -221,16 +196,14 @@ fun ThemeSettingsScreen(
                     Button(
                         onClick = { originalColor = customAccentColor; showCustomColorDialog = true },
                         modifier = Modifier.weight(1f)
-                    ) {
-                        Text("Eigene Farbe wählen")
-                    }
+                    ) { Text(stringResource(R.string.choose_custom_color))}
 
                     Button(
                         onClick = { viewModel.setCustomAccentColor(Color(0xFFD0BCFF)) }, // Reset to original purple
                         modifier = Modifier.weight(1f)
-                    ) {
-                        Text("Standard")
-                    }
+                    )
+                    { Text(stringResource(R.string.default_option))}
+
                 }
             }
 
@@ -238,12 +211,12 @@ fun ThemeSettingsScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Standardmäßige Transparenz für Fächer",
+                text = stringResource(R.string.default_subject_transparency),
                 style = MaterialTheme.typography.titleMedium
             )
 
             Text(
-                text = "Stellen Sie die Transparenz der Fachfarben ein (im Noten-Tab und Stundenplan):",
+                text = stringResource(R.string.transparency_description),
                 style = MaterialTheme.typography.bodyMedium
             )
 
@@ -255,10 +228,10 @@ fun ThemeSettingsScreen(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Transparenz: ${(defaultSubjectAlpha * 100).toInt()}%",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
+                    text = "${stringResource(R.string.transparency)}: ${(defaultSubjectAlpha * 100).toInt()}%",
+            style = MaterialTheme.typography.bodyMedium
+            )
+}
 
             Slider(
                 value = defaultSubjectAlpha,

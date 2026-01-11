@@ -15,6 +15,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.future.schoolplanner.data.Lesson
 import com.future.schoolplanner.data.WeekType
 import java.util.*
+import androidx.compose.ui.res.stringResource
+import com.future.schoolplanner.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,15 +42,15 @@ fun AddLessonScreen(
     var room by remember { mutableStateOf(lessonToEdit?.room ?: "") }
     var isVisible by remember { mutableStateOf(lessonToEdit?.isVisible ?: true) }
 
-    val daysOfWeek = listOf("Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag")
+    val daysOfWeek = listOf(stringResource(R.string.monday), stringResource(R.string.tuesday), stringResource(R.string.wednesday), stringResource(R.string.thursday), stringResource(R.string.friday))
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(if (lessonToEdit == null) "Stunde hinzufügen" else "Stunde bearbeiten") },
+                title = { Text(if (lessonToEdit == null) stringResource(R.string.add_lesson) else stringResource(R.string.edit_lesson)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, "Zurück")
+                        Icon(Icons.Default.ArrowBack, stringResource(R.string.back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -67,14 +69,14 @@ fun AddLessonScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // Subject selection
-            Text("Fach", style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.subject), style = MaterialTheme.typography.titleMedium)
             var expandedSubject by remember { mutableStateOf(false) }
             ExposedDropdownMenuBox(
                 expanded = expandedSubject,
                 onExpandedChange = { expandedSubject = it }
             ) {
                 OutlinedTextField(
-                    value = subjects.value.find { it.id == selectedSubjectId }?.name ?: "Fach auswählen",
+                    value = subjects.value.find { it.id == selectedSubjectId }?.name ?: stringResource(R.string.choose_subject),
                     onValueChange = {},
                     readOnly = true,
                     trailingIcon = {
@@ -139,7 +141,7 @@ fun AddLessonScreen(
             }
 
             // Hour selection
-            Text("Stunde", style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.hour), style = MaterialTheme.typography.titleMedium)
             if (fixedHour) {
                 Text(selectedHour.toString(), style = MaterialTheme.typography.bodyLarge)
             } else {
@@ -150,16 +152,16 @@ fun AddLessonScreen(
                             if (hour in 1..12) selectedHour = hour
                         }
                     },
-                    label = { Text("Stundennummer (1-12)") },
+                    label = { Text("${stringResource(R.string.lesson_number)} (1-12)") },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
                 )
             }
 
             // Week type selection
-            Text("Wochentyp", style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.week_type), style = MaterialTheme.typography.titleMedium)
             if (fixedWeekType) {
-                Text(if (selectedWeekType == WeekType.A) "A-Woche" else "B-Woche", style = MaterialTheme.typography.bodyLarge)
+                Text(if (selectedWeekType == WeekType.A) stringResource(R.string.a_week) else stringResource(R.string.b_week), style = MaterialTheme.typography.bodyLarge)
             } else {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -168,12 +170,12 @@ fun AddLessonScreen(
                     FilterChip(
                         selected = selectedWeekType == WeekType.A,
                         onClick = { selectedWeekType = WeekType.A },
-                        label = { Text("A-Woche") }
+                        label = { Text(stringResource(R.string.a_week)) }
                     )
                     FilterChip(
                         selected = selectedWeekType == WeekType.B,
                         onClick = { selectedWeekType = WeekType.B },
-                        label = { Text("B-Woche") }
+                        label = { Text(stringResource(R.string.b_week)) }
                     )
                 }
             }
@@ -182,7 +184,7 @@ fun AddLessonScreen(
             OutlinedTextField(
                 value = teacher,
                 onValueChange = { teacher = it },
-                label = { Text("Lehrer") },
+                label = { Text(stringResource(R.string.teacher)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
             )
@@ -191,7 +193,7 @@ fun AddLessonScreen(
             OutlinedTextField(
                 value = room,
                 onValueChange = { room = it },
-                label = { Text("Raum") },
+                label = { Text(stringResource(R.string.room)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
             )
@@ -229,7 +231,7 @@ fun AddLessonScreen(
                 modifier = Modifier.fillMaxWidth(),
                 enabled = selectedSubjectId.isNotEmpty()
             ) {
-                Text(if (lessonToEdit == null) "Stunde hinzufügen" else "Stunde speichern")
+                Text(if (lessonToEdit == null) stringResource(R.string.add_lesson) else stringResource(R.string.save_lesson))
             }
         }
     }

@@ -13,6 +13,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.res.stringResource
+import com.future.schoolplanner.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -26,10 +28,10 @@ fun MainSettingsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Einstellungen") },
+                title = { Text(stringResource(R.string.settings),) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, "Zurück")
+                        Icon(Icons.Default.ArrowBack, stringResource(R.string.back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -46,34 +48,28 @@ fun MainSettingsScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            item {
-                Text(
-                    text = "Einstellungen",
-                    style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-            }
+
 
             item {
                 SettingsCategory(
-                    title = "Noten",
-                    description = "Einstellungen für Noteneingabe und -anzeige",
+                    title = stringResource(R.string.grades_title),
+                    description = stringResource(R.string.grade_settings),
                     onClick = onNavigateToGradeSettings
                 )
             }
 
             item {
                 SettingsCategory(
-                    title = "Stundenplan",
-                    description = "Einstellungen für die Anzeige von Stundenplan und Noten",
+                    title = stringResource(R.string.schedule_display),
+                    description = stringResource(R.string.schedule_title_description),
                     onClick = onNavigateToDisplaySettings
                 )
             }
 
             item {
                 SettingsCategory(
-                    title = "App",
-                    description = "Allgemeine App-Einstellungen",
+                    title = stringResource(R.string.app_settings),
+                    description = stringResource(R.string.app_settings_description),
                     onClick = onNavigateToAppSettings
                 )
             }
@@ -103,7 +99,7 @@ fun SettingsCategory(
                 text = title,
                 style = MaterialTheme.typography.titleLarge
             )
-            Icon(Icons.Default.ArrowForward, contentDescription = "Weiter")
+            Icon(Icons.Default.ArrowForward, contentDescription = stringResource(R.string.next))
         }
         Text(
             text = description,

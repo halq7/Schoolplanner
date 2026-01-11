@@ -52,6 +52,8 @@ import com.future.schoolplanner.ui.theme.getContrastingTextColor
 import java.util.UUID
 import kotlin.math.max
 import kotlin.math.min
+import androidx.compose.ui.res.stringResource
+import com.future.schoolplanner.R
 
 // HSV Color conversion functions
 data class HSV(val hue: Float, val saturation: Float, val value: Float)
@@ -148,13 +150,13 @@ fun ColorPicker(
                     }
                 }
             },
-            label = { Text("Hex-Farbe") },
+            label = { Text(stringResource(R.string.hex_color)) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
 
         // Hue slider
-        Text("Farbton", style = MaterialTheme.typography.bodyMedium)
+        Text(stringResource(R.string.hue), style = MaterialTheme.typography.bodyMedium)
         HueSlider(
             hue = hsv.hue,
             onHueChange = { newHue ->
@@ -165,7 +167,7 @@ fun ColorPicker(
         )
 
         // Saturation and Value picker
-        Text("Sättigung & Helligkeit", style = MaterialTheme.typography.bodyMedium)
+        Text(stringResource(R.string.saturation_brightness), style = MaterialTheme.typography.bodyMedium)
         SaturationValuePicker(
             hsv = hsv,
             onHSVChange = { newHsv ->
@@ -315,10 +317,10 @@ fun AddSubjectScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Fach hinzufügen") },
+                title = { Text(stringResource(R.string.add_subject)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, "Zurück")
+                        Icon(Icons.Default.ArrowBack, stringResource(R.string.back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -336,10 +338,6 @@ fun AddSubjectScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(
-                text = "Neues Fach erstellen",
-                style = MaterialTheme.typography.headlineMedium
-            )
 
             OutlinedTextField(
                 value = subjectName,
@@ -347,11 +345,11 @@ fun AddSubjectScreen(
                     subjectName = it
                     showNameError = false
                 },
-                label = { Text("Fach") },
+                label = { Text(stringResource(R.string.subject)) },
                 isError = showNameError,
                 supportingText = {
                     if (showNameError) {
-                        Text("Bitte gib einen Fachnamen ein")
+                        Text(stringResource(R.string.enter_subject_name))
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
@@ -364,11 +362,11 @@ fun AddSubjectScreen(
                     abbreviation = filtered
                     showAbbreviationError = false
                 },
-                label = { Text("Abkürzung (2-3 Buchstaben)") },
+                label = { Text(stringResource(R.string.abbreviation)) },
                 isError = showAbbreviationError,
                 supportingText = {
                     if (showAbbreviationError) {
-                        Text("Bitte gib eine Abkürzung mit 2-3 Buchstaben ein")
+                        Text(stringResource(R.string.enter_abbreviation))
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
@@ -377,27 +375,27 @@ fun AddSubjectScreen(
             OutlinedTextField(
                 value = teacher,
                 onValueChange = { teacher = it },
-                label = { Text("Lehrer") },
+                label = { Text(stringResource(R.string.teacher)) },
                 modifier = Modifier.fillMaxWidth()
             )
 
             OutlinedTextField(
                 value = room,
                 onValueChange = { room = it },
-                label = { Text("Raum") },
+                label = { Text(stringResource(R.string.room)) },
                 modifier = Modifier.fillMaxWidth()
             )
 
             OutlinedTextField(
                 value = description,
                 onValueChange = { description = it },
-                label = { Text("Beschreibung") },
+                label = { Text(stringResource(R.string.description_optional)) },
                 modifier = Modifier.fillMaxWidth(),
                 minLines = 3
             )
 
             Text(
-                text = "Fachfarbe:",
+                text = stringResource(R.string.subject_color),
                 style = MaterialTheme.typography.bodyMedium
             )
 
@@ -441,7 +439,7 @@ fun AddSubjectScreen(
                 onClick = { originalColor = selectedColor; showCustomColorDialog = true },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Eigene Farbe wählen")
+                Text(stringResource(R.string.choose_custom_color))
             }
 
             Spacer(modifier = Modifier.weight(1f))
@@ -481,13 +479,13 @@ fun AddSubjectScreen(
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Fach hinzufügen")
+                Text(stringResource(R.string.add_subject))
             }
 
             if (showCustomColorDialog) {
                 AlertDialog(
                     onDismissRequest = { showCustomColorDialog = false },
-                    title = { Text("Eigene Farbe wählen") },
+                    title = { Text(stringResource(R.string.choose_custom_color)) },
                     text = {
                         ColorPicker(
                             initialColor = selectedColor,
@@ -496,12 +494,12 @@ fun AddSubjectScreen(
                     },
                     confirmButton = {
                         TextButton(onClick = { showCustomColorDialog = false }) {
-                            Text("OK")
+                            Text(stringResource(R.string.ok))
                         }
                     },
                     dismissButton = {
                         TextButton(onClick = { selectedColor = originalColor; showCustomColorDialog = false }) {
-                            Text("Abbrechen")
+                            Text(stringResource(R.string.cancel))
                         }
                     }
                 )

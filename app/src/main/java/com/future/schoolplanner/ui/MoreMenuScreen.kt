@@ -27,7 +27,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.future.schoolplanner.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,7 +43,7 @@ fun MoreMenuScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Mehr") },
+                title = { Text(stringResource(R.string.more_title)) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary
@@ -70,7 +72,7 @@ fun MoreMenuScreen(
                 ) {
                     Icon(Icons.Default.DateRange, contentDescription = null)
                     Spacer(modifier = Modifier.width(16.dp))
-                    Text("Schuljahre")
+                    Text(stringResource(R.string.school_years))
                 }
             }
 
@@ -88,7 +90,7 @@ fun MoreMenuScreen(
                 ) {
                     Icon(Icons.Default.List, contentDescription = null)
                     Spacer(modifier = Modifier.width(16.dp))
-                    Text("Zeugnisse")
+                    Text(stringResource(R.string.reports))
                 }
             }
             Card(
@@ -105,7 +107,7 @@ fun MoreMenuScreen(
                 ) {
                     Icon(Icons.Default.Build, contentDescription = null)
                     Spacer(modifier = Modifier.width(16.dp))
-                    Text("Erweiterungen")
+                    Text(stringResource(R.string.extensions))
                 }
             }
 
@@ -123,7 +125,7 @@ fun MoreMenuScreen(
                 ) {
                     Icon(Icons.Filled.ImportExport, contentDescription = null)
                     Spacer(modifier = Modifier.width(16.dp))
-                    Text("Daten verwalten")
+                    Text(stringResource(R.string.manage_data))
                 }
             }
             
@@ -141,7 +143,7 @@ fun MoreMenuScreen(
                 ) {
                     Icon(Icons.Default.Settings, contentDescription = null)
                     Spacer(modifier = Modifier.width(16.dp))
-                    Text("Einstellungen")
+                    Text(stringResource(R.string.settings))
                 }
             }
         }

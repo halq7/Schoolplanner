@@ -22,6 +22,8 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import java.time.LocalDate
+import androidx.compose.ui.res.stringResource
+import com.future.schoolplanner.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -73,14 +75,8 @@ fun TasksScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Keine Aufgaben vorhanden",
+                    text = stringResource(R.string.no_tasks),
                     style = MaterialTheme.typography.headlineMedium
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = "Drücke den + Button, um eine neue Aufgabe zu erstellen.",
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(horizontal = 32.dp)
                 )
             }
         } else {
@@ -96,7 +92,7 @@ fun TasksScreen(
                 if (pendingTasks.isNotEmpty()) {
                     item {
                         Text(
-                            text = "Offene Aufgaben",
+                            text = stringResource(R.string.open_tasks),
                             style = MaterialTheme.typography.titleMedium,
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
@@ -126,12 +122,12 @@ fun TasksScreen(
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(
-                                text = "Erledigte Aufgaben (${completedTasks.size})",
+                                text = "${stringResource(R.string.completed_tasks)} (${completedTasks.size})",
                                 style = MaterialTheme.typography.titleMedium
                             )
                             Icon(
                                 imageVector = if (showCompletedTasks) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                                contentDescription = if (showCompletedTasks) "Ausklappen" else "Einklappen"
+                                contentDescription = if (showCompletedTasks) stringResource(R.string.expand) else stringResource(R.string.collapse)
                             )
                         }
                     }
@@ -161,10 +157,10 @@ fun TasksScreen(
     if (showTaskActionDialog && selectedTask != null) {
         AlertDialog(
             onDismissRequest = { showTaskActionDialog = false },
-            title = { Text("Aktion für Aufgabe \"${selectedTask!!.title}\"") },
+            title = { Text("${stringResource(R.string.action_for_task)} \"${selectedTask!!.title}\"") },
             text = {
                 Column {
-                    Text("Wählen Sie eine Aktion:")
+                    Text(stringResource(R.string.choose_action))
                 }
             },
             confirmButton = {
@@ -179,7 +175,7 @@ fun TasksScreen(
                     ) {
                         Icon(Icons.Default.Edit, contentDescription = null)
                         Spacer(modifier = Modifier.size(4.dp))
-                        Text("Bearbeiten")
+                        Text(stringResource(R.string.edit))
                     }
                     TextButton(
                         onClick = {
@@ -189,7 +185,7 @@ fun TasksScreen(
                     ) {
                         Icon(Icons.Default.Delete, contentDescription = null)
                         Spacer(modifier = Modifier.size(4.dp))
-                        Text("Löschen")
+                        Text(stringResource(R.string.delete))
                     }
                 }
             },
@@ -197,7 +193,7 @@ fun TasksScreen(
                 TextButton(
                     onClick = { showTaskActionDialog = false }
                 ) {
-                    Text("Abbrechen")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )
@@ -207,9 +203,9 @@ fun TasksScreen(
     if (showDeleteTaskDialog && selectedTask != null) {
         AlertDialog(
             onDismissRequest = { showDeleteTaskDialog = false },
-            title = { Text("Aufgabe löschen") },
+            title = { Text(stringResource(R.string.delete_task)) },
             text = {
-                Text("Möchten Sie diese Aufgabe wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.")
+                Text(stringResource(R.string.delete_task_confirmation))
             },
             confirmButton = {
                 TextButton(
@@ -221,12 +217,12 @@ fun TasksScreen(
                         contentColor = MaterialTheme.colorScheme.error
                     )
                 ) {
-                    Text("Löschen")
+                    Text(stringResource(R.string.delete))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteTaskDialog = false }) {
-                    Text("Abbrechen")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )

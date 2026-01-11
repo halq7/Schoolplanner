@@ -19,6 +19,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.future.schoolplanner.data.SchoolYear
 import java.util.UUID
+import androidx.compose.ui.res.stringResource
+import com.future.schoolplanner.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,7 +36,7 @@ fun SchoolYearsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Schuljahre") },
+                title = { Text(stringResource(R.string.school_years)) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary
@@ -43,7 +45,7 @@ fun SchoolYearsScreen(
         },
         floatingActionButton = {
             FloatingActionButton(onClick = onAddSchoolYear) {
-                Icon(Icons.Default.Add, "Schuljahr hinzufügen")
+                Icon(Icons.Default.Add, stringResource(R.string.add_year))
             }
         }
     ) { paddingValues ->
@@ -55,7 +57,7 @@ fun SchoolYearsScreen(
                 contentAlignment = Alignment.Center
             ) {
                Text(
-                    text = "Keine Schuljahre vorhanden",
+                    text = stringResource(R.string.no_years),
                     style = MaterialTheme.typography.headlineSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -100,8 +102,8 @@ fun SchoolYearCard(
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            title = { Text("Schuljahr löschen") },
-            text = { Text("Möchten Sie das Schuljahr \"${schoolYear.name}\" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.") },
+            title = { Text(stringResource(R.string.add_school_year)) },
+            text = { Text("${stringResource(R.string.delete)} \"${schoolYear.name}\"? ${stringResource(R.string.undone)}" )},
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -109,12 +111,12 @@ fun SchoolYearCard(
                         showDeleteDialog = false
                     }
                 ) {
-                    Text("Löschen", color = MaterialTheme.colorScheme.error)
+                    Text(stringResource(R.string.delete), color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("Abbrechen")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )
@@ -154,7 +156,7 @@ fun SchoolYearCard(
                     )
                 }
                 Text(
-                    text = "Von ${schoolYear.startDate} bis ${schoolYear.endDate}",
+                    text = "${stringResource(R.string.from)} ${schoolYear.startDate} ${stringResource(R.string.to)} ${schoolYear.endDate}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                 )
@@ -167,7 +169,7 @@ fun SchoolYearCard(
                 IconButton(onClick = onEdit) {
                     Icon(
                         imageVector = Icons.Default.Edit,
-                        contentDescription = "Bearbeiten",
+                        contentDescription = stringResource(R.string.edit),
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }
@@ -175,7 +177,7 @@ fun SchoolYearCard(
                 if (isCurrent) {
                     Icon(
                         imageVector = Icons.Default.Check,
-                        contentDescription = "Aktuelles Schuljahr",
+                        contentDescription = stringResource(R.string.current_year),
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }
@@ -198,7 +200,7 @@ fun AddSchoolYearScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Neues Schuljahr") },
+                title = { Text(stringResource(R.string.new_year)) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary
@@ -218,21 +220,21 @@ fun AddSchoolYearScreen(
                 onValueChange = { name = it },
                 label = { Text("Name") },
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text("z.B. 2024/2025") }
+                placeholder = { Text(stringResource(R.string.year_eg)) }
             )
 
             OutlinedTextField(
                 value = description,
                 onValueChange = { description = it },
-                label = { Text("Beschreibung") },
+                label = { Text(stringResource(R.string.description)) },
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text("Optionale Beschreibung") }
+                placeholder = { Text(stringResource(R.string.description_optional),) }
             )
 
             OutlinedTextField(
                 value = startDate,
                 onValueChange = { startDate = it },
-                label = { Text("Beginn") },
+                label = { Text(stringResource(R.string.start)) },
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = { Text("YYYY-MM-DD") }
             )
@@ -240,7 +242,7 @@ fun AddSchoolYearScreen(
             OutlinedTextField(
                 value = endDate,
                 onValueChange = { endDate = it },
-                label = { Text("Ende") },
+                label = { Text(stringResource(R.string.end)) },
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = { Text("YYYY-MM-DD") }
             )
@@ -264,7 +266,7 @@ fun AddSchoolYearScreen(
                 modifier = Modifier.fillMaxWidth(),
                 enabled = name.isNotEmpty() && startDate.isNotEmpty() && endDate.isNotEmpty()
             ) {
-                Text("Schuljahr hinzufügen")
+                Text(stringResource(R.string.add_year))
             }
         }
     }
@@ -285,7 +287,7 @@ fun EditSchoolYearScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Schuljahr bearbeiten") },
+                title = { Text(stringResource(R.string.edit_year),) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary
@@ -305,21 +307,21 @@ fun EditSchoolYearScreen(
                 onValueChange = { name = it },
                 label = { Text("Name") },
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text("z.B. 2024/2025") }
+                placeholder = { Text(stringResource(R.string.year_eg)) }
             )
 
             OutlinedTextField(
                 value = description,
                 onValueChange = { description = it },
-                label = { Text("Beschreibung") },
+                label = { Text(stringResource(R.string.description)) },
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text("Optionale Beschreibung") }
+                placeholder = { Text(stringResource(R.string.description_optional)) }
             )
 
             OutlinedTextField(
                 value = startDate,
                 onValueChange = { startDate = it },
-                label = { Text("Beginn") },
+                label = { Text(stringResource(R.string.start)) },
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = { Text("YYYY-MM-DD") }
             )
@@ -327,7 +329,7 @@ fun EditSchoolYearScreen(
             OutlinedTextField(
                 value = endDate,
                 onValueChange = { endDate = it },
-                label = { Text("Ende") },
+                label = { Text(stringResource(R.string.end)) },
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = { Text("YYYY-MM-DD") }
             )
@@ -350,7 +352,7 @@ fun EditSchoolYearScreen(
                 modifier = Modifier.fillMaxWidth(),
                 enabled = name.isNotEmpty() && startDate.isNotEmpty() && endDate.isNotEmpty()
             ) {
-                Text("Schuljahr speichern")
+                Text(stringResource(R.string.save_year))
             }
         }
     }

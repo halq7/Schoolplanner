@@ -39,6 +39,8 @@ import com.future.schoolplanner.data.Report
 import com.future.schoolplanner.data.ReportSubject
 import com.future.schoolplanner.data.SchoolYear
 import java.util.UUID
+import androidx.compose.ui.res.stringResource
+import com.future.schoolplanner.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,10 +61,10 @@ fun EditReportScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Zeugnis bearbeiten") },
+                title = { Text(stringResource(R.string.edit_report)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Zurück")
+                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 actions = {
@@ -76,7 +78,7 @@ fun EditReportScreen(
                             onReportUpdated(updatedReport)
                         }
                     ) {
-                        Icon(Icons.Default.Check, contentDescription = "Speichern")
+                        Icon(Icons.Default.Check, contentDescription = stringResource(R.string.save))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -96,26 +98,26 @@ fun EditReportScreen(
         ) {
             // Report Info
             Text(
-                text = "Zeugnis Informationen",
+                text = stringResource(R.string.report_information),
                 style = MaterialTheme.typography.titleMedium
             )
 
             OutlinedTextField(
                 value = reportName,
                 onValueChange = { reportName = it },
-                label = { Text("Zeugnis Name") },
+                label = { Text(stringResource(R.string.report_name)) },
                 modifier = Modifier.fillMaxWidth()
             )
 
             OutlinedTextField(
                 value = reportDate,
                 onValueChange = { reportDate = it },
-                label = { Text("Ausstellungsdatum") },
+                label = { Text(stringResource(R.string.issue_date_optional)) },
                 modifier = Modifier.fillMaxWidth()
             )
 
             Text(
-                text = "Schuljahr: ${schoolYear?.name ?: "Unbekannt"}",
+                text = "${stringResource(R.string.school_year)} ${schoolYear?.name ?: stringResource(R.string.unknown)}",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -123,7 +125,7 @@ fun EditReportScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Fächer",
+                text = stringResource(R.string.subjects),
                 style = MaterialTheme.typography.titleMedium
             )
 
@@ -159,7 +161,7 @@ fun EditReportScreen(
             ) {
                 Icon(Icons.Default.Add, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Zusätzliches Fach hinzufügen")
+                Text(stringResource(R.string.add_additional_subject))
             }
         }
     }
@@ -183,7 +185,7 @@ fun EditableReportSubjectItem(
                 onValueChange = { name ->
                     onSubjectChange(subject.copy(name = name))
                 },
-                label = { Text("Fachname") },
+                label = { Text(stringResource(R.string.subject_name)) },
                 modifier = Modifier.weight(1f)
             )
             OutlinedTextField(
@@ -191,7 +193,7 @@ fun EditableReportSubjectItem(
                 onValueChange = { abbr ->
                     onSubjectChange(subject.copy(abbreviation = abbr))
                 },
-                label = { Text("Abk.") },
+                label = { Text(stringResource(R.string.abbreviation)) },
                 modifier = Modifier.width(80.dp)
             )
             OutlinedTextField(
@@ -199,11 +201,11 @@ fun EditableReportSubjectItem(
                 onValueChange = { gradeStr ->
                     onSubjectChange(subject.copy(finalGrade = gradeStr.ifEmpty { null }))
                 },
-                label = { Text("Note (z.B. 2-)") },
+                label = { Text(stringResource(R.string.grade)) },
                 modifier = Modifier.width(100.dp)
             )
             IconButton(onClick = onRemove) {
-                Icon(Icons.Default.Delete, contentDescription = "Entfernen")
+                Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete))
             }
         } else {
             // Regular subjects - editable grade field
@@ -217,7 +219,7 @@ fun EditableReportSubjectItem(
                 onValueChange = { gradeStr ->
                     onSubjectChange(subject.copy(finalGrade = gradeStr.ifEmpty { null }))
                 },
-                label = { Text("Note (z.B. 2-)") },
+                label = { Text(stringResource(R.string.grade)) },
                 modifier = Modifier.width(100.dp)
             )
         }

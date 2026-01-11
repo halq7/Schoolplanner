@@ -8,6 +8,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.future.schoolplanner.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -17,10 +19,10 @@ fun PrivacyScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Datenschutz") },
+                title = { Text(stringResource(R.string.privacy)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, "Zurück")
+                        Icon(Icons.Default.ArrowBack, stringResource(R.string.back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -37,13 +39,6 @@ fun PrivacyScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            item {
-                Text(
-                    text = "Datenschutz",
-                    style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-            }
 
             item {
                 Card(
@@ -54,12 +49,12 @@ fun PrivacyScreen(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Text(
-                            text = "Datenschutzerklärung",
+                            text = stringResource(R.string.privacy_policy),
                             style = MaterialTheme.typography.titleLarge
                         )
 
                         Text(
-                            text = "Diese App sammelt keine Daten, Nutzungsstatistiken oder Ähnliches, NICHTS.",
+                            text = stringResource(R.string.privacy_text),
                             style = MaterialTheme.typography.bodyLarge
                         )
                     }

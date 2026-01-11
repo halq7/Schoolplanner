@@ -30,6 +30,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.future.schoolplanner.data.Report
+import androidx.compose.ui.res.stringResource
+import com.future.schoolplanner.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,15 +47,15 @@ fun ViewReportScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Zeugnis anzeigen") },
+                title = { Text(stringResource(R.string.view_report)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Zurück")
+                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 actions = {
                     IconButton(onClick = onEdit) {
-                        Icon(Icons.Default.Edit, contentDescription = "Bearbeiten")
+                        Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.edit_report))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -80,14 +82,14 @@ fun ViewReportScreen(
 
             if (schoolYear != null) {
                 Text(
-                    text = "Schuljahr: ${schoolYear.name}",
+                    text = "${stringResource(R.string.school_year)} ${schoolYear.name}",
                     style = MaterialTheme.typography.titleMedium
                 )
             }
 
             if (report.date.isNotEmpty()) {
                 Text(
-                    text = "Ausstellungsdatum: ${report.date}",
+                    text = "${stringResource(R.string.issue_date)} ${report.date}",
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
@@ -96,7 +98,7 @@ fun ViewReportScreen(
 
             // Subjects
             Text(
-                text = "Fächer",
+                text = stringResource(R.string.subjects),
                 style = MaterialTheme.typography.titleLarge
             )
 
@@ -141,7 +143,7 @@ fun ViewReportScreen(
 
             if (report.reportSubjects.isEmpty()) {
                 Text(
-                    text = "Keine Fächer in diesem Zeugnis",
+                    text = stringResource(R.string.no_subjects_in_report),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.align(Alignment.CenterHorizontally)

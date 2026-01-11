@@ -9,6 +9,7 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -16,6 +17,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.future.schoolplanner.R
 import com.future.schoolplanner.data.Subject
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -27,13 +29,13 @@ fun SchoolPlannerApp() {
     var selectedTabIndex by remember { mutableIntStateOf(0) }
 
     val baseTabs = listOf(
-        TabItem("Noten", Icons.Default.List),
-        TabItem("Stundenplan", Icons.Default.DateRange)
+        TabItem(R.string.tab_grades, Icons.Default.List),
+        TabItem(R.string.tab_schedule, Icons.Default.DateRange)
     )
 
-    val tasksTab = if (tasksTabEnabled) listOf(TabItem("Aufgaben", Icons.Default.CheckCircle)) else emptyList()
+    val tasksTab = if (tasksTabEnabled) listOf(TabItem(R.string.tab_tasks, Icons.Default.CheckCircle)) else emptyList()
 
-    val moreTab = listOf(TabItem("Mehr", Icons.Default.Menu))
+    val moreTab = listOf(TabItem(R.string.tab_more, Icons.Default.Menu))
 
     val tabs = baseTabs + tasksTab + moreTab
 
@@ -46,8 +48,8 @@ fun SchoolPlannerApp() {
             NavigationBar {
                 tabs.forEachIndexed { index, tab ->
                     NavigationBarItem(
-                        icon = { Icon(tab.icon, contentDescription = tab.title) },
-                        label = { Text(tab.title) },
+                        icon = { Icon(tab.icon, contentDescription = stringResource(tab.titleRes)) },
+                        label = { Text(stringResource(tab.titleRes)) },
                         selected = selectedTabIndex == index,
                         onClick = {
                             val targetStart = startRoutes[index]
@@ -98,7 +100,7 @@ fun SchoolPlannerApp() {
 
 
 
-data class TabItem(val title: String, val icon: androidx.compose.ui.graphics.vector.ImageVector)
+data class TabItem(val titleRes: Int, val icon: androidx.compose.ui.graphics.vector.ImageVector)
 
 fun GradesTab(builder: NavGraphBuilder, navController: NavHostController, viewModel: GradeViewModel, paddingValues: androidx.compose.foundation.layout.PaddingValues) {
     builder.composable("subjectList") {
@@ -461,6 +463,16 @@ fun MoreTab(builder: NavGraphBuilder, navController: NavHostController, viewMode
             onNavigateToAboutScreen = {
                 navController.navigate("aboutScreen")
             },
+            onNavigateToLanguageSettings = {
+                navController.navigate("languageSettings")
+            },
+            viewModel = viewModel
+        )
+    }
+
+    builder.composable("languageSettings") {
+        LanguageSettingsScreen(
+            onBack = { navController.popBackStack() },
             viewModel = viewModel
         )
     }

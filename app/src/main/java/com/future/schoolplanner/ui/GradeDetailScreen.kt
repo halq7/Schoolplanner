@@ -52,6 +52,8 @@ import com.future.schoolplanner.data.GradeInputMethod
 import com.future.schoolplanner.data.Subject
 import com.future.schoolplanner.ui.theme.getGradeColor
 import java.util.UUID
+import androidx.compose.ui.res.stringResource
+import com.future.schoolplanner.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -129,9 +131,9 @@ fun GradeDetailScreen(
                     if (currentSubject.grades.isNotEmpty() || simulatedGrade != null) {
                         val average = String.format("%.2f", viewModel.calculateAverage(currentSubject, simulatedGrade))
                         val averageText = if (simulatedGrade != null) {
-                            "Simulierter Durchschnitt: $average"
+                            "${stringResource(R.string.simulated_average)}: $average"
                         } else {
-                            "Aktueller Durchschnitt: $average"
+                            "${stringResource(R.string.average)}: $average"
                         }
                         Text(
                             text = averageText,
@@ -139,19 +141,19 @@ fun GradeDetailScreen(
                             color = getGradeColor(average.toDouble())
                         )
                         Text(
-                            text = "${currentSubject.grades.size} Noten",
+                            text = "${currentSubject.grades.size} ${stringResource(R.string.tab_grades)}",
                             style = MaterialTheme.typography.bodyMedium
                         )
                         if (simulatedGrade != null) {
                             Text(
-                                text = "Simuliert: ${simulatedGrade.value} (Gewichtung: ${simulatedGrade.weight})",
+                                text = "${stringResource(R.string.simulated)}: ${simulatedGrade.value} (${stringResource(R.string.weight)} ${simulatedGrade.weight})",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                             )
                         }
                     } else {
                         Text(
-                            text = "Keine Noten vorhanden",
+                            text = stringResource(R.string.no_grades_available),
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
@@ -185,7 +187,7 @@ fun GradeDetailScreen(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
-                                text = "Simulierter Gesamtschnitt (alle Fächer)",
+                                text = stringResource(R.string.simulated_overall_average),
                                 style = MaterialTheme.typography.titleMedium
                             )
                             Text(
@@ -204,7 +206,7 @@ fun GradeDetailScreen(
             // Grades list
             if (currentSubject.grades.isNotEmpty()) {
                 Text(
-                    text = "Deine Noten:",
+                    text = stringResource(R.string.your_grades),
                     style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
@@ -240,10 +242,10 @@ fun GradeDetailScreen(
             if (showGradeActionDialog && selectedGrade != null) {
                 AlertDialog(
                     onDismissRequest = { showGradeActionDialog = false },
-                    title = { Text("Aktion für Note ${selectedGrade!!.value}") },
+                    title = { Text("${stringResource(R.string.action_for_grade)} ${selectedGrade!!.value}") },
                     text = {
                         Column {
-                            Text("Wählen Sie eine Aktion:")
+                            Text(stringResource(R.string.choose_action))
                         }
                     },
                     confirmButton = {
@@ -258,7 +260,7 @@ fun GradeDetailScreen(
                             ) {
                                 Icon(Icons.Default.Edit, contentDescription = null)
                                 Spacer(modifier = Modifier.size(4.dp))
-                                Text("Bearbeiten")
+                                Text(stringResource(R.string.edit))
                             }
                             androidx.compose.material3.TextButton(
                                 onClick = {
@@ -268,7 +270,7 @@ fun GradeDetailScreen(
                             ) {
                                 Icon(Icons.Default.Delete, contentDescription = null)
                                 Spacer(modifier = Modifier.size(4.dp))
-                                Text("Löschen")
+                                Text(stringResource(R.string.delete))
                             }
                         }
                     },
@@ -276,7 +278,7 @@ fun GradeDetailScreen(
                         androidx.compose.material3.TextButton(
                             onClick = { showGradeActionDialog = false }
                         ) {
-                            Text("Abbrechen")
+                            Text(stringResource(R.string.cancel))
                         }
                     }
                 )
@@ -299,9 +301,9 @@ fun GradeDetailScreen(
             if (showDeleteGradeDialog && selectedGrade != null) {
                 AlertDialog(
                     onDismissRequest = { showDeleteGradeDialog = false },
-                    title = { Text("Note löschen") },
+                    title = { Text(stringResource(R.string.delete_grade)) },
                     text = {
-                        Text("Möchten Sie diese Note wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.")
+                        Text(stringResource(R.string.delete_grade_confirmation))
                     },
                     confirmButton = {
                             androidx.compose.material3.TextButton(
@@ -317,7 +319,7 @@ fun GradeDetailScreen(
                         androidx.compose.material3.TextButton(
                             onClick = { showDeleteGradeDialog = false }
                         ) {
-                            Text("Abbrechen")
+                            Text(stringResource(R.string.cancel))
                         }
                     }
                 )
@@ -351,17 +353,11 @@ fun SimulationCard(
                 .padding(16.dp)
         ) {
             Text(
-                text = "Noten-Simulation",
+                text = stringResource(R.string.grade_simulation),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = "Simuliere eine Note, um zu sehen, wie sich der Durchschnitt ändert. Die simulierte Note wird nicht gespeichert.",
-                style = MaterialTheme.typography.bodySmall
-            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -381,7 +377,7 @@ fun SimulationCard(
                 isError = showSimError,
                 supportingText = {
                     if (showSimError) {
-                        Text("Ungültige Note")
+                        Text(stringResource(R.string.invalid_grade))
                     }
                 }
             )
@@ -391,7 +387,7 @@ fun SimulationCard(
             OutlinedTextField(
                 value = simWeight,
                 onValueChange = { simWeight = it },
-                label = { Text("Gewichtung") },
+                label = { Text(stringResource(R.string.weight)) },
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -414,7 +410,7 @@ fun SimulationCard(
                     },
                     enabled = simGradeValue.isNotBlank()
                 ) {
-                    Text("Simulieren")
+                    Text(stringResource(R.string.simulate))
                 }
 
                 if (simulatedGrade != null) {
@@ -457,24 +453,24 @@ fun EditGradeDialog(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Text(
-                    text = "Note bearbeiten",
+                    text = stringResource(R.string.edit_grade),
                     style = MaterialTheme.typography.headlineSmall
                 )
 
                 val labelText = when (gradeInputMethod) {
-                    GradeInputMethod.WHOLE -> "Note (1-6)"
-                    GradeInputMethod.DECIMAL -> "Note (1.0-6.0)"
-                    GradeInputMethod.TENDENCY -> "Note (z.B. 2-)"
-                    GradeInputMethod.FIFTEEN_POINT -> "Punkte (0-15)"
-                    else -> "Note"
+                    GradeInputMethod.WHOLE -> "${stringResource(R.string.grade)} (1-6)"
+                    GradeInputMethod.DECIMAL -> "${stringResource(R.string.grade)} (1.0-6.0)"
+                    GradeInputMethod.TENDENCY -> "${stringResource(R.string.grade)} (1-, 2+...6)"
+                    GradeInputMethod.FIFTEEN_POINT -> "${stringResource(R.string.points)} (0-15)"
+                    else -> stringResource(R.string.grade)
                 }
 
                 val errorText = when (gradeInputMethod) {
-                    GradeInputMethod.WHOLE -> "Bitte gib eine gültige Note ein (1-6)"
-                    GradeInputMethod.DECIMAL -> "Bitte gib eine gültige Note ein (1.0-6.0)"
-                    GradeInputMethod.TENDENCY -> "Bitte gib eine gültige Note ein (z.B. 2-)"
-                    GradeInputMethod.FIFTEEN_POINT -> "Bitte gib gültige Punkte ein (0-15)"
-                    else -> "Bitte gib eine gültige Note ein"
+                    GradeInputMethod.WHOLE -> "${stringResource(R.string.insert_grade)} (1-6)"
+                    GradeInputMethod.DECIMAL -> "${stringResource(R.string.insert_grade)} (1.0-6.0)"
+                    GradeInputMethod.TENDENCY -> "${stringResource(R.string.insert_grade)} (1-, 2+...6)"
+                    GradeInputMethod.FIFTEEN_POINT -> "${stringResource(R.string.insert_points)} (0-15)"
+                    else -> stringResource(R.string.grade)
                 }
 
                 OutlinedTextField(
@@ -492,19 +488,19 @@ fun EditGradeDialog(
                 OutlinedTextField(
                     value = description,
                     onValueChange = { description = it },
-                    label = { Text("Beschreibung (optional)") }
+                    label = { Text(stringResource(R.string.description_optional)) }
                 )
 
                 OutlinedTextField(
                     value = weight,
                     onValueChange = { weight = it },
-                    label = { Text("Gewichtung (optional)") }
+                    label = { Text(stringResource(R.string.weight_optional)) }
                 )
 
                 OutlinedTextField(
                     value = date,
                     onValueChange = { date = it },
-                    label = { Text("Datum (optional)") }
+                    label = { Text(stringResource(R.string.date_optional)) }
                 )
 
                 Row(
@@ -512,7 +508,7 @@ fun EditGradeDialog(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Button(onClick = onDismiss) {
-                        Text("Abbrechen")
+                        Text(stringResource(R.string.cancel))
                     }
 
                     Spacer(modifier = Modifier.size(8.dp))
@@ -528,7 +524,7 @@ fun EditGradeDialog(
                             }
                         }
                     ) {
-                        Text("Speichern")
+                        Text(stringResource(R.string.save))
                     }
                 }
             }
@@ -585,7 +581,7 @@ fun GradeItem(
             if (grade.weight != 1.0) {
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Gewichtung: ${grade.weight}",
+                    text = "${stringResource(R.string.weight)} ${grade.weight}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                 )
@@ -618,24 +614,24 @@ fun AddGradeDialog(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Text(
-                    text = "Neue Note hinzufügen",
+                    text = stringResource(R.string.add_new_grade),
                     style = MaterialTheme.typography.headlineSmall
                 )
 
                 val labelText = when (gradeInputMethod) {
-                    GradeInputMethod.WHOLE -> "Note (1-6)"
-                    GradeInputMethod.DECIMAL -> "Note (1.0-6.0)"
-                    GradeInputMethod.TENDENCY -> "Note (z.B. 2-)"
-                    GradeInputMethod.FIFTEEN_POINT -> "Punkte (0-15)"
-                    else -> "Note"
+                    GradeInputMethod.WHOLE -> "${stringResource(R.string.grade)} (1-6)"
+                    GradeInputMethod.DECIMAL -> "${stringResource(R.string.grade)} (1.0-6.0)"
+                    GradeInputMethod.TENDENCY -> "${stringResource(R.string.grade)} (1-, 2+...6)"
+                    GradeInputMethod.FIFTEEN_POINT -> "${stringResource(R.string.points)} (0-15)"
+                    else -> stringResource(R.string.grade)
                 }
 
                 val errorText = when (gradeInputMethod) {
-                    GradeInputMethod.WHOLE -> "Bitte gib eine gültige Note ein (1-6)"
-                    GradeInputMethod.DECIMAL -> "Bitte gib eine gültige Note ein (1.0-6.0)"
-                    GradeInputMethod.TENDENCY -> "Bitte gib eine gültige Note ein (z.B. 2-)"
-                    GradeInputMethod.FIFTEEN_POINT -> "Bitte gib gültige Punkte ein (0-15)"
-                    else -> "Bitte gib eine gültige Note ein"
+                    GradeInputMethod.WHOLE -> "${stringResource(R.string.insert_grade)} (1-6)"
+                    GradeInputMethod.DECIMAL -> "${stringResource(R.string.insert_grade)} (1.0-6.0)"
+                    GradeInputMethod.TENDENCY -> "${stringResource(R.string.insert_grade)} (1-, 2+...6)"
+                    GradeInputMethod.FIFTEEN_POINT -> "${stringResource(R.string.insert_points)} (0-15)"
+                    else -> stringResource(R.string.grade)
                 }
 
                 OutlinedTextField(
@@ -653,19 +649,19 @@ fun AddGradeDialog(
                 OutlinedTextField(
                     value = description,
                     onValueChange = { description = it },
-                    label = { Text("Beschreibung (optional)") }
+                    label = { Text(stringResource(R.string.description_optional)) }
                 )
 
                 OutlinedTextField(
                     value = weight,
                     onValueChange = { weight = it },
-                    label = { Text("Gewichtung (optional)") }
+                    label = { Text(stringResource(R.string.weight_optional)) }
                 )
 
                 OutlinedTextField(
                     value = date,
                     onValueChange = { date = it },
-                    label = { Text("Datum (optional)") }
+                    label = { Text(stringResource(R.string.date_optional)) }
                 )
 
                 Row(
@@ -673,7 +669,7 @@ fun AddGradeDialog(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Button(onClick = onDismiss) {
-                        Text("Abbrechen")
+                        Text(stringResource(R.string.cancel))
                     }
 
                     Spacer(modifier = Modifier.size(8.dp))
@@ -695,7 +691,7 @@ fun AddGradeDialog(
                             }
                         }
                     ) {
-                        Text("Hinzufügen")
+                        Text(stringResource(R.string.add))
                     }
                 }
             }

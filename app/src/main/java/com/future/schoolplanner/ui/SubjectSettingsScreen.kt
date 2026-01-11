@@ -39,6 +39,8 @@ import androidx.compose.ui.graphics.Color as ComposeColor
 import androidx.compose.ui.unit.dp
 import com.future.schoolplanner.data.Subject
 import com.future.schoolplanner.ui.theme.getContrastingTextColor
+import androidx.compose.ui.res.stringResource
+import com.future.schoolplanner.R
 
 
 
@@ -75,10 +77,10 @@ fun SubjectSettingsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Facheinstellungen") },
+                title = { Text(stringResource(R.string.subject_settings)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, "Zurück")
+                        Icon(Icons.Default.ArrowBack, stringResource(R.string.back))
                     }
                 },
                 actions = {
@@ -107,7 +109,7 @@ fun SubjectSettingsScreen(
                             onSubjectUpdated(updatedSubject)
                         }
                     }) {
-                        Icon(Icons.Filled.Check, "Speichern")
+                        Icon(Icons.Filled.Check, stringResource(R.string.save))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -130,11 +132,11 @@ fun SubjectSettingsScreen(
                     subjectName = it
                     showNameError = false
                 },
-                label = { Text("Fach") },
+                label = { Text(stringResource(R.string.subject)) },
                 isError = showNameError,
                 supportingText = {
                     if (showNameError) {
-                        Text("Bitte gib einen Fachnamen ein")
+                        Text(stringResource(R.string.enter_subject_name))
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
@@ -147,11 +149,11 @@ fun SubjectSettingsScreen(
                     abbreviation = filtered
                     showAbbreviationError = false
                 },
-                label = { Text("Abkürzung (2-3 Buchstaben)") },
+                label = { Text(stringResource(R.string.abbreviation)) },
                 isError = showAbbreviationError,
                 supportingText = {
                     if (showAbbreviationError) {
-                        Text("Bitte gib eine Abkürzung mit 2-3 Buchstaben ein")
+                        Text(stringResource(R.string.enter_abbreviation))
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
@@ -160,27 +162,27 @@ fun SubjectSettingsScreen(
             OutlinedTextField(
                 value = teacher,
                 onValueChange = { teacher = it },
-                label = { Text("Lehrer") },
+                label = { Text(stringResource(R.string.teacher)) },
                 modifier = Modifier.fillMaxWidth()
             )
 
             OutlinedTextField(
                 value = room,
                 onValueChange = { room = it },
-                label = { Text("Raum") },
+                label = { Text(stringResource(R.string.room)) },
                 modifier = Modifier.fillMaxWidth()
             )
 
             OutlinedTextField(
                 value = description,
                 onValueChange = { description = it },
-                label = { Text("Beschreibung") },
+                label = { Text(stringResource(R.string.description)) },
                 modifier = Modifier.fillMaxWidth(),
                 minLines = 3
             )
 
             Text(
-                text = "Fachfarbe:",
+                text = stringResource(R.string.subject_color),
                 style = MaterialTheme.typography.bodyMedium
             )
 
@@ -223,14 +225,14 @@ fun SubjectSettingsScreen(
                 onClick = { originalColor = selectedColor; showCustomColorDialog = true },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Eigene Farbe wählen")
+                Text(stringResource(R.string.choose_custom_color))
             }
 
 
             if (showCustomColorDialog) {
                 AlertDialog(
                     onDismissRequest = { showCustomColorDialog = false },
-                    title = { Text("Eigene Farbe wählen") },
+                    title = { Text(stringResource(R.string.choose_custom_color)) },
                     text = {
                         ColorPicker(
                             initialColor = selectedColor,
@@ -239,12 +241,12 @@ fun SubjectSettingsScreen(
                     },
                     confirmButton = {
                         TextButton(onClick = { showCustomColorDialog = false }) {
-                            Text("OK")
+                            Text(stringResource(R.string.ok))
                         }
                     },
                     dismissButton = {
                         TextButton(onClick = { selectedColor = originalColor; showCustomColorDialog = false }) {
-                            Text("Abbrechen")
+                            Text(stringResource(R.string.cancel))
                         }
                     }
                 )

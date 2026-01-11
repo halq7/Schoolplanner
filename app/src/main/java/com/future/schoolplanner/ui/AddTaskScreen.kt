@@ -11,8 +11,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.future.schoolplanner.R
 import com.future.schoolplanner.data.Task
 import com.future.schoolplanner.data.TaskType
 
@@ -38,10 +40,10 @@ fun AddTaskScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(if (taskToEdit == null) "Aufgabe hinzufügen" else "Aufgabe bearbeiten") },
+                title = { Text(if (taskToEdit == null) stringResource(R.string.add_task) else stringResource(R.string.edit_task)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, "Zurück")
+                        Icon(Icons.Default.ArrowBack, stringResource(R.string.back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -82,7 +84,7 @@ fun AddTaskScreen(
                 },
                 containerColor = MaterialTheme.colorScheme.primary
             ) {
-                Icon(Icons.Default.DateRange, if (taskToEdit == null) "Aufgabe speichern" else "Änderungen speichern")
+                Icon(Icons.Default.DateRange, if (taskToEdit == null) stringResource(R.string.save_task) else stringResource(R.string.save_changes))
             }
         }
     ) { paddingValues ->
@@ -98,7 +100,7 @@ fun AddTaskScreen(
             OutlinedTextField(
                 value = title,
                 onValueChange = { title = it },
-                label = { Text("Titel") },
+                label = { Text("Name") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
             )
@@ -107,13 +109,13 @@ fun AddTaskScreen(
             OutlinedTextField(
                 value = description,
                 onValueChange = { description = it },
-                label = { Text("Beschreibung") },
+                label = { Text(stringResource(R.string.description)) },
                 modifier = Modifier.fillMaxWidth(),
                 minLines = 3
             )
 
             // Task Type
-            Text("Typ", style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.task_type), style = MaterialTheme.typography.titleMedium)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -126,7 +128,7 @@ fun AddTaskScreen(
                         selected = taskType == TaskType.TASK,
                         onClick = { taskType = TaskType.TASK }
                     )
-                    Text("Aufgabe")
+                    Text(stringResource(R.string.task))
                 }
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -136,7 +138,7 @@ fun AddTaskScreen(
                         selected = taskType == TaskType.APPOINTMENT,
                         onClick = { taskType = TaskType.APPOINTMENT }
                     )
-                    Text("Termin")
+                    Text(stringResource(R.string.appointment))
                 }
             }
 
@@ -144,18 +146,18 @@ fun AddTaskScreen(
             OutlinedTextField(
                 value = dueDate,
                 onValueChange = { dueDate = it },
-                label = { Text("Fälligkeitsdatum (YYYY-MM-DD)") },
+                label = { Text(stringResource(R.string.due_date)) },
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text("z.B. 2024-12-31") }
+                placeholder = { Text(stringResource(R.string.due_date_placeholder)) }
             )
 
             // Due Time (optional)
             OutlinedTextField(
                 value = dueTime,
                 onValueChange = { dueTime = it },
-                label = { Text("Fälligkeitszeit (HH:mm, optional)") },
+                label = { Text(stringResource(R.string.due_time_optional)) },
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text("z.B. 14:30, leer lassen für ganztägig") }
+                placeholder = { Text(stringResource(R.string.due_time_placeholder)) }
             )
 
 
@@ -169,9 +171,9 @@ fun AddTaskScreen(
                 OutlinedTextField(
                     value = selectedSubjectId?.let { id ->
                         subjects.find { it.id == id }?.name ?: ""
-                    } ?: "Kein Fach zugeordnet",
+                    } ?: stringResource(R.string.no_subject_associated),
                     onValueChange = { },
-                    label = { Text("Zugeordnetes Fach (optional)") },
+                    label = { Text(stringResource(R.string.associated_subject_optional)) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .menuAnchor(),
@@ -185,7 +187,7 @@ fun AddTaskScreen(
                     onDismissRequest = { expanded = false }
                 ) {
                     DropdownMenuItem(
-                        text = { Text("Kein Fach zugeordnet") },
+                        text = { Text(stringResource(R.string.no_subject_associated)) },
                         onClick = {
                             selectedSubjectId = null
                             expanded = false

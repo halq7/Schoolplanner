@@ -13,7 +13,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.future.schoolplanner.R
 import com.future.schoolplanner.data.serialization.AppData
 import kotlinx.serialization.json.Json
 
@@ -41,12 +43,12 @@ fun ImportScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Daten importieren") },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Zurück")
-                    }
+            title = { Text(stringResource(R.string.import_data)) },
+            navigationIcon = {
+                IconButton(onClick = onBack) {
+                    Icon(Icons.Default.ArrowBack, stringResource(R.string.back))
                 }
+            }
             )
         }
     ) { paddingValues ->
@@ -59,7 +61,7 @@ fun ImportScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Wählen Sie eine JSON-Datei aus, um Ihre Daten zu importieren.",
+                text = stringResource(R.string.import_description),
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.padding(bottom = 24.dp)
             )
@@ -75,16 +77,16 @@ fun ImportScreen(
                         color = MaterialTheme.colorScheme.onPrimary
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Importiere...")
+                    Text(stringResource(R.string.importing))
                 } else {
-                    Text("Datei auswählen")
+                    Text(stringResource(R.string.select_file))
                 }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Hinweis: Alle aktuellen Daten werden durch die importierten Daten ersetzt.",
+                text = stringResource(R.string.import_note),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -111,12 +113,12 @@ private fun importDataFromUri(
             // Load the data into viewModel
             viewModel.loadAppData(appData)
 
-            Toast.makeText(context, "Daten erfolgreich importiert", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(R.string.import_success), Toast.LENGTH_SHORT).show()
         } ?: run {
-            Toast.makeText(context, "Fehler beim Lesen der Datei", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(R.string.import_file_error), Toast.LENGTH_SHORT).show()
         }
     } catch (e: Exception) {
-        Toast.makeText(context, "Fehler beim Importieren: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, context.getString(R.string.import_error, e.localizedMessage), Toast.LENGTH_SHORT).show()
     } finally {
         onComplete()
     }

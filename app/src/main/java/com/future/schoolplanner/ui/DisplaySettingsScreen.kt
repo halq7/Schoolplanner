@@ -13,6 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.future.schoolplanner.data.WeekType
+import androidx.compose.ui.res.stringResource
+import com.future.schoolplanner.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,10 +29,10 @@ fun DisplaySettingsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Anzeigeeinstellungen") },
+                title = { Text(stringResource(R.string.schedule_display)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, "Zurück")
+                        Icon(Icons.Default.ArrowBack, stringResource(R.string.back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -47,13 +49,7 @@ fun DisplaySettingsScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(
-                text = "Stundenplan-Anzeige",
-                style = MaterialTheme.typography.titleLarge
-            )
 
-
-            Spacer(modifier = Modifier.height(4.dp))
 
             // Teacher toggle
             Row(
@@ -66,11 +62,11 @@ fun DisplaySettingsScreen(
             ) {
                 Column {
                     Text(
-                        text = "Lehrer anzeigen",
+                        text = stringResource(R.string.show_teachers),
                         style = MaterialTheme.typography.bodyLarge
                     )
                     Text(
-                        text = "Zeigt Lehrerinformationen im Stundenplan an",
+                        text = stringResource(R.string.show_teachers_description),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                     )
@@ -92,11 +88,11 @@ fun DisplaySettingsScreen(
             ) {
                 Column {
                     Text(
-                        text = "Räume anzeigen",
+                        text = stringResource(R.string.show_rooms),
                         style = MaterialTheme.typography.bodyLarge
                     )
                     Text(
-                        text = "Zeigt Rauminformationen im Stundenplan an",
+                        text = stringResource(R.string.show_rooms_description),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                     )
@@ -109,7 +105,7 @@ fun DisplaySettingsScreen(
 
             // Week type configuration
             Text(
-                text = "Wochen-Konfiguration",
+                text = stringResource(R.string.week_configuration),
                 style = MaterialTheme.typography.titleMedium
             )
 
@@ -121,12 +117,12 @@ fun DisplaySettingsScreen(
                 FilterChip(
                     selected = weekTypeEvenWeeks == WeekType.A,
                     onClick = { viewModel.setWeekTypeEvenWeeks(WeekType.A) },
-                    label = { Text("A-Wochen = gerade") }
+                    label = { Text(stringResource(R.string.a_weeks_even)) }
                 )
                 FilterChip(
                     selected = weekTypeEvenWeeks == WeekType.B,
                     onClick = { viewModel.setWeekTypeEvenWeeks(WeekType.B) },
-                    label = { Text("B-Wochen = gerade") }
+                    label = { Text(stringResource(R.string.b_weeks_even)) }
                 )
             }
             
@@ -134,12 +130,12 @@ fun DisplaySettingsScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Wochen kopieren",
+                text = stringResource(R.string.copy_week),
                 style = MaterialTheme.typography.titleMedium
             )
 
             Text(
-                text = "Kopieren Sie den Stundenplan einer Woche in die andere:",
+                text = stringResource(R.string.copy_week_description),
                 style = MaterialTheme.typography.bodyMedium
             )
 
@@ -158,7 +154,7 @@ fun DisplaySettingsScreen(
                         contentAlignment = Alignment.Center,
                         modifier = Modifier.fillMaxSize()
                     ) {
-                        Text("A → B kopieren")
+                        Text(stringResource(R.string.copy_a_to_b))
                     }
                 }
                 OutlinedButton(
@@ -171,13 +167,13 @@ fun DisplaySettingsScreen(
                         contentAlignment = Alignment.Center,
                         modifier = Modifier.fillMaxSize()
                     ) {
-                        Text("B → A kopieren")
+                        Text(stringResource(R.string.copy_b_to_a))
                     }
                 }
             }
 
             Text(
-                text = "Hinweis: Bestehende Stunden in der Zielwoche werden überschrieben.",
+                text = stringResource(R.string.copy_note),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
             )

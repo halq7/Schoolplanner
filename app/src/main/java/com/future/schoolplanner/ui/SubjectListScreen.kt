@@ -43,9 +43,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.future.schoolplanner.R
 import com.future.schoolplanner.data.Subject
 import com.future.schoolplanner.ui.GradeViewModel
 import com.future.schoolplanner.ui.theme.getContrastingTextColor
@@ -70,7 +72,7 @@ fun SubjectListScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Noten") },
+                title = { Text(stringResource(R.string.grades_title)) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary
@@ -79,23 +81,23 @@ fun SubjectListScreen(
         },
         floatingActionButton = {
             FloatingActionButton(onClick = onAddSubject) {
-                Icon(Icons.Default.Add, "Fach hinzufügen")
+                Icon(Icons.Default.Add, stringResource(R.string.add_subject))
             }
         }
     ) { paddingValues ->
-        if (subjects.value.isEmpty()) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-                contentAlignment = Alignment.Center
-            ) {
-               Text(
-                    text = "Keine Fächer vorhanden",
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
+            if (subjects.value.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
+                   Text(
+                        text = stringResource(R.string.no_subjects),
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
         } else {
             LazyColumn(
                 modifier = Modifier
@@ -121,7 +123,7 @@ fun SubjectListScreen(
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Text(
-                                    text = if (hasSimulatedGrades) "Simulierter Gesamtschnitt" else "Gesamtschnitt",
+                                    text = stringResource(if (hasSimulatedGrades) R.string.simulated_overall_average else R.string.overall_average),
                                     style = MaterialTheme.typography.titleMedium
                                 )
                                 Text(
@@ -132,7 +134,7 @@ fun SubjectListScreen(
                                 )
                                 if (hasSimulatedGrades) {
                                     Text(
-                                        text = "Enthält simulierte Noten",
+                                        text = stringResource(R.string.contains_simulated_grades),
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                                     )
@@ -166,12 +168,6 @@ fun SubjectListScreen(
     if (showSubjectActionDialog && selectedSubject != null) {
         AlertDialog(
             onDismissRequest = { showSubjectActionDialog = false },
-            title = { Text("Aktion für ${selectedSubject!!.name}") },
-            text = {
-                Column {
-                    Text("Wählen Sie eine Aktion:")
-                }
-            },
             confirmButton = {
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -184,7 +180,7 @@ fun SubjectListScreen(
                     ) {
                         Icon(Icons.Default.Edit, contentDescription = null)
                         Spacer(modifier = Modifier.size(4.dp))
-                        Text("Bearbeiten")
+                        Text(stringResource(R.string.edit))
                     }
                     TextButton(
                         onClick = {
@@ -194,7 +190,7 @@ fun SubjectListScreen(
                     ) {
                         Icon(Icons.Default.Delete, contentDescription = null)
                         Spacer(modifier = Modifier.size(4.dp))
-                        Text("Löschen")
+                        Text(stringResource(R.string.delete))
                     }
                 }
             },
@@ -202,7 +198,13 @@ fun SubjectListScreen(
                 TextButton(
                     onClick = { showSubjectActionDialog = false }
                 ) {
-                    Text("Abbrechen")
+                    Text(stringResource(R.string.cancel))
+                }
+            },
+            title = { Text(stringResource(R.string.action_for_subject, selectedSubject!!.name)) },
+            text = {
+                Column {
+                    Text(stringResource(R.string.choose_action))
                 }
             }
         )
@@ -212,10 +214,6 @@ fun SubjectListScreen(
     if (showDeleteSubjectDialog && selectedSubject != null) {
         AlertDialog(
             onDismissRequest = { showDeleteSubjectDialog = false },
-            title = { Text("Fach löschen") },
-            text = {
-                Text("Möchten Sie dieses Fach wirklich löschen? Alle Noten werden ebenfalls gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.")
-            },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -223,15 +221,19 @@ fun SubjectListScreen(
                         showDeleteSubjectDialog = false
                     }
                 ) {
-                    Text("Löschen", color = MaterialTheme.colorScheme.error)
+                    Text(stringResource(R.string.delete), color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
                 TextButton(
                     onClick = { showDeleteSubjectDialog = false }
                 ) {
-                    Text("Abbrechen")
+                    Text(stringResource(R.string.cancel))
                 }
+            },
+            title = { Text(stringResource(R.string.delete_subject)) },
+            text = {
+                Text(stringResource(R.string.delete_subject_confirmation))
             }
         )
     }
@@ -298,9 +300,9 @@ fun SubjectCard(
             if (subject.grades.isNotEmpty() || simulatedGrade != null) {
                 val average = String.format("%.2f", viewModel.calculateAverage(subject, simulatedGrade))
                 val averageText = if (simulatedGrade != null) {
-                    "Simulierter Durchschnitt: $average"
+                    stringResource(R.string.simulated_average, average)
                 } else {
-                    "Durchschnitt: $average"
+                    stringResource(R.string.average, average)
                 }
                 Text(
                     text = averageText,
@@ -308,20 +310,20 @@ fun SubjectCard(
                     color = subject.color.getContrastingTextColor()
                 )
                 Text(
-                    text = "${subject.grades.size} Noten",
+                    text = stringResource(R.string.grades_count, subject.grades.size),
                     style = MaterialTheme.typography.bodyMedium,
                     color = subject.color.getContrastingTextColor().copy(alpha = 0.7f)
                 )
                 if (simulatedGrade != null) {
                     Text(
-                        text = "Simuliert: ${simulatedGrade.value} (Gewichtung: ${simulatedGrade.weight})",
+                        text = stringResource(R.string.simulated, simulatedGrade.value, simulatedGrade.weight),
                         style = MaterialTheme.typography.bodySmall,
                         color = subject.color.getContrastingTextColor().copy(alpha = 0.7f)
                     )
                 }
             } else {
                 Text(
-                    text = "Keine Noten vorhanden",
+                    text = stringResource(R.string.no_grades_available),
                     style = MaterialTheme.typography.bodyMedium,
                     color = subject.color.getContrastingTextColor().copy(alpha = 0.7f)
                 )

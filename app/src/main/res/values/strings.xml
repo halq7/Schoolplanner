@@ -1,3 +1,312 @@
 <resources>
     <string name="app_name">Schoolplanner</string>
+
+    <!-- Navigation -->
+    <string name="tab_grades">Grades</string>
+    <string name="tab_schedule">Schedule</string>
+    <string name="tab_tasks">Tasks</string>
+    <string name="tab_more">More</string>
+
+    <!-- More Menu -->
+    <string name="more_title">More</string>
+    <string name="school_years">School Years</string>
+    <string name="reports">Reports</string>
+    <string name="extensions">Extensions</string>
+    <string name="manage_data">Manage Data</string>
+    <string name="settings">Settings</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="app_settings">App Settings</string>
+    <string name="back">Back</string>
+    <string name="appearance">Appearance</string>
+    <string name="appearance_description">Settings for appearance and display</string>
+    <string name="privacy">Privacy</string>
+    <string name="privacy_description">Privacy settings and permissions</string>
+    <string name="about_app">About the App</string>
+    <string name="about_app_description">Information about the app and version</string>
+    <string name="language">Language</string>
+
+    <!-- Grades -->
+    <string name="grades_title">Grades</string>
+    <string name="no_subjects">No subjects available</string>
+    <string name="overall_average">Overall Average</string>
+    <string name="simulated_overall_average">Simulated Overall Average</string>
+    <string name="contains_simulated_grades">Contains simulated grades</string>
+    <string name="action_for_subject">Action for</string>
+    <string name="choose_action">Choose an action:</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="delete_subject">Delete Subject</string>
+    <string name="delete_subject_confirmation">Do you really want to delete this subject? All grades will also be deleted. This action cannot be undone.</string>
+    <string name="cancel">Cancel</string>
+    <string name="no_grades_available">No grades available</string>
+    <string name="grades_count">%1$d Grades</string>
+    <string name="simulated">Simulated</string>
+    <string name="your_grades">Your Grades:</string>
+    <string name="action_for_grade">Action for Grade</string>
+    <string name="delete_grade">Delete Grade</string>
+    <string name="delete_grade_confirmation">Do you really want to delete this grade? This action cannot be undone.</string>
+    <string name="grade_simulation">Grade Simulation</string>
+    <string name="simulation_description">Simulate a grade to see how the average changes. The simulated grade will not be saved.</string>
+    <string name="simulate">Simulate</string>
+    <string name="edit_grade">Edit Grade</string>
+    <string name="add_new_grade">Add New Grade</string>
+    <string name="grade_value">Grade Value</string>
+    <string name="description_optional">Description (optional)</string>
+    <string name="weight_optional">Weight (optional)</string>
+    <string name="date_optional">Date (optional)</string>
+    <string name="save">Save</string>
+    <string name="add">Add</string>
+    <string name="invalid_grade">Invalid Grade</string>
+    <string name="grade">Grade</string>
+
+    <!-- Schedule -->
+    <string name="schedule_title">Schedule</string>
+    <string name="week">Week:</string>
+    <string name="week_a">A</string>
+    <string name="week_b">B</string>
+    <string name="time">Time</string>
+    <string name="no_subjects_schedule">No subjects available</string>
+    <string name="delete_lesson">Delete Lesson</string>
+    <string name="delete_lesson_confirmation">Do you really want to delete this lesson? This action cannot be undone.</string>
+    <string name="monday">Monday</string>
+    <string name="tuesday">Tuesday</string>
+    <string name="wednesday">Wednesday</string>
+    <string name="thursday">Thursday</string>
+    <string name="friday">Friday</string>
+    <string name="saturday">Saturday</string>
+    <string name="sunday">Sunday</string>
+    <string name="week_type">Week Type</string>
+    <string name="a_week">A-Week</string>
+    <string name="b_week">B-Week</string>
+    <string name="subject">Subject</string>
+    <string name="day">Day</string>
+    <string name="hour">Hour</string>
+    <string name="teacher">Teacher</string>
+    <string name="room">Room</string>
+    <string name="add_lesson">Add Lesson</string>
+    <string name="edit_lesson">Edit Lesson</string>
+    <string name="save_lesson">Save Lesson</string>
+    <string name="hour_number">Hour Number (1-12)</string>
+    <string name="subject_settings">Subject Settings</string>
+    <string name="subject_name">Subject Name</string>
+    <string name="abbreviation">Abbr.</string>
+    <string name="enter_subject_name">Please enter a subject name</string>
+    <string name="enter_abbreviation">Please enter an abbreviation with 2-3 letters</string>
+
+    <!-- Tasks -->
+    <string name="tasks_title">Tasks</string>
+    <string name="no_tasks">No tasks available</string>
+    <string name="create_task_hint">Press the + button to create a new task.</string>
+    <string name="open_tasks">Open Tasks</string>
+    <string name="completed_tasks">Completed Tasks</string>
+    <string name="action_for_task">Action for Task</string>
+    <string name="delete_task">Delete Task</string>
+    <string name="delete_task_confirmation">Do you really want to delete this task? This action cannot be undone.</string>
+    <string name="add_task">Add Task</string>
+    <string name="edit_task">Edit Task</string>
+    <string name="title">Title</string>
+    <string name="description">Description</string>
+    <string name="task_type">Type</string>
+    <string name="task">Task</string>
+    <string name="appointment">Appointment</string>
+    <string name="due_date">Due Date (YYYY-MM-DD)</string>
+    <string name="due_date_placeholder">e.g. 2024-12-31</string>
+    <string name="due_time_optional">Due Time (HH:mm, optional)</string>
+    <string name="due_time_placeholder">e.g. 14:30, leave empty for all-day</string>
+    <string name="associated_subject_optional">Associated Subject (optional)</string>
+    <string name="no_subject_associated">No subject associated</string>
+
+    <!-- Reports -->
+    <string name="reports_title">Reports</string>
+    <string name="view_report">View Report</string>
+    <string name="edit_report">Edit Report</string>
+    <string name="create_report">Create Report</string>
+    <string name="report_information">Report Information</string>
+    <string name="report_name">Report Name</string>
+    <string name="issue_date">Issue Date</string>
+    <string name="school_year">School Year:</string>
+    <string name="subjects">Subjects</string>
+    <string name="add_additional_subject">Add Additional Subject</string>
+    <string name="subject_name_label">Subject Name</string>
+    <string name="grade_example">Grade (e.g. 2-)</string>
+    <string name="no_subjects_in_report">No subjects in this report</string>
+
+    <!-- Import/Export -->
+    <string name="import_export_title">Manage Data</string>
+    <string name="import_export_description">Import and Export</string>
+    <string name="export_data">Export Data</string>
+    <string name="exporting">Exporting...</string>
+    <string name="export_description">Your data will be exported as a JSON file and can be shared.</string>
+    <string name="export_details">The exported file contains all subjects, grades, school years, tasks and settings.</string>
+    <string name="export_success">Data successfully exported</string>
+    <string name="export_error">Error exporting: %1$s</string>
+    <string name="export_subject">Schoolplanner Data Export</string>
+    <string name="export_chooser_title">Export Data</string>
+    <string name="import_data">Import Data</string>
+    <string name="importing">Importing...</string>
+    <string name="select_file">Select File</string>
+    <string name="import_description">Select a JSON file to import your data.</string>
+    <string name="import_note">Note: All current data will be replaced by the imported data.</string>
+    <string name="import_success">Data successfully imported</string>
+    <string name="import_file_error">Error reading file</string>
+    <string name="import_error">Error importing: %1$s</string>
+
+    <!-- Extensions -->
+    <string name="extensions_title">Extensions</string>
+    <string name="tasks_tab">Tasks Tab</string>
+    <string name="tasks_tab_description">Enables a tab for managing tasks</string>
+
+    <!-- Display Settings -->
+    <string name="display_settings_title">Display Settings</string>
+    <string name="schedule_display">Schedule Display</string>
+    <string name="show_teachers">Show Teachers</string>
+    <string name="show_teachers_description">Shows teacher information in the schedule</string>
+    <string name="show_rooms">Show Rooms</string>
+    <string name="show_rooms_description">Shows room information in the schedule</string>
+    <string name="week_configuration">Week Configuration</string>
+    <string name="a_weeks_even">A-Weeks = even</string>
+    <string name="b_weeks_even">B-Weeks = even</string>
+    <string name="copy_week">Copy Week</string>
+    <string name="copy_week_description">Copy the schedule of one week to the other:</string>
+    <string name="copy_a_to_b">Copy A → B</string>
+    <string name="copy_b_to_a">Copy B → A</string>
+    <string name="copy_note">Note: Existing lessons in the target week will be overwritten.</string>
+
+    <!-- Theme Settings -->
+    <string name="theme_settings_title">Appearance</string>
+    <string name="dark_mode">Dark Mode</string>
+    <string name="dark_mode_description">Enables dark mode for the entire app</string>
+    <string name="dynamic_colors">Dynamic Colors</string>
+    <string name="amoled_mode">AMOLED Mode</string>
+    <string name="amoled_mode_description">Pure black background for AMOLED displays</string>
+    <string name="accent_color">Accent Color</string>
+    <string name="choose_accent_color">Choose a custom accent color:</string>
+    <string name="choose_custom_color">Choose Custom Color</string>
+    <string name="default_option">Default</string>
+    <string name="default_subject_transparency">Default Transparency for Subjects</string>
+    <string name="transparency_description">Set the transparency of subject colors (in Grades tab and Schedule):</string>
+    <string name="transparency_percentage">Transparency: %1$d%%</string>
+    <string name="transparency">transparency</string>
+    <string name="preview">Preview</string>
+    <string name="choose_custom_accent_color">Choose Custom Accent Color</string>
+    <string name="ok">OK</string>
+    <string name="theme_settings">Theme-settings</string>
+    <string name="theme">Theme</string>
+    <!-- About -->
+    <string name="about_title">About the App</string>
+    <string name="app_name_full">School Planner</string>
+    <string name="version">Version: %1$s</string>
+    <string name="updates">Updates</string>
+    <string name="checking_updates">Checking for updates...</string>
+    <string name="latest_version">Latest Version: %1$s</string>
+    <string name="download_running">Download running...</string>
+    <string name="update_available">An update is available!</string>
+    <string name="download_update">Download Update</string>
+    <string name="version_current">Your version is current.</string>
+    <string name="no_releases">No releases found.</string>
+
+    <!-- Privacy -->
+    <string name="privacy_title">Privacy</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="privacy_text">This app does not collect any data, usage statistics or similar, NOTHING.</string>
+
+    <!-- Developer Options -->
+    <string name="developer_options">Developer Options</string>
+    <string name="dangerous_actions">⚠️ These actions delete data irrevocably!</string>
+    <string name="debug_info">Debug Information</string>
+    <string name="subjects_count">Subjects:</string>
+    <string name="grades_count_total">Grades:</string>
+    <string name="reports_count">Reports:</string>
+    <string name="school_years_count">School Years:</string>
+    <string name="lessons_count">Lessons:</string>
+    <string name="delete_all_subjects">Delete All Subjects</string>
+    <string name="delete_all_grades">Delete All Grades</string>
+    <string name="delete_all_reports">Delete All Reports</string>
+    <string name="delete_all_school_years">Delete All School Years</string>
+    <string name="delete_all_lessons">Delete All Lessons</string>
+
+    <!-- Add Subject -->
+    <string name="add_subject_title">Add Subject</string>
+    <string name="create_new_subject">Create New Subject</string>
+    <string name="choose_custom_color_title">Choose Custom Color</string>
+    <string name="hex_color">Hex Color</string>
+    <string name="hue">Hue</string>
+    <string name="saturation_brightness">Saturation &amp; Brightness</string>
+    <string name="add_subject">Add Subject</string>
+
+    <!-- Add Report -->
+    <string name="select_school_year">Select School Year</string>
+    <string name="issue_date_optional">Issue Date (optional)</string>
+    <string name="subjects_for_year">Subjects for %1$s</string>
+    <string name="no_subjects_for_year">No subjects for this school year available</string>
+    <string name="additional_subjects">Additional Subjects</string>
+
+    <!-- School Years -->
+    <string name="school_years_title">School Years</string>
+    <string name="add_school_year">Add School Year</string>
+    <string name="edit_school_year">Edit School Year</string>
+    <string name="current_year">Current school year</string>
+    <string name="new_year">New school year</string>
+    <string name="year_eg">e.g. 2024/2025</string>
+
+    <!-- Grade Settings -->
+    <string name="grade_input_method">Grade Input Method</string>
+    <string name="select_input_method">Select the method for entering grades:</string>
+    <string name="numeric">Numeric</string>
+    <string name="text">Text</string>
+    <string name="points">Points</string>
+
+    <!-- Languages -->
+    <string name="english">English</string>
+    <string name="german">German</string>
+    <string name="select_language">Select your preferred language:</string>
+    <string name="dynamic_colors_description">uses system colors</string>
+
+    <!-- Additional -->
+    <string name="save_task">Save Task</string>
+    <string name="save_changes">Save Changes</string>
+    <string name="simulated_average">Simulated average</string>
+    <string name="average">Average</string>
+    <string name="from">from</string>
+    <string name="to">to</string>
+    <string name="start">start</string>
+    <string name="end">End</string>
+    <string name="save_year">Save school year</string>
+
+    <!-- Developer Options -->
+    <string name="developer_options_unlocked">Developer Options unlocked!</string>
+    <string name="apk_install_error">APK could not be installed. Please install manually from Downloads.</string>
+    <string name="update_load_error">Error loading updates: %1$s</string>
+    <string name="add_year">Add school year</string>
+    <string name="edit_year">Edit school year</string>
+    <string name="absolute_grade">Absolute grade</string>
+    <string name="decimal_grade">Decimal grade</string>
+    <string name="tendency_grade">Tendency grades</string>
+    <string name="fifteen_points">15 Points system</string>
+    <string name="eg">e.g.</string>
+    <string name="mon">Mon</string>
+    <string name="tue">Tue</string>
+    <string name="wed">Wed</string>
+    <string name="thu">Thu</string>
+    <string name="fri">Fri</string>
+    <string name="no_reports">No reports available</string>
+    <string name="unknown_year">Unknown school year</string>
+    <string name="delete_year">Delete shool year</string>
+    <string name="undone">This action cannot be undone!</string>
+    <string name="grade_settings">Settings for grade input and grade display</string>
+    <string name="app_settings_description">Settings for the App itself</string>
+    <string name="next">Next</string>
+    <string name="weight">Weight:</string>
+    <string name="insert_grade">Insert a valid grade</string>
+    <string name="insert_points">Insert a valid Points count</string>
+    <string name="no_years">No school years available</string>
+    <string name="unknown">Unknown</string>
+    <string name="expand">Expand</string>
+    <string name="collapse">Collapse</string>
+    <string name="schedule_title_description">Settings for the schedule</string>
+    <string name="subject_color">Color for subject</string>
+    <string name="choose_subject">Choose subject</string>
+    <string name="lesson_number">Lesson number</string>
 </resources>

@@ -12,10 +12,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.future.schoolplanner.R
 import com.future.schoolplanner.data.WeekType
 import com.future.schoolplanner.data.Lesson
 import com.future.schoolplanner.ui.theme.blendOver
@@ -51,20 +53,20 @@ fun ScheduleScreen(
 
     var selectedWeekType by remember(currentWeekType) { mutableStateOf(currentWeekType) }
 
-    val daysOfWeek = listOf("Mo", "Di", "Mi", "Do", "Fr") // Short names for table
+    val daysOfWeek = listOf(stringResource(R.string.mon), stringResource(R.string.tue), stringResource(R.string.wed), stringResource(R.string.thu), stringResource(R.string.fri)) // Short names for table
     val maxHours = maxOf(lessons.value.maxOfOrNull { it.hour } ?: 8, 8)
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Stundenplan") },
+                title = { Text(stringResource(R.string.tab_schedule),) },
                 actions = {
                     // Week type selector
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(end = 16.dp)
                     ) {
-                        Text("Woche:")
+                        Text(stringResource(R.string.week))
                         Spacer(modifier = Modifier.width(8.dp))
                         FilterChip(
                             selected = selectedWeekType == WeekType.A,
@@ -87,7 +89,7 @@ fun ScheduleScreen(
         },
         floatingActionButton = {
             FloatingActionButton(onClick = { onAddLesson(null, null, null) }) {
-                Icon(Icons.Default.Add, "Stunde hinzufügen")
+                Icon(Icons.Default.Add, stringResource(R.string.add_lesson))
             }
         }
     ) { paddingValues ->
@@ -99,7 +101,7 @@ fun ScheduleScreen(
                 contentAlignment = Alignment.Center
             ) {
                Text(
-                    text = "Keine Fächer vorhanden",
+                    text = stringResource(R.string.no_subjects),
                     style = MaterialTheme.typography.headlineSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -121,7 +123,7 @@ fun ScheduleScreen(
                                 .height(40.dp),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text("Zeit", style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold)
+                            Text(stringResource(R.string.time), style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold)
                         }
                         // Day headers
                         daysOfWeek.forEach { day ->
@@ -256,9 +258,9 @@ fun ScheduleCell(
     if (showDeleteDialog && lesson != null) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            title = { Text("Stunde löschen") },
+            title = { Text(stringResource(R.string.delete_lesson),) },
             text = {
-                Text("Möchten Sie diese Stunde wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.")
+                Text(stringResource(R.string.delete_lesson_confirmation),)
             },
             confirmButton = {
                 TextButton(
@@ -267,12 +269,12 @@ fun ScheduleCell(
                         showDeleteDialog = false
                     }
                 ) {
-                    Text("Löschen")
+                    Text(stringResource(R.string.delete),)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("Abbrechen")
+                    Text(stringResource(R.string.cancel),)
                 }
             }
         )

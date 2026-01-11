@@ -855,4 +855,52 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
             saveData()
         }
     }
+
+    // Developer options functions
+    fun clearAllSubjects() {
+        viewModelScope.launch {
+            _subjects.value = emptyList()
+            _selectedSubject.value = null
+            _simulatedGrades.value = emptyMap()
+            saveData()
+        }
+    }
+
+    fun clearAllGrades() {
+        viewModelScope.launch {
+            val subjectsWithoutGrades = _subjects.value.map { subject ->
+                subject.copy(grades = emptyList())
+            }
+            _subjects.value = subjectsWithoutGrades
+            _simulatedGrades.value = emptyMap()
+
+            // Update selected subject if it's the one we just modified
+            if (_selectedSubject.value != null) {
+                _selectedSubject.value = subjectsWithoutGrades.find { it.id == _selectedSubject.value?.id }
+            }
+            saveData()
+        }
+    }
+
+    fun clearAllReports() {
+        viewModelScope.launch {
+            _reports.value = emptyList()
+            saveData()
+        }
+    }
+
+    fun clearAllSchoolYears() {
+        viewModelScope.launch {
+            _schoolYears.value = emptyList()
+            _currentSchoolYearId.value = null
+            saveData()
+        }
+    }
+
+    fun clearAllLessons() {
+        viewModelScope.launch {
+            _lessons.value = emptyList()
+            saveData()
+        }
+    }
 }
