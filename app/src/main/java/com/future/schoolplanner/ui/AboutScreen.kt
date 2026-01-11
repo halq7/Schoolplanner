@@ -32,6 +32,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import java.io.File
+import com.future.schoolplanner.BuildConfig
 
 @Serializable
 data class GitHubRelease(
@@ -58,7 +59,7 @@ fun AboutScreen(
     var versionClickCount by remember { mutableIntStateOf(0) }
     var showDeveloperToast by remember { mutableStateOf(false) }
 
-    val currentVersion = "1.0"
+    val currentVersion = BuildConfig.VERSION_NAME
 
     // BroadcastReceiver for download completion
     val downloadReceiver = remember {
