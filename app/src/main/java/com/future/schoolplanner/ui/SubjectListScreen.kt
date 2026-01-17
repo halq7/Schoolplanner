@@ -1,9 +1,12 @@
 package com.future.schoolplanner.ui
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.runtime.remember
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalViewConfiguration
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -254,15 +257,23 @@ fun SubjectCard(
     val simulatedGrade = simulatedGrades.value[subject.id]
 
     val interactionSource = remember { MutableInteractionSource() }
+    val viewConfiguration = LocalViewConfiguration.current
+    val density = LocalDensity.current
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .combinedClickable(
+            .clickable(
                 interactionSource = interactionSource,
                 indication = null,
-                onClick = onClick,
-                onLongClick = onLongClick
-            ),
+                onClick = onClick
+            )
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onLongPress = { onLongClick() },
+                    onTap = { onClick() }
+                )
+            },
         colors = CardDefaults.cardColors(
             containerColor = subject.color.copy(alpha = defaultSubjectAlpha)
         ),
