@@ -2,7 +2,9 @@ package com.future.schoolplanner.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.runtime.remember
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -194,6 +196,7 @@ fun ScheduleCell(
 
     var showDeleteDialog by remember { mutableStateOf(false) }
 
+    val interactionSource = remember { MutableInteractionSource() }
     Box(
         modifier = modifier
             .width(64.dp)
@@ -202,17 +205,14 @@ fun ScheduleCell(
             .background(
                 color = if (subject != null) subject.color.copy(alpha = defaultSubjectAlpha) else Color.Transparent
             )
-            .combinedClickable(
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null,
                 onClick = {
                     if (lesson != null) {
                         onEdit(lesson.id)
                     } else {
                         onAdd()
-                    }
-                },
-                onLongClick = {
-                    if (lesson != null) {
-                        showDeleteDialog = true
                     }
                 }
             ),

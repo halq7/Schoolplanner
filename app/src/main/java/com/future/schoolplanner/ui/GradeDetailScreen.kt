@@ -1,6 +1,9 @@
 package com.future.schoolplanner.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.runtime.remember
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -537,10 +540,13 @@ fun GradeItem(
     grade: Grade,
     onLongClick: () -> Unit
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .combinedClickable(
+                interactionSource = interactionSource,
+                indication = null,
                 onClick = {},
                 onLongClick = onLongClick
             ),

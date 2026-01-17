@@ -1,6 +1,9 @@
 package com.future.schoolplanner.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.runtime.remember
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -250,10 +253,13 @@ fun SubjectCard(
     val simulatedGrades = viewModel.simulatedGrades.collectAsState()
     val simulatedGrade = simulatedGrades.value[subject.id]
 
+    val interactionSource = remember { MutableInteractionSource() }
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .combinedClickable(
+                interactionSource = interactionSource,
+                indication = null,
                 onClick = onClick,
                 onLongClick = onLongClick
             ),

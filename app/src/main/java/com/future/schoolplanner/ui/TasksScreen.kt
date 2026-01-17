@@ -2,7 +2,10 @@ package com.future.schoolplanner.ui
 
 import androidx.compose.animation.*
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.runtime.remember
+import androidx.compose.ui.input.pointer.pointerInput
+import kotlinx.coroutines.launch
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -24,6 +27,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import java.time.LocalDate
 import androidx.compose.ui.res.stringResource
 import com.future.schoolplanner.R
+import androidx.compose.foundation.gestures.detectTapGestures
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -254,13 +258,20 @@ fun TaskItem(
         ),
         border = if (isOverdue) androidx.compose.foundation.BorderStroke(2.dp, Color.Red) else null
     ) {
+        val interactionSource = remember { MutableInteractionSource() }
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .combinedClickable(
-                    onClick = {},
-                    onLongClick = onLongClick
+                .clickable(
+                    interactionSource = interactionSource,
+                    indication = null,
+                    onClick = {}
                 )
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onLongPress = { onLongClick() }
+                    )
+                }
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
