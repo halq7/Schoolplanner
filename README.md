@@ -1,9 +1,14 @@
-# Schoolplanner
-<p align="center">
-  <img src="app/src/main/rounded-corners.png" alt="App Logo" width="200">
-</p>
+<div align="center">
 
+<img src="app/src/main/rounded-corners.png" alt="App Logo" width="200">
+
+# Schoolplanner
 A comprehensive school planning application for Android that helps you organizing your academic life.
+
+
+
+</div>
+
 
 ## Features
 
