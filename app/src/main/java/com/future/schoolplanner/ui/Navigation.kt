@@ -185,12 +185,11 @@ fun GradesTab(builder: NavGraphBuilder, navController: NavHostController, viewMo
 fun ScheduleTab(builder: NavGraphBuilder, navController: NavHostController, viewModel: GradeViewModel, paddingValues: androidx.compose.foundation.layout.PaddingValues) {
     builder.composable("schedule") {
         ScheduleScreen(
-            onAddLesson = { day, hour, weekType ->
-                if (day == null || hour == null || weekType == null) {
+            onAddLesson = { day, hour ->
+                if (day == null || hour == null) {
                     navController.navigate("addLesson")
                 } else {
-                    val wtStr = if (weekType == com.future.schoolplanner.data.WeekType.B) "B" else "A"
-                    navController.navigate("addLesson/$day/$hour/$wtStr")
+                    navController.navigate("addLesson/$day/$hour")
                 }
             },
             onEditLesson = { lessonId ->
@@ -215,11 +214,9 @@ fun ScheduleTab(builder: NavGraphBuilder, navController: NavHostController, view
         )
     }
 
-    builder.composable("addLesson/{day}/{hour}/{weekType}") { backStackEntry ->
+    builder.composable("addLesson/{day}/{hour}") { backStackEntry ->
         val day = backStackEntry.arguments?.getString("day")?.toIntOrNull() ?: 1
         val hour = backStackEntry.arguments?.getString("hour")?.toIntOrNull() ?: 1
-        val weekTypeStr = backStackEntry.arguments?.getString("weekType") ?: "A"
-        val weekType = if (weekTypeStr == "B") com.future.schoolplanner.data.WeekType.B else com.future.schoolplanner.data.WeekType.A
 
         AddLessonScreen(
             onBack = { navController.popBackStack() },
@@ -230,10 +227,8 @@ fun ScheduleTab(builder: NavGraphBuilder, navController: NavHostController, view
             viewModel = viewModel,
             initialDay = day,
             initialHour = hour,
-            initialWeekType = weekType,
             fixedDay = true,
-            fixedHour = true,
-            fixedWeekType = true
+            fixedHour = true
         )
     }
 

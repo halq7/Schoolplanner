@@ -38,6 +38,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.future.schoolplanner.R
 import com.future.schoolplanner.data.Report
 import com.future.schoolplanner.data.ReportSubject
 import com.future.schoolplanner.data.SchoolYear
@@ -66,13 +68,15 @@ fun AddReportScreen(
         } ?: emptyList()
     }
 
+    val reportsTitle = stringResource(R.string.reports_title)
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Zeugnis erstellen") },
+                title = { Text(stringResource(R.string.create_report)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Zurück")
+                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 actions = {
@@ -95,7 +99,7 @@ fun AddReportScreen(
                                 val report = Report(
                                     id = UUID.randomUUID().toString(),
                                     schoolYearId = schoolYear.id,
-                                    name = reportName.ifEmpty { "Zeugnis ${schoolYear.name}" },
+                                    name = reportName.ifEmpty { "$reportsTitle ${schoolYear.name}" },
                                     reportSubjects = reportSubjects,
                                     date = reportDate
                                 )
@@ -104,7 +108,7 @@ fun AddReportScreen(
                         },
                         enabled = selectedSchoolYear != null
                     ) {
-                        Icon(Icons.Default.Check, contentDescription = "Speichern")
+                        Icon(Icons.Default.Check, contentDescription = stringResource(R.string.save))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -124,7 +128,7 @@ fun AddReportScreen(
         ) {
             // School Year Selection
             Text(
-                text = "Schuljahr auswählen",
+                text = stringResource(R.string.select_school_year),
                 style = MaterialTheme.typography.titleMedium
             )
 
@@ -136,7 +140,7 @@ fun AddReportScreen(
                     value = selectedSchoolYear?.name ?: "",
                     onValueChange = {},
                     readOnly = true,
-                    label = { Text("Schuljahr") },
+                    label = { Text(stringResource(R.string.school_year)) },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -154,7 +158,7 @@ fun AddReportScreen(
                                 selectedSchoolYear = schoolYear
                                 expanded = false
                                 if (reportName.isEmpty()) {
-                                    reportName = "Zeugnis ${schoolYear.name}"
+                                    reportName = "$reportsTitle ${schoolYear.name}"
                                 }
                             }
                         )
@@ -166,7 +170,7 @@ fun AddReportScreen(
             OutlinedTextField(
                 value = reportName,
                 onValueChange = { reportName = it },
-                label = { Text("Zeugnis Name") },
+                label = { Text(stringResource(R.string.report_name)) },
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -174,7 +178,7 @@ fun AddReportScreen(
             OutlinedTextField(
                 value = reportDate,
                 onValueChange = { reportDate = it },
-                label = { Text("Ausstellungsdatum (optional)") },
+                label = { Text(stringResource(R.string.issue_date_optional)) },
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -182,13 +186,13 @@ fun AddReportScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "Fächer für ${schoolYear.name}",
+                    text = stringResource(R.string.subjects_for_year, schoolYear.name),
                     style = MaterialTheme.typography.titleMedium
                 )
 
                 if (subjectsForYear.isEmpty()) {
                Text(
-                    text = "Keine Fächer für dieses Schuljahr vorhanden",
+                    text = stringResource(R.string.no_subjects_for_year, schoolYear.name),
                     style = MaterialTheme.typography.headlineSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -214,7 +218,7 @@ fun AddReportScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "Zusätzliche Fächer",
+                    text = stringResource(R.string.additional_subjects),
                     style = MaterialTheme.typography.titleMedium
                 )
 
@@ -257,7 +261,7 @@ fun AddReportScreen(
                 ) {
                     Icon(Icons.Default.Add, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Zusätzliches Fach hinzufügen")
+                    Text(stringResource(R.string.add_additional_subject))
                 }
             }
         }
@@ -284,23 +288,23 @@ fun ReportSubjectItem(
             OutlinedTextField(
                 value = name,
                 onValueChange = onNameChange,
-                label = { Text("Fachname") },
+                label = { Text(stringResource(R.string.subject_name_label)) },
                 modifier = Modifier.weight(1f)
             )
             OutlinedTextField(
                 value = abbreviation,
                 onValueChange = { /* abbreviation */ },
-                label = { Text("Abk.") },
+                label = { Text(stringResource(R.string.abbreviation)) },
                 modifier = Modifier.width(80.dp)
             )
             OutlinedTextField(
                 value = gradeStr,
                 onValueChange = onGradeChange,
-                label = { Text("Note (z.B. 2-)") },
+                label = { Text(stringResource(R.string.grade_example)) },
                 modifier = Modifier.width(100.dp)
             )
             IconButton(onClick = onRemove) {
-                Icon(Icons.Default.Delete, contentDescription = "Entfernen")
+                Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete))
             }
         } else {
             // Regular subjects with tendency input
@@ -312,7 +316,7 @@ fun ReportSubjectItem(
             OutlinedTextField(
                 value = gradeStr,
                 onValueChange = onGradeChange,
-                label = { Text("Note (z.B. 2-)") },
+                label = { Text(stringResource(R.string.grade_example)) },
                 modifier = Modifier.width(100.dp)
             )
         }
@@ -353,11 +357,11 @@ fun ReportSubjectItem(
                 onValueChange = { value ->
                     value.toDoubleOrNull()?.let { onGradeChange(it) }
                 },
-                label = { Text("Note") },
+                label = { Text(stringResource(R.string.grade)) },
                 modifier = Modifier.width(80.dp)
             )
             IconButton(onClick = onRemove) {
-                Icon(Icons.Default.Delete, contentDescription = "Entfernen")
+                Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete))
             }
         } else {
             // Regular subjects - this should not be called for regular subjects anymore

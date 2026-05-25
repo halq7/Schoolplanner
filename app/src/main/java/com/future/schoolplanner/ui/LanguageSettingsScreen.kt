@@ -24,12 +24,12 @@ fun LanguageSettingsScreen(
     viewModel: GradeViewModel = viewModel()
 ) {
     val context = LocalContext.current
-    var selectedLanguage by remember { mutableStateOf("en") } // Default to English
+    var selectedLanguage by remember { mutableStateOf("vi") } // Default to Vietnamese
 
     // Load current language preference
     LaunchedEffect(Unit) {
         val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-        selectedLanguage = prefs.getString("language", "en") ?: "en"
+        selectedLanguage = prefs.getString("language", "vi") ?: "vi"
     }
 
     Scaffold(
@@ -81,15 +81,15 @@ fun LanguageSettingsScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     RadioButton(
-                        selected = selectedLanguage == "de",
+                        selected = selectedLanguage == "vi",
                         onClick = {
-                            selectedLanguage = "de"
-                            saveLanguagePreference(context, "de")
-                            changeAppLanguage(context, "de")
+                            selectedLanguage = "vi"
+                            saveLanguagePreference(context, "vi")
+                            changeAppLanguage(context, "vi")
                         }
                     )
                     Spacer(modifier = Modifier.width(16.dp))
-                    Text(stringResource(R.string.german))
+                    Text(stringResource(R.string.vietnamese))
                 }
             }
         }

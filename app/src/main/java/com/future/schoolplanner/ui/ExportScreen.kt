@@ -113,7 +113,6 @@ private fun exportData(
                 useAmoledTheme = viewModel.useAmoledTheme.value,
                 customAccentColor = viewModel.customAccentColor.value.toArgb(),
                 tasksTabEnabled = viewModel.tasksTabEnabled.value,
-                weekTypeEvenWeeks = viewModel.weekTypeEvenWeeks.value.name,
                 defaultSubjectAlpha = viewModel.defaultSubjectAlpha.value
             )
         )

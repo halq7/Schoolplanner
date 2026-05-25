@@ -47,7 +47,7 @@ fun ThemeSettingsScreen(
                 title = { Text(stringResource(R.string.appearance)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, "Zurück")
+                        Icon(Icons.Default.ArrowBack, stringResource(R.string.back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -258,7 +258,7 @@ fun ThemeSettingsScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Vorschau",
+                    text = stringResource(R.string.preview),
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color(0xFF2196F3).copy(alpha = defaultSubjectAlpha).getContrastingTextColor()
                 )
@@ -267,7 +267,7 @@ fun ThemeSettingsScreen(
             if (showCustomColorDialog) {
                 AlertDialog(
                     onDismissRequest = { showCustomColorDialog = false },
-                    title = { Text("Eigene Akzentfarbe wählen") },
+                    title = { Text(stringResource(R.string.choose_custom_accent_color)) },
                     text = {
                         ColorPicker(
                             initialColor = customAccentColor,
@@ -276,12 +276,12 @@ fun ThemeSettingsScreen(
                     },
                     confirmButton = {
                         TextButton(onClick = { showCustomColorDialog = false }) {
-                            Text("OK")
+                            Text(stringResource(R.string.ok))
                         }
                     },
                     dismissButton = {
                         TextButton(onClick = { viewModel.setCustomAccentColor(originalColor); showCustomColorDialog = false }) {
-                            Text("Abbrechen")
+                            Text(stringResource(R.string.cancel))
                         }
                     }
                 )

@@ -1,282 +1,506 @@
 package com.future.schoolplanner.ui
 
+import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.runtime.remember
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.unit.sp
 import com.future.schoolplanner.R
-import com.future.schoolplanner.data.WeekType
 import com.future.schoolplanner.data.Lesson
 import com.future.schoolplanner.ui.theme.blendOver
 import com.future.schoolplanner.ui.theme.getContrastingTextColor
+import kotlinx.coroutines.launch
 import java.time.LocalDate
-import java.time.temporal.WeekFields
+import java.time.format.DateTimeFormatter
+import java.time.format.TextStyle
 import java.util.Locale
+
+enum class ScheduleViewMode {
+    DAY, WEEK, MONTH
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScheduleScreen(
-    onAddLesson: (day: Int?, hour: Int?, weekType: WeekType?) -> Unit,
+    onAddLesson: (day: Int?, hour: Int?) -> Unit,
     onEditLesson: (String) -> Unit,
     viewModel: GradeViewModel
 ) {
-    val lessons = viewModel.lessonsForCurrentYear.collectAsState()
-    val weekTypeEvenWeeks by viewModel.weekTypeEvenWeeks.collectAsState()
+    val lessons by viewModel.lessonsForCurrentYear.collectAsState()
+    var viewMode by remember { mutableStateOf(ScheduleViewMode.WEEK) }
+    var selectedDate by remember { mutableStateOf(LocalDate.now()) }
+    
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
 
-    // Calculate current week type based on settings
-    val currentWeekType = remember(weekTypeEvenWeeks) {
-        val currentDate = LocalDate.now()
-        val weekFields = WeekFields.of(Locale.getDefault())
-        val weekOfYear = currentDate.get(weekFields.weekOfYear())
-        val isEvenWeek = weekOfYear % 2 == 0
-
-        if ((weekTypeEvenWeeks == WeekType.A && isEvenWeek) ||
-            (weekTypeEvenWeeks == WeekType.B && !isEvenWeek)) {
-            WeekType.A
-        } else {
-            WeekType.B
-        }
-    }
-
-    var selectedWeekType by remember(currentWeekType) { mutableStateOf(currentWeekType) }
-
-    val daysOfWeek = listOf(stringResource(R.string.mon), stringResource(R.string.tue), stringResource(R.string.wed), stringResource(R.string.thu), stringResource(R.string.fri)) // Short names for table
-    val maxHours = maxOf(lessons.value.maxOfOrNull { it.hour } ?: 8, 8)
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.tab_schedule),) },
-                actions = {
-                    // Week type selector
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(end = 16.dp)
-                    ) {
-                        Text(stringResource(R.string.week))
-                        Spacer(modifier = Modifier.width(8.dp))
-                        FilterChip(
-                            selected = selectedWeekType == WeekType.A,
-                            onClick = { selectedWeekType = WeekType.A },
-                            label = { Text("A") }
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        FilterChip(
-                            selected = selectedWeekType == WeekType.B,
-                            onClick = { selectedWeekType = WeekType.B },
-                            label = { Text("B") }
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            ModalDrawerSheet {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    stringResource(R.string.schedule_view),
+                    modifier = Modifier.padding(16.dp),
+                    style = MaterialTheme.typography.titleMedium
                 )
-            )
-        },
-        floatingActionButton = {
-            FloatingActionButton(onClick = { onAddLesson(null, null, null) }) {
-                Icon(Icons.Default.Add, stringResource(R.string.add_lesson))
-            }
-        }
-    ) { paddingValues ->
-        if (viewModel.subjectsForCurrentYear.collectAsState().value.isEmpty()) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-                contentAlignment = Alignment.Center
-            ) {
-               Text(
-                    text = stringResource(R.string.no_subjects),
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                NavigationDrawerItem(
+                    label = { Text(stringResource(R.string.view_day)) },
+                    selected = viewMode == ScheduleViewMode.DAY,
+                    onClick = {
+                        viewMode = ScheduleViewMode.DAY
+                        scope.launch { drawerState.close() }
+                    },
+                    icon = { Icon(Icons.Default.Today, null) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                )
+                NavigationDrawerItem(
+                    label = { Text(stringResource(R.string.view_week)) },
+                    selected = viewMode == ScheduleViewMode.WEEK,
+                    onClick = {
+                        viewMode = ScheduleViewMode.WEEK
+                        scope.launch { drawerState.close() }
+                    },
+                    icon = { Icon(Icons.Default.ViewWeek, null) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                )
+                NavigationDrawerItem(
+                    label = { Text(stringResource(R.string.view_month)) },
+                    selected = viewMode == ScheduleViewMode.MONTH,
+                    onClick = {
+                        viewMode = ScheduleViewMode.MONTH
+                        scope.launch { drawerState.close() }
+                    },
+                    icon = { Icon(Icons.Default.CalendarMonth, null) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
             }
-        } else {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(16.dp)
-            ) {
-                // Header row
-                item {
-                    Row(modifier = Modifier.fillMaxWidth()) {
-                        // Time column header (empty)
-                        Box(
-                            modifier = Modifier
-                                .width(60.dp)
-                                .height(40.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(stringResource(R.string.time), style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold)
-                        }
-                        // Day headers
-                        daysOfWeek.forEach { day ->
-                            Box(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .height(40.dp)
-                                    .border(1.dp, Color.Gray),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(day, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold)
-                            }
-                        }
-                    }
-                }
-                // Hour rows
-                items(maxHours) { hourIndex ->
-                    val hour = hourIndex + 1
-                    Row(modifier = Modifier.fillMaxWidth()) {
-                        // Time column
-                        Box(
-                            modifier = Modifier
-                                .width(60.dp)
-                                .height(60.dp)
-                                .border(1.dp, Color.Gray),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text("$hour.", style = MaterialTheme.typography.bodyMedium)
-                        }
-                        // Day cells
-                        for (dayIndex in daysOfWeek.indices) {
-                            val day = dayIndex + 1
-                            val lesson = lessons.value.find {
-                                it.dayOfWeek == day && it.hour == hour && it.weekType == selectedWeekType && it.isVisible
-                            }
-                            ScheduleCell(
-                                lesson = lesson,
-                                viewModel = viewModel,
-                                onEdit = { onEditLesson(it) },
-                                onAdd = { onAddLesson(day, hour, selectedWeekType) },
-                                modifier = Modifier.weight(1f),
-                                defaultSubjectAlpha = viewModel.defaultSubjectAlpha.value
+        }
+    ) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Column {
+                            Text(
+                                when (viewMode) {
+                                    ScheduleViewMode.DAY -> stringResource(R.string.view_day)
+                                    ScheduleViewMode.WEEK -> stringResource(R.string.view_week)
+                                    ScheduleViewMode.MONTH -> stringResource(R.string.view_month)
+                                },
+                                style = MaterialTheme.typography.titleLarge
+                            )
+                            Text(
+                                when (viewMode) {
+                                    ScheduleViewMode.DAY -> selectedDate.format(DateTimeFormatter.ofPattern("EEEE, dd. MMMM", Locale.getDefault()))
+                                    ScheduleViewMode.WEEK -> stringResource(R.string.current_week_schedule)
+                                    ScheduleViewMode.MONTH -> selectedDate.format(DateTimeFormatter.ofPattern("MMMM yyyy", Locale.getDefault()))
+                                },
+                                style = MaterialTheme.typography.bodySmall
                             )
                         }
-                    }
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                            Icon(Icons.Default.Menu, "Menu")
+                        }
+                    },
+                    actions = {
+                        if (selectedDate != LocalDate.now()) {
+                            IconButton(onClick = { selectedDate = LocalDate.now() }) {
+                                Icon(Icons.Default.History, "Hôm nay")
+                            }
+                        }
+                        IconButton(onClick = {
+                            selectedDate = when (viewMode) {
+                                ScheduleViewMode.DAY -> selectedDate.minusDays(1)
+                                ScheduleViewMode.MONTH -> selectedDate.minusMonths(1)
+                                ScheduleViewMode.WEEK -> selectedDate.minusWeeks(1)
+                            }
+                        }) {
+                            Icon(Icons.Default.ChevronLeft, null)
+                        }
+                        IconButton(onClick = {
+                            selectedDate = when (viewMode) {
+                                ScheduleViewMode.DAY -> selectedDate.plusDays(1)
+                                ScheduleViewMode.MONTH -> selectedDate.plusMonths(1)
+                                ScheduleViewMode.WEEK -> selectedDate.plusWeeks(1)
+                            }
+                        }) {
+                            Icon(Icons.Default.ChevronRight, null)
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        titleContentColor = MaterialTheme.colorScheme.onSurface
+                    )
+                )
+            },
+            floatingActionButton = {
+                FloatingActionButton(
+                    onClick = { onAddLesson(selectedDate.dayOfWeek.value, null) },
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ) {
+                    Icon(Icons.Default.Add, stringResource(R.string.add_lesson))
                 }
-
-                item {
-                    Spacer(modifier = Modifier.height(80.dp))
+            }
+        ) { paddingValues ->
+            Box(modifier = Modifier.padding(paddingValues).fillMaxSize().background(MaterialTheme.colorScheme.surface)) {
+                when (viewMode) {
+                    ScheduleViewMode.DAY -> DayTimelineView(selectedDate, lessons, viewModel, onEditLesson, onDateSelected = { selectedDate = it })
+                    ScheduleViewMode.WEEK -> WeekListView(selectedDate, lessons, viewModel, onEditLesson)
+                    ScheduleViewMode.MONTH -> MonthGridView(selectedDate, lessons, viewModel)
                 }
             }
         }
     }
-
 }
 
 @Composable
-fun ScheduleCell(
-    lesson: Lesson?,
+fun DayTimelineView(
+    date: LocalDate,
+    lessons: List<Lesson>,
     viewModel: GradeViewModel,
-    onEdit: (String) -> Unit,
-    onAdd: () -> Unit,
-    modifier: Modifier = Modifier,
-    defaultSubjectAlpha: Float = 1.0f
+    onEditLesson: (String) -> Unit,
+    onDateSelected: (LocalDate) -> Unit
 ) {
-    val subject = lesson?.let { viewModel.getSubjectById(it.subjectId) }
-    val showTeachers by viewModel.showTeachers.collectAsState()
-    val showRooms by viewModel.showRooms.collectAsState()
+    val dayOfWeek = date.dayOfWeek.value
+    val dayLessons = lessons.filter { it.dayOfWeek == dayOfWeek }.sortedBy { it.startTime }
 
-    var showDeleteDialog by remember { mutableStateOf(false) }
+    Column(modifier = Modifier.fillMaxSize()) {
+        DaySelector(selectedDate = date, onDateSelected = onDateSelected)
+        
+        if (dayLessons.isEmpty()) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Icon(
+                        Icons.Default.EventBusy, 
+                        null, 
+                        modifier = Modifier.size(64.dp), 
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(stringResource(R.string.no_subjects_schedule), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+        } else {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
+                contentPadding = PaddingValues(top = 16.dp, bottom = 80.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                items(dayLessons) { lesson ->
+                    TimelineLessonItem(lesson, viewModel, onEditLesson)
+                }
+            }
+        }
+    }
+}
 
-    val interactionSource = remember { MutableInteractionSource() }
-    Box(
-        modifier = modifier
-            .height(60.dp)
-            .border(1.dp, Color.Gray)
-            .background(
-                color = if (subject != null) subject.color.copy(alpha = defaultSubjectAlpha) else Color.Transparent
-            )
-            .clickable(
-                interactionSource = interactionSource,
-                indication = null,
-                onClick = {
-                    if (lesson != null) {
-                        onEdit(lesson.id)
+@Composable
+fun DaySelector(selectedDate: LocalDate, onDateSelected: (LocalDate) -> Unit) {
+    val startOfWeek = selectedDate.minusDays((selectedDate.dayOfWeek.value - 1).toLong())
+    
+    Surface(tonalElevation = 2.dp, shadowElevation = 1.dp) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            for (i in 0..6) {
+                val date = startOfWeek.plusDays(i.toLong())
+                val isSelected = date == selectedDate
+                val isToday = date == LocalDate.now()
+                
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(12.dp))
+                        .clickable { onDateSelected(date) }
+                        .background(if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent)
+                        .padding(horizontal = 12.dp, vertical = 8.dp)
+                ) {
+                    Text(
+                        text = date.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault()),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = date.dayOfMonth.toString(),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = if (isSelected) MaterialTheme.colorScheme.onPrimary else if (isToday) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun WeekListView(
+    selectedDate: LocalDate,
+    lessons: List<Lesson>,
+    viewModel: GradeViewModel,
+    onEditLesson: (String) -> Unit
+) {
+    val startOfWeek = selectedDate.minusDays((selectedDate.dayOfWeek.value - 1).toLong())
+    val daysOfWeek = (0..6).map { startOfWeek.plusDays(it.toLong()) }
+
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(24.dp)
+    ) {
+        items(daysOfWeek) { date ->
+            val dayLessons = lessons.filter { it.dayOfWeek == date.dayOfWeek.value }.sortedBy { it.startTime }
+            
+            if (dayLessons.isNotEmpty() || date.dayOfWeek.value <= 5) {
+                Column {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Surface(
+                            shape = CircleShape,
+                            color = if (date == LocalDate.now()) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                            modifier = Modifier.size(32.dp)
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Text(
+                                    date.dayOfMonth.toString(),
+                                    style = MaterialTheme.typography.labelLarge,
+                                    color = if (date == LocalDate.now()) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                        }
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Text(
+                            text = date.format(DateTimeFormatter.ofPattern("EEEE", Locale.getDefault())),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = if (date == LocalDate.now()) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                    
+                    Spacer(modifier = Modifier.height(12.dp))
+                    
+                    if (dayLessons.isEmpty()) {
+                        Text(
+                            stringResource(R.string.no_subjects_schedule),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(start = 44.dp)
+                        )
                     } else {
-                        onAdd()
+                        Column(
+                            modifier = Modifier.padding(start = 44.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            dayLessons.forEach { lesson ->
+                                CompactLessonItem(lesson, viewModel, onEditLesson)
+                            }
+                        }
                     }
                 }
+            }
+        }
+        item { Spacer(modifier = Modifier.height(80.dp)) }
+    }
+}
+
+@Composable
+fun TimelineLessonItem(lesson: Lesson, viewModel: GradeViewModel, onEdit: (String) -> Unit) {
+    val subject = viewModel.getSubjectById(lesson.subjectId)
+    val defaultAlpha by viewModel.defaultSubjectAlpha.collectAsState()
+    
+    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
+        Column(modifier = Modifier.width(60.dp).padding(top = 4.dp), horizontalAlignment = Alignment.End) {
+            Text(lesson.startTime, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Text(lesson.endTime, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        
+        Spacer(modifier = Modifier.width(16.dp))
+        
+        Card(
+            onClick = { onEdit(lesson.id) },
+            modifier = Modifier.weight(1f),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = subject?.color?.copy(alpha = 0.15f * defaultAlpha)?.blendOver(MaterialTheme.colorScheme.surface) ?: MaterialTheme.colorScheme.surfaceVariant
             ),
-        contentAlignment = Alignment.Center
-    ) {
-        if (subject != null) {
-            val effectiveBackgroundColor = subject.color.copy(alpha = 0.2f * defaultSubjectAlpha).blendOver(MaterialTheme.colorScheme.surface)
-            val textColor = effectiveBackgroundColor.getContrastingTextColor()
-
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = subject.abbreviation.ifEmpty { subject.name.take(3) },
-                    style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center,
-                    color = textColor
+            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+        ) {
+            Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier.width(4.dp).height(40.dp).clip(CircleShape).background(subject?.color ?: Color.Gray)
                 )
-
-                // Show teacher and room info if enabled
-                if (showTeachers || showRooms) {
-                    val teacherInfo = if (showTeachers && lesson?.teacher?.isNotEmpty() == true) lesson.teacher else null
-                    val roomInfo = if (showRooms && lesson?.room?.isNotEmpty() == true) lesson.room else null
-
-                    val infoParts = listOfNotNull(teacherInfo, roomInfo)
-                    if (infoParts.isNotEmpty()) {
+                Spacer(modifier = Modifier.width(12.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        subject?.name ?: "Môn học không xác định",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    if (lesson.room.isNotEmpty() || lesson.teacher.isNotEmpty()) {
                         Text(
-                            text = infoParts.joinToString(", "),
+                            text = listOfNotNull(lesson.room.ifEmpty { null }, lesson.teacher.ifEmpty { null }).joinToString(" • "),
                             style = MaterialTheme.typography.bodySmall,
-                            fontSize = MaterialTheme.typography.bodySmall.fontSize * 0.8,
-                            textAlign = TextAlign.Center,
-                            color = textColor
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
+                    }
+                }
+                Icon(Icons.Default.ChevronRight, null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        }
+    }
+}
+
+@Composable
+fun CompactLessonItem(lesson: Lesson, viewModel: GradeViewModel, onEdit: (String) -> Unit) {
+    val subject = viewModel.getSubjectById(lesson.subjectId)
+    val defaultAlpha by viewModel.defaultSubjectAlpha.collectAsState()
+
+    Surface(
+        onClick = { onEdit(lesson.id) },
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        color = subject?.color?.copy(alpha = 0.1f * defaultAlpha)?.blendOver(MaterialTheme.colorScheme.surface) ?: MaterialTheme.colorScheme.surfaceVariant,
+        border = if (subject != null) null else border(1.dp, MaterialTheme.colorScheme.outlineVariant)
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                "${lesson.startTime} - ${lesson.endTime}",
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.width(90.dp)
+            )
+            
+            VerticalDivider(modifier = Modifier.height(16.dp).padding(horizontal = 8.dp), color = subject?.color ?: Color.Gray)
+            
+            Text(
+                subject?.name ?: "Unknown",
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.weight(1f),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            
+            if (lesson.room.isNotEmpty()) {
+                Surface(
+                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
+                    shape = RoundedCornerShape(4.dp)
+                ) {
+                    Text(
+                        lesson.room,
+                        style = MaterialTheme.typography.labelSmall,
+                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun MonthGridView(
+    date: LocalDate,
+    lessons: List<Lesson>,
+    viewModel: GradeViewModel
+) {
+    val firstDayOfMonth = date.withDayOfMonth(1)
+    val daysInMonth = date.lengthOfMonth()
+    val firstDayOfWeek = firstDayOfMonth.dayOfWeek.value
+    
+    val days = (1 until firstDayOfWeek).map { null } + (1..daysInMonth).map { date.withDayOfMonth(it) }
+
+    Column(modifier = Modifier.fillMaxSize().padding(8.dp)) {
+        Row(modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)) {
+            listOf("T2", "T3", "T4", "T5", "T6", "T7", "CN").forEach { day ->
+                Text(
+                    text = day,
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+        
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(7),
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            items(days) { day ->
+                if (day == null) {
+                    Box(modifier = Modifier.aspectRatio(1f))
+                } else {
+                    val dayLessons = lessons.filter { it.dayOfWeek == day.dayOfWeek.value }
+                    val isToday = day == LocalDate.now()
+                    
+                    Surface(
+                        shape = RoundedCornerShape(8.dp),
+                        color = if (isToday) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                        modifier = Modifier.aspectRatio(0.8f)
+                    ) {
+                        Column(modifier = Modifier.padding(4.dp)) {
+                            Text(
+                                text = day.dayOfMonth.toString(),
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = if (isToday) FontWeight.Bold else FontWeight.Normal,
+                                color = if (isToday) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            dayLessons.take(3).forEach { lesson ->
+                                val subject = viewModel.getSubjectById(lesson.subjectId)
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(3.dp)
+                                        .clip(CircleShape)
+                                        .background(subject?.color ?: Color.Gray)
+                                        .padding(vertical = 1.dp)
+                                )
+                                Spacer(modifier = Modifier.height(2.dp))
+                            }
+                            if (dayLessons.size > 3) {
+                                Text("...", fontSize = 8.sp, lineHeight = 8.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+                            }
+                        }
                     }
                 }
             }
         }
     }
-
-    // Delete confirmation dialog
-    if (showDeleteDialog && lesson != null) {
-        AlertDialog(
-            onDismissRequest = { showDeleteDialog = false },
-            title = { Text(stringResource(R.string.delete_lesson),) },
-            text = {
-                Text(stringResource(R.string.delete_lesson_confirmation),)
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        viewModel.deleteLesson(lesson.id)
-                        showDeleteDialog = false
-                    }
-                ) {
-                    Text(stringResource(R.string.delete),)
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDeleteDialog = false }) {
-                    Text(stringResource(R.string.cancel),)
-                }
-            }
-        )
-    }
 }
+
+private fun border(width: androidx.compose.ui.unit.Dp, color: Color) = 
+    androidx.compose.foundation.BorderStroke(width, color)

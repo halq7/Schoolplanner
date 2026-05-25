@@ -48,10 +48,10 @@ fun TasksScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Aufgaben") },
+                title = { Text(stringResource(R.string.tasks_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, "Zurück")
+                        Icon(Icons.Default.ArrowBack, stringResource(R.string.back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -65,7 +65,7 @@ fun TasksScreen(
                 onClick = onAddTask,
                 containerColor = MaterialTheme.colorScheme.primary
             ) {
-                Icon(Icons.Default.Add, "Aufgabe hinzufügen")
+                Icon(Icons.Default.Add, stringResource(R.string.add_task))
             }
         }
     ) { paddingValues ->
@@ -300,7 +300,7 @@ fun TaskItem(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "${if (task.type == com.future.schoolplanner.data.TaskType.APPOINTMENT) "Termin" else "Aufgabe"} • ${task.dueDate}",
+                        text = "${if (task.type == com.future.schoolplanner.data.TaskType.APPOINTMENT) stringResource(R.string.appointment) else stringResource(R.string.task)} • ${task.dueDate}",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                     )

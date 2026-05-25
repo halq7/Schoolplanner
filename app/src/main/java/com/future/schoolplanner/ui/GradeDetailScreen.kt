@@ -83,12 +83,12 @@ fun GradeDetailScreen(
                 title = { Text(currentSubject.name) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, "Zurück")
+                        Icon(Icons.Default.ArrowBack, stringResource(R.string.back))
                     }
                 },
                 actions = {
                     IconButton(onClick = { showSimulation = !showSimulation }) {
-                        Icon(Icons.Default.Build, "Simulation")
+                        Icon(Icons.Default.Build, stringResource(R.string.simulate))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -99,7 +99,7 @@ fun GradeDetailScreen(
         },
         floatingActionButton = {
             FloatingActionButton(onClick = { showAddGradeDialog = true }) {
-                Icon(Icons.Default.Add, "Note hinzufügen")
+                Icon(Icons.Default.Add, stringResource(R.string.add_new_grade))
             }
         }
     ) { paddingValues ->
@@ -318,7 +318,7 @@ fun GradeDetailScreen(
                                     showDeleteGradeDialog = false
                                 }
                             ) {
-                                Text("Löschen", color = MaterialTheme.colorScheme.error)
+                                Text(stringResource(R.string.delete), color = MaterialTheme.colorScheme.error)
                             }
                     },
                     dismissButton = {
@@ -371,8 +371,8 @@ fun SimulationCard(
                 GradeInputMethod.WHOLE -> "Note (1-6)"
                 GradeInputMethod.DECIMAL -> "Note (1.0-6.0)"
                 GradeInputMethod.TENDENCY -> "Note (z.B. 2-)"
-                GradeInputMethod.FIFTEEN_POINT -> "Punkte (0-15)"
-                else -> "Note"
+                GradeInputMethod.FIFTEEN_POINT -> stringResource(R.string.points) + " (0-15)"
+                else -> stringResource(R.string.grade)
             }
 
             OutlinedTextField(
@@ -427,7 +427,7 @@ fun SimulationCard(
                             simWeight = "1.0"
                         }
                     ) {
-                        Icon(Icons.Default.Clear, "Simulation löschen")
+                        Icon(Icons.Default.Clear, stringResource(R.string.cancel))
                     }
                 }
             }

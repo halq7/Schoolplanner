@@ -27,7 +27,6 @@ data class AppSettings(
     val useAmoledTheme: Boolean = false,
     val customAccentColor: Int = 0xFF4CAF50.toInt(), // Default green
     val tasksTabEnabled: Boolean = false,
-    val weekTypeEvenWeeks: String = "A", // Which week type corresponds to even weeks
     val defaultSubjectAlpha: Float = 1.0f // Default alpha value for subject colors
 )
 
@@ -68,8 +67,9 @@ data class SerializableLesson(
     val id: String,
     val subjectId: String,
     val dayOfWeek: Int,
-    val hour: Int,
-    val weekType: String, // Store as string
+    val startTime: String = "08:00",
+    val endTime: String = "08:45",
+    val hour: Int = 1,
     val teacher: String = "",
     val room: String = "",
     val isVisible: Boolean = true,
@@ -182,8 +182,9 @@ fun Lesson.toSerializable(): SerializableLesson {
         id = id,
         subjectId = subjectId,
         dayOfWeek = dayOfWeek,
+        startTime = startTime,
+        endTime = endTime,
         hour = hour,
-        weekType = weekType.name,
         teacher = teacher,
         room = room,
         isVisible = isVisible,
@@ -196,8 +197,9 @@ fun SerializableLesson.toDomain(): Lesson {
         id = id,
         subjectId = subjectId,
         dayOfWeek = dayOfWeek,
+        startTime = startTime,
+        endTime = endTime,
         hour = hour,
-        weekType = WeekType.valueOf(weekType),
         teacher = teacher,
         room = room,
         isVisible = isVisible,

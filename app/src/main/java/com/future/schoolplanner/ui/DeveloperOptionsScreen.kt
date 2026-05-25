@@ -168,7 +168,7 @@ fun DeveloperOptionsScreen(
         AlertDialog(
             onDismissRequest = { showClearSubjectsDialog = false },
             title = { Text(stringResource(R.string.delete_all_subjects)) },
-            text = { Text("Möchten Sie wirklich alle Fächer löschen? Diese Aktion kann nicht rückgängig gemacht werden!") },
+            text = { Text("${stringResource(R.string.delete_subject_confirmation)} ${stringResource(R.string.undone)}") },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -191,7 +191,7 @@ fun DeveloperOptionsScreen(
         AlertDialog(
             onDismissRequest = { showClearGradesDialog = false },
             title = { Text(stringResource(R.string.delete_all_grades)) },
-            text = { Text("Möchten Sie wirklich alle Noten löschen? Diese Aktion kann nicht rückgängig gemacht werden!") },
+            text = { Text("${stringResource(R.string.delete_grade_confirmation)} ${stringResource(R.string.undone)}") },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -214,7 +214,7 @@ fun DeveloperOptionsScreen(
         AlertDialog(
             onDismissRequest = { showClearReportsDialog = false },
             title = { Text(stringResource(R.string.delete_all_reports)) },
-            text = { Text("Möchten Sie wirklich alle Zeugnisse löschen? Diese Aktion kann nicht rückgängig gemacht werden!") },
+            text = { Text("${stringResource(R.string.delete_grade_confirmation)} ${stringResource(R.string.undone)}") },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -237,7 +237,7 @@ fun DeveloperOptionsScreen(
         AlertDialog(
             onDismissRequest = { showClearSchoolYearsDialog = false },
             title = { Text(stringResource(R.string.delete_all_school_years)) },
-            text = { Text("Möchten Sie wirklich alle Schuljahre löschen? Diese Aktion kann nicht rückgängig gemacht werden!") },
+            text = { Text(stringResource(R.string.undone)) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -260,7 +260,7 @@ fun DeveloperOptionsScreen(
         AlertDialog(
             onDismissRequest = { showClearLessonsDialog = false },
             title = { Text(stringResource(R.string.delete_all_lessons)) },
-            text = { Text("Möchten Sie wirklich alle Stunden löschen? Diese Aktion kann nicht rückgängig gemacht werden!") },
+            text = { Text("${stringResource(R.string.delete_lesson_confirmation)} ${stringResource(R.string.undone)}") },
             confirmButton = {
                 TextButton(
                     onClick = {

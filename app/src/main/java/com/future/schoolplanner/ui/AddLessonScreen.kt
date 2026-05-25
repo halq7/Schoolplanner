@@ -13,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.future.schoolplanner.data.Lesson
-import com.future.schoolplanner.data.WeekType
 import java.util.*
 import androidx.compose.ui.res.stringResource
 import com.future.schoolplanner.R
@@ -27,17 +26,15 @@ fun AddLessonScreen(
     lessonToEdit: Lesson? = null,
     initialDay: Int? = null,
     initialHour: Int? = null,
-    initialWeekType: WeekType? = null,
     fixedDay: Boolean = false,
-    fixedHour: Boolean = false,
-    fixedWeekType: Boolean = false
+    fixedHour: Boolean = false
 ) {
     val subjects = viewModel.subjectsForCurrentYear.collectAsState()
 
     var selectedSubjectId by remember { mutableStateOf(lessonToEdit?.subjectId ?: "") }
     var selectedDay by remember { mutableStateOf(lessonToEdit?.dayOfWeek ?: initialDay ?: 1) }
-    var selectedHour by remember { mutableStateOf(lessonToEdit?.hour ?: initialHour ?: 1) }
-    var selectedWeekType by remember { mutableStateOf(lessonToEdit?.weekType ?: initialWeekType ?: WeekType.A) }
+    var startTime by remember { mutableStateOf(lessonToEdit?.startTime ?: "08:00") }
+    var endTime by remember { mutableStateOf(lessonToEdit?.endTime ?: "08:45") }
     var teacher by remember { mutableStateOf(lessonToEdit?.teacher ?: "") }
     var room by remember { mutableStateOf(lessonToEdit?.room ?: "") }
     var isVisible by remember { mutableStateOf(lessonToEdit?.isVisible ?: true) }
@@ -140,44 +137,25 @@ fun AddLessonScreen(
                 }
             }
 
-            // Hour selection
-            Text(stringResource(R.string.hour), style = MaterialTheme.typography.titleMedium)
-            if (fixedHour) {
-                Text(selectedHour.toString(), style = MaterialTheme.typography.bodyLarge)
-            } else {
+            // Time selection
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 OutlinedTextField(
-                    value = selectedHour.toString(),
-                    onValueChange = { value ->
-                        value.toIntOrNull()?.let { hour ->
-                            if (hour in 1..12) selectedHour = hour
-                        }
-                    },
-                    label = { Text("${stringResource(R.string.lesson_number)} (1-12)") },
-                    modifier = Modifier.fillMaxWidth(),
+                    value = startTime,
+                    onValueChange = { startTime = it },
+                    label = { Text(stringResource(R.string.start)) },
+                    modifier = Modifier.weight(1f),
                     singleLine = true
                 )
-            }
-
-            // Week type selection
-            Text(stringResource(R.string.week_type), style = MaterialTheme.typography.titleMedium)
-            if (fixedWeekType) {
-                Text(if (selectedWeekType == WeekType.A) stringResource(R.string.a_week) else stringResource(R.string.b_week), style = MaterialTheme.typography.bodyLarge)
-            } else {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    FilterChip(
-                        selected = selectedWeekType == WeekType.A,
-                        onClick = { selectedWeekType = WeekType.A },
-                        label = { Text(stringResource(R.string.a_week)) }
-                    )
-                    FilterChip(
-                        selected = selectedWeekType == WeekType.B,
-                        onClick = { selectedWeekType = WeekType.B },
-                        label = { Text(stringResource(R.string.b_week)) }
-                    )
-                }
+                OutlinedTextField(
+                    value = endTime,
+                    onValueChange = { endTime = it },
+                    label = { Text(stringResource(R.string.end)) },
+                    modifier = Modifier.weight(1f),
+                    singleLine = true
+                )
             }
 
             // Teacher
@@ -208,8 +186,8 @@ fun AddLessonScreen(
                             val lesson = lessonToEdit?.copy(
                                 subjectId = selectedSubjectId,
                                 dayOfWeek = selectedDay,
-                                hour = selectedHour,
-                                weekType = selectedWeekType,
+                                startTime = startTime,
+                                endTime = endTime,
                                 teacher = teacher,
                                 room = room,
                                 isVisible = isVisible
@@ -217,8 +195,8 @@ fun AddLessonScreen(
                                 id = UUID.randomUUID().toString(),
                                 subjectId = selectedSubjectId,
                                 dayOfWeek = selectedDay,
-                                hour = selectedHour,
-                                weekType = selectedWeekType,
+                                startTime = startTime,
+                                endTime = endTime,
                                 teacher = teacher,
                                 room = room,
                                 isVisible = isVisible,

@@ -14,7 +14,6 @@ import com.future.schoolplanner.data.ReportSubject
 import com.future.schoolplanner.data.SchoolYear
 import com.future.schoolplanner.data.Subject
 import com.future.schoolplanner.data.Task
-import com.future.schoolplanner.data.WeekType
 import com.future.schoolplanner.data.persistence.DataPersistenceManager
 import com.future.schoolplanner.data.serialization.AppData
 import com.future.schoolplanner.data.serialization.AppSettings
@@ -86,9 +85,6 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
 
     private val _defaultSubjectAlpha = MutableStateFlow(1.0f)
     val defaultSubjectAlpha: StateFlow<Float> = _defaultSubjectAlpha.asStateFlow()
-
-    private val _weekTypeEvenWeeks = MutableStateFlow(WeekType.A)
-    val weekTypeEvenWeeks: StateFlow<WeekType> = _weekTypeEvenWeeks.asStateFlow()
 
     private val _lessons = MutableStateFlow<List<Lesson>>(emptyList())
     val lessons: StateFlow<List<Lesson>> = _lessons.asStateFlow()
@@ -173,7 +169,7 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
         val defaultSchoolYear = SchoolYear(
             id = defaultSchoolYearId,
             name = "2024/2025",
-            description = "Aktuelles Schuljahr",
+            description = "Current school year",
             startDate = "2024-09-01",
             endDate = "2025-06-30"
         )
@@ -183,17 +179,17 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
         val defaultSubjects = listOf(
             Subject(
                 id = UUID.randomUUID().toString(),
-                name = "Mathematik",
+                name = "Mathematics",
                 abbreviation = "MA",
-                teacher = "Herr Müller",
+                teacher = "Mr. Muller",
                 room = "101",
-                description = "Mathematik Grundkurs",
+                description = "Mathematics Basic Course",
                 color = Color(0xFF4CAF50),
                 grades = listOf(
                     Grade(
                         id = UUID.randomUUID().toString(),
                         value = 2.0,
-                        description = "1. Schulaufgabe",
+                        description = "1st Class Test",
                         date = "2024-10-15"
                     )
                 ),
@@ -201,17 +197,17 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
             ),
             Subject(
                 id = UUID.randomUUID().toString(),
-                name = "Deutsch",
-                abbreviation = "DE",
-                teacher = "Frau Schmidt",
+                name = "History",
+                abbreviation = "HI",
+                teacher = "Mrs. Schmidt",
                 room = "102",
-                description = "Deutsch Grundkurs",
+                description = "History Course",
                 color = Color(0xFF2196F3),
                 grades = listOf(
                     Grade(
                         id = UUID.randomUUID().toString(),
                         value = 1.5,
-                        description = "Aufsatz",
+                        description = "Essay",
                         date = "2024-09-28"
                     )
                 ),
@@ -219,7 +215,7 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
             ),
             Subject(
                 id = UUID.randomUUID().toString(),
-                name = "Englisch",
+                name = "English",
                 abbreviation = "EN",
                 teacher = "Mr. Johnson",
                 room = "103",
@@ -256,7 +252,6 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
                 useAmoledTheme = _useAmoledTheme.value,
                 customAccentColor = _customAccentColor.value.toArgb(),
                 tasksTabEnabled = _tasksTabEnabled.value,
-                weekTypeEvenWeeks = _weekTypeEvenWeeks.value.name,
                 defaultSubjectAlpha = _defaultSubjectAlpha.value
             )
         )
@@ -278,7 +273,6 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
         _useAmoledTheme.value = appData.settings.useAmoledTheme
         _customAccentColor.value = Color(appData.settings.customAccentColor)
         _tasksTabEnabled.value = appData.settings.tasksTabEnabled
-        _weekTypeEvenWeeks.value = WeekType.valueOf(appData.settings.weekTypeEvenWeeks)
         _defaultSubjectAlpha.value = appData.settings.defaultSubjectAlpha
         _simulatedGrades.value = emptyMap()
     }
@@ -338,11 +332,11 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
     fun connectNextcloud(serverUrl: String, username: String, password: String) {
         updateNextcloudSettings(serverUrl, username, password)
         if (serverUrl.isBlank() || username.isBlank() || password.isBlank()) {
-            updateNextcloudState { it.copy(enabled = false, statusMessage = "Bitte Server, Benutzername und App-Passwort ausfüllen.") }
+            updateNextcloudState { it.copy(enabled = false, statusMessage = "Vui lòng nhập đầy đủ Server, Tên đăng nhập và Mật khẩu ứng dụng.") }
             return
         }
 
-        updateNextcloudState { it.copy(enabled = true, statusMessage = "Verbinde mit Nextcloud...") }
+        updateNextcloudState { it.copy(enabled = true, statusMessage = "Đang kết nối với Nextcloud...") }
         syncPrefs?.edit()
             ?.putBoolean(KEY_NEXTCLOUD_LOCAL_DIRTY, true)
             ?.putLong(KEY_NEXTCLOUD_LOCAL_UPDATED_AT, System.currentTimeMillis())
@@ -352,7 +346,7 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
 
     fun disconnectNextcloud() {
         syncPrefs?.edit()?.clear()?.apply()
-        _nextcloudSyncState.value = NextcloudSyncState(statusMessage = "Nextcloud-Sync getrennt.")
+        _nextcloudSyncState.value = NextcloudSyncState(statusMessage = "Đã ngắt kết nối Nextcloud.")
     }
 
     fun syncNextcloud() {
@@ -363,7 +357,7 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
         if (state.serverUrl.isBlank() || state.username.isBlank() || state.password.isBlank()) return
 
         viewModelScope.launch {
-            updateNextcloudState { it.copy(isSyncing = true, statusMessage = "Synchronisiere...") }
+            updateNextcloudState { it.copy(isSyncing = true, statusMessage = "Đang đồng bộ...") }
             try {
                 val localJson = persistence.encodeAppData(createAppData())
                 val result = manager.sync(
@@ -413,7 +407,7 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
                 updateNextcloudState {
                     it.copy(
                         isSyncing = false,
-                        statusMessage = "Sync fehlgeschlagen: ${e.localizedMessage ?: e.javaClass.simpleName}"
+                        statusMessage = "Đồng bộ thất bại: ${e.localizedMessage ?: e.javaClass.simpleName}"
                     )
                 }
             }
@@ -596,11 +590,6 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
         saveData()
     }
 
-    fun setWeekTypeEvenWeeks(weekType: WeekType) {
-        _weekTypeEvenWeeks.value = weekType
-        saveData()
-    }
-
     fun setDefaultSubjectAlpha(alpha: Float) {
         _defaultSubjectAlpha.value = alpha
         saveData()
@@ -718,39 +707,6 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
     fun deleteLesson(lessonId: String) {
         viewModelScope.launch {
             _lessons.value = _lessons.value.filter { it.id != lessonId }
-            saveData()
-        }
-    }
-
-    fun copyWeekLessons(fromWeekType: WeekType, toWeekType: WeekType) {
-        viewModelScope.launch {
-            val currentYearId = _currentSchoolYearId.value ?: return@launch
-
-            // Get all lessons
-            val allLessons = _lessons.value.toMutableList()
-
-            // First, remove ALL lessons from the target week for current year
-            allLessons.removeIf { lesson ->
-                lesson.schoolYearId == currentYearId && lesson.weekType == toWeekType
-            }
-
-            // Get lessons from the source week for current year
-            val sourceLessons = _lessons.value.filter {
-                it.schoolYearId == currentYearId && it.weekType == fromWeekType
-            }
-
-            // Create copies of all source lessons for the target week
-            val targetLessons = sourceLessons.map { sourceLesson ->
-                sourceLesson.copy(
-                    id = java.util.UUID.randomUUID().toString(),
-                    weekType = toWeekType
-                )
-            }
-
-            // Add all target lessons
-            allLessons.addAll(targetLessons)
-
-            _lessons.value = allLessons
             saveData()
         }
     }
