@@ -217,6 +217,12 @@ fun AboutScreen(
                         )
 
                         Text(
+                            text = "${stringResource(R.string.author)}: Ha Le (7janv)",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+
+                        Text(
                             text = stringResource(R.string.version, currentVersion),
                             style = MaterialTheme.typography.bodyLarge,
                             modifier = Modifier.clickable {

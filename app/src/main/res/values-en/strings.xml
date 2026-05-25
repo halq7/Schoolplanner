@@ -331,4 +331,5 @@
     <string name="schedule_view">Schedule View</string>
     <string name="current_week_schedule">This week\'s schedule</string>
     <string name="today">Today</string>
+    <string name="author">Author</string>
 </resources>

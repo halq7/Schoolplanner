@@ -169,7 +169,7 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
         val defaultSchoolYear = SchoolYear(
             id = defaultSchoolYearId,
             name = "2024/2025",
-            description = "Current school year",
+            description = "Năm học hiện tại",
             startDate = "2024-09-01",
             endDate = "2025-06-30"
         )
@@ -179,17 +179,17 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
         val defaultSubjects = listOf(
             Subject(
                 id = UUID.randomUUID().toString(),
-                name = "Mathematics",
-                abbreviation = "MA",
-                teacher = "Mr. Muller",
+                name = "Toán học",
+                abbreviation = "TOÁN",
+                teacher = "Thầy Hùng",
                 room = "101",
-                description = "Mathematics Basic Course",
+                description = "Môn Toán cơ bản",
                 color = Color(0xFF4CAF50),
                 grades = listOf(
                     Grade(
                         id = UUID.randomUUID().toString(),
-                        value = 2.0,
-                        description = "1st Class Test",
+                        value = 8.5,
+                        description = "Kiểm tra 1 tiết",
                         date = "2024-10-15"
                     )
                 ),
@@ -197,17 +197,17 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
             ),
             Subject(
                 id = UUID.randomUUID().toString(),
-                name = "History",
-                abbreviation = "HI",
-                teacher = "Mrs. Schmidt",
+                name = "Ngữ văn",
+                abbreviation = "VĂN",
+                teacher = "Cô Lan",
                 room = "102",
-                description = "History Course",
+                description = "Môn Văn học",
                 color = Color(0xFF2196F3),
                 grades = listOf(
                     Grade(
                         id = UUID.randomUUID().toString(),
-                        value = 1.5,
-                        description = "Essay",
+                        value = 9.0,
+                        description = "Bài viết số 1",
                         date = "2024-09-28"
                     )
                 ),
@@ -215,16 +215,16 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
             ),
             Subject(
                 id = UUID.randomUUID().toString(),
-                name = "English",
-                abbreviation = "EN",
+                name = "Tiếng Anh",
+                abbreviation = "ANH",
                 teacher = "Mr. Johnson",
                 room = "103",
-                description = "English Basic Course",
+                description = "English Course",
                 color = Color(0xFFFF9800),
                 grades = listOf(
                     Grade(
                         id = UUID.randomUUID().toString(),
-                        value = 3.0,
+                        value = 7.5,
                         description = "Vocabulary Test",
                         date = "2024-10-05"
                     )

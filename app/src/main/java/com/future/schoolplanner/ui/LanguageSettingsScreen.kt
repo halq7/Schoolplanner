@@ -101,17 +101,17 @@ private fun saveLanguagePreference(context: Context, language: String) {
     prefs.edit().putString("language", language).apply()
 }
 
-private fun changeAppLanguage(context: android.content.Context, language: String) {
-    val locale = java.util.Locale(language)
+private fun changeAppLanguage(context: Context, language: String) {
+    val locale = java.util.Locale.forLanguageTag(language)
     java.util.Locale.setDefault(locale)
+    
     val config = android.content.res.Configuration(context.resources.configuration)
     config.setLocale(locale)
     context.resources.updateConfiguration(config, context.resources.displayMetrics)
 
-    // Restart the activity to apply changes
-    val intent = (context as? android.app.Activity)?.intent
-    intent?.let {
-        (context as android.app.Activity).finish()
-        context.startActivity(it)
-    }
+    // Restart the activity to apply changes globally
+    val intent = android.content.Intent(context, (context as Activity)::class.java)
+    intent.addFlags(android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP or android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+    context.startActivity(intent)
+    (context as Activity).finish()
 }
