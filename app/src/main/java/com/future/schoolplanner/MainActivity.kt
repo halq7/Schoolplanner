@@ -30,7 +30,7 @@ class MainActivity : ComponentActivity() {
                 amoledTheme = useAmoledTheme,
                 customAccentColor = customAccentColor
             ) {
-                SchoolPlannerApp()
+                SchoolPlannerApp(viewModel = viewModel)
             }
         }
     }

@@ -153,6 +153,21 @@
     <string name="import_file_error">Error reading file</string>
     <string name="import_error">Error importing: %1$s</string>
 
+
+    <!-- Nextcloud Sync -->
+    <string name="nextcloud_sync">Nextcloud Sync</string>
+    <string name="nextcloud_sync_category_description">Sync all app data with your Nextcloud server</string>
+    <string name="nextcloud_sync_description">Connect a Nextcloud server to sync all subjects, grades, schedules, reports, tasks and app settings in both directions. The app creates a folder named Schoolplanner and stores the sync file there.</string>
+    <string name="nextcloud_server_url">Server URL</string>
+    <string name="nextcloud_username">Username</string>
+    <string name="nextcloud_app_password">App password</string>
+    <string name="nextcloud_connect">Connect</string>
+    <string name="nextcloud_save_and_sync">Save and Sync</string>
+    <string name="nextcloud_sync_now">Sync Now</string>
+    <string name="nextcloud_disconnect">Disconnect</string>
+    <string name="nextcloud_last_sync">Last sync: %1$s</string>
+    <string name="nextcloud_app_password_hint">Use a Nextcloud app password. The server must be reachable via HTTPS; data is stored in /Schoolplanner/school_planner_data.json.</string>
+
     <!-- Extensions -->
     <string name="extensions_title">Extensions</string>
     <string name="tasks_tab">Tasks Tab</string>

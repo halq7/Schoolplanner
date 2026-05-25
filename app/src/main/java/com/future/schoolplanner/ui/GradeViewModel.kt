@@ -16,7 +16,12 @@ import com.future.schoolplanner.data.Subject
 import com.future.schoolplanner.data.Task
 import com.future.schoolplanner.data.WeekType
 import com.future.schoolplanner.data.persistence.DataPersistenceManager
+import com.future.schoolplanner.data.serialization.AppData
+import com.future.schoolplanner.data.serialization.AppSettings
 import com.future.schoolplanner.data.serialization.toDomain
+import com.future.schoolplanner.data.serialization.toSerializable
+import com.future.schoolplanner.data.sync.NextcloudCredentials
+import com.future.schoolplanner.data.sync.NextcloudSyncManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -31,9 +36,23 @@ data class SimulatedGrade(
     val weight: Double = 1.0
 )
 
+data class NextcloudSyncState(
+    val enabled: Boolean = false,
+    val serverUrl: String = "",
+    val username: String = "",
+    val password: String = "",
+    val isSyncing: Boolean = false,
+    val statusMessage: String? = null,
+    val lastSyncAt: Long = 0L
+)
+
 class GradeViewModel(context: Context? = null) : ViewModel() {
-    private val persistenceManager = context?.let { DataPersistenceManager(it) }
+    private val appContext = context?.applicationContext
+    private val persistenceManager = appContext?.let { DataPersistenceManager(it) }
+    private val nextcloudSyncManager = appContext?.let { NextcloudSyncManager() }
+    private val syncPrefs = appContext?.getSharedPreferences("nextcloud_sync", Context.MODE_PRIVATE)
     private var isInitialized = false
+    private var suppressNextcloudUpload = false
 
     private val _subjects = MutableStateFlow<List<Subject>>(emptyList())
     val subjects: StateFlow<List<Subject>> = _subjects.asStateFlow()
@@ -89,6 +108,9 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
     private val _tasks = MutableStateFlow<List<Task>>(emptyList())
     val tasks: StateFlow<List<Task>> = _tasks.asStateFlow()
 
+    private val _nextcloudSyncState = MutableStateFlow(loadNextcloudSyncState())
+    val nextcloudSyncState: StateFlow<NextcloudSyncState> = _nextcloudSyncState.asStateFlow()
+
     val subjectsForCurrentYear: StateFlow<List<Subject>> = combine<List<Subject>, String?, List<Subject>>(
         _subjects, _currentSchoolYearId
     ) { subjects, currentYearId ->
@@ -113,115 +135,152 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
         loadData()
     }
 
+    private fun loadNextcloudSyncState(): NextcloudSyncState {
+        val prefs = syncPrefs ?: return NextcloudSyncState()
+        return NextcloudSyncState(
+            enabled = prefs.getBoolean(KEY_NEXTCLOUD_ENABLED, false),
+            serverUrl = prefs.getString(KEY_NEXTCLOUD_SERVER_URL, "") ?: "",
+            username = prefs.getString(KEY_NEXTCLOUD_USERNAME, "") ?: "",
+            password = prefs.getString(KEY_NEXTCLOUD_PASSWORD, "") ?: "",
+            lastSyncAt = prefs.getLong(KEY_NEXTCLOUD_LAST_SYNC_AT, 0L)
+        )
+    }
+
     private fun loadData() {
         viewModelScope.launch {
             try {
                 val savedData = persistenceManager?.loadAppData()
                 if (savedData != null) {
-                    // Load saved data
-                    _subjects.value = savedData.subjects.map { it.toDomain() }
-                    _schoolYears.value = savedData.schoolYears.map { it.toDomain() }
-                    _currentSchoolYearId.value = savedData.currentSchoolYearId
-                    _lessons.value = savedData.lessons.map { it.toDomain() }
-                    _reports.value = savedData.reports.map { it.toDomain() }
-                    _tasks.value = savedData.tasks.map { it.toDomain() }
-
-                    // Load settings
-                    _gradeInputMethod.value = GradeInputMethod.valueOf(savedData.settings.gradeInputMethod)
-                    _showTeachers.value = savedData.settings.showTeachers
-                    _showRooms.value = savedData.settings.showRooms
-                    _isDarkTheme.value = savedData.settings.isDarkTheme
-                    _useDynamicColors.value = savedData.settings.useDynamicColors
-                    _useAmoledTheme.value = savedData.settings.useAmoledTheme
-                    _customAccentColor.value = Color(savedData.settings.customAccentColor)
-                    _tasksTabEnabled.value = savedData.settings.tasksTabEnabled
-                    _weekTypeEvenWeeks.value = WeekType.valueOf(savedData.settings.weekTypeEvenWeeks)
-                    _defaultSubjectAlpha.value = savedData.settings.defaultSubjectAlpha
-
+                    applyAppData(savedData)
                     Log.d("GradeViewModel", "Data loaded successfully from persistence")
                 } else {
-                    // Initialize with default data if no saved data exists
                     initializeDefaultData()
                 }
                 isInitialized = true
+                if (_nextcloudSyncState.value.enabled) {
+                    syncNextcloud()
+                }
             } catch (e: Exception) {
                 Log.e("GradeViewModel", "Error loading data, initializing with defaults", e)
                 initializeDefaultData()
+                isInitialized = true
             }
         }
     }
 
     private fun initializeDefaultData() {
-        viewModelScope.launch {
-            val defaultSchoolYearId = UUID.randomUUID().toString()
-            val defaultSchoolYear = SchoolYear(
-                id = defaultSchoolYearId,
-                name = "2024/2025",
-                description = "Aktuelles Schuljahr",
-                startDate = "2024-09-01",
-                endDate = "2025-06-30"
-            )
-            _schoolYears.value = listOf(defaultSchoolYear)
-            _currentSchoolYearId.value = defaultSchoolYearId
+        val defaultSchoolYearId = UUID.randomUUID().toString()
+        val defaultSchoolYear = SchoolYear(
+            id = defaultSchoolYearId,
+            name = "2024/2025",
+            description = "Aktuelles Schuljahr",
+            startDate = "2024-09-01",
+            endDate = "2025-06-30"
+        )
+        _schoolYears.value = listOf(defaultSchoolYear)
+        _currentSchoolYearId.value = defaultSchoolYearId
 
-            val defaultSubjects = listOf(
-                Subject(
-                    id = UUID.randomUUID().toString(),
-                    name = "Mathematik",
-                    abbreviation = "MA",
-                    teacher = "Herr Müller",
-                    room = "101",
-                    description = "Mathematik Grundkurs",
-                    color = Color(0xFF4CAF50),
-                    grades = listOf(
-                        Grade(
-                            id = UUID.randomUUID().toString(),
-                            value = 2.0,
-                            description = "1. Schulaufgabe",
-                            date = "2024-10-15"
-                        )
-                    ),
-                    schoolYearId = defaultSchoolYearId
+        val defaultSubjects = listOf(
+            Subject(
+                id = UUID.randomUUID().toString(),
+                name = "Mathematik",
+                abbreviation = "MA",
+                teacher = "Herr Müller",
+                room = "101",
+                description = "Mathematik Grundkurs",
+                color = Color(0xFF4CAF50),
+                grades = listOf(
+                    Grade(
+                        id = UUID.randomUUID().toString(),
+                        value = 2.0,
+                        description = "1. Schulaufgabe",
+                        date = "2024-10-15"
+                    )
                 ),
-                Subject(
-                    id = UUID.randomUUID().toString(),
-                    name = "Deutsch",
-                    abbreviation = "DE",
-                    teacher = "Frau Schmidt",
-                    room = "102",
-                    description = "Deutsch Grundkurs",
-                    color = Color(0xFF2196F3),
-                    grades = listOf(
-                        Grade(
-                            id = UUID.randomUUID().toString(),
-                            value = 1.5,
-                            description = "Aufsatz",
-                            date = "2024-09-28"
-                        )
-                    ),
-                    schoolYearId = defaultSchoolYearId
+                schoolYearId = defaultSchoolYearId
+            ),
+            Subject(
+                id = UUID.randomUUID().toString(),
+                name = "Deutsch",
+                abbreviation = "DE",
+                teacher = "Frau Schmidt",
+                room = "102",
+                description = "Deutsch Grundkurs",
+                color = Color(0xFF2196F3),
+                grades = listOf(
+                    Grade(
+                        id = UUID.randomUUID().toString(),
+                        value = 1.5,
+                        description = "Aufsatz",
+                        date = "2024-09-28"
+                    )
                 ),
-                Subject(
-                    id = UUID.randomUUID().toString(),
-                    name = "Englisch",
-                    abbreviation = "EN",
-                    teacher = "Mr. Johnson",
-                    room = "103",
-                    description = "English Basic Course",
-                    color = Color(0xFFFF9800),
-                    grades = listOf(
-                        Grade(
-                            id = UUID.randomUUID().toString(),
-                            value = 3.0,
-                            description = "Vocabulary Test",
-                            date = "2024-10-05"
-                        )
-                    ),
-                    schoolYearId = defaultSchoolYearId
-                )
+                schoolYearId = defaultSchoolYearId
+            ),
+            Subject(
+                id = UUID.randomUUID().toString(),
+                name = "Englisch",
+                abbreviation = "EN",
+                teacher = "Mr. Johnson",
+                room = "103",
+                description = "English Basic Course",
+                color = Color(0xFFFF9800),
+                grades = listOf(
+                    Grade(
+                        id = UUID.randomUUID().toString(),
+                        value = 3.0,
+                        description = "Vocabulary Test",
+                        date = "2024-10-05"
+                    )
+                ),
+                schoolYearId = defaultSchoolYearId
             )
-            _subjects.value = defaultSubjects
-        }
+        )
+        _subjects.value = defaultSubjects
+    }
+
+    private fun createAppData(): AppData {
+        return AppData(
+            subjects = _subjects.value.map { it.toSerializable() },
+            schoolYears = _schoolYears.value.map { it.toSerializable() },
+            currentSchoolYearId = _currentSchoolYearId.value,
+            lessons = _lessons.value.map { it.toSerializable() },
+            reports = _reports.value.map { it.toSerializable() },
+            tasks = _tasks.value.map { it.toSerializable() },
+            settings = AppSettings(
+                gradeInputMethod = _gradeInputMethod.value.name,
+                showTeachers = _showTeachers.value,
+                showRooms = _showRooms.value,
+                isDarkTheme = _isDarkTheme.value,
+                useDynamicColors = _useDynamicColors.value,
+                useAmoledTheme = _useAmoledTheme.value,
+                customAccentColor = _customAccentColor.value.toArgb(),
+                tasksTabEnabled = _tasksTabEnabled.value,
+                weekTypeEvenWeeks = _weekTypeEvenWeeks.value.name,
+                defaultSubjectAlpha = _defaultSubjectAlpha.value
+            )
+        )
+    }
+
+    private fun applyAppData(appData: AppData) {
+        _subjects.value = appData.subjects.map { it.toDomain() }
+        _schoolYears.value = appData.schoolYears.map { it.toDomain() }
+        _currentSchoolYearId.value = appData.currentSchoolYearId
+        _lessons.value = appData.lessons.map { it.toDomain() }
+        _reports.value = appData.reports.map { it.toDomain() }
+        _tasks.value = appData.tasks.map { it.toDomain() }
+
+        _gradeInputMethod.value = GradeInputMethod.valueOf(appData.settings.gradeInputMethod)
+        _showTeachers.value = appData.settings.showTeachers
+        _showRooms.value = appData.settings.showRooms
+        _isDarkTheme.value = appData.settings.isDarkTheme
+        _useDynamicColors.value = appData.settings.useDynamicColors
+        _useAmoledTheme.value = appData.settings.useAmoledTheme
+        _customAccentColor.value = Color(appData.settings.customAccentColor)
+        _tasksTabEnabled.value = appData.settings.tasksTabEnabled
+        _weekTypeEvenWeeks.value = WeekType.valueOf(appData.settings.weekTypeEvenWeeks)
+        _defaultSubjectAlpha.value = appData.settings.defaultSubjectAlpha
+        _simulatedGrades.value = emptyMap()
     }
 
     private fun saveData() {
@@ -229,27 +288,134 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
 
         viewModelScope.launch {
             try {
-                persistenceManager.saveAppData(
-                    subjects = _subjects.value,
-                    schoolYears = _schoolYears.value,
-                    currentSchoolYearId = _currentSchoolYearId.value,
-                    lessons = _lessons.value,
-                    reports = _reports.value,
-                    tasks = _tasks.value,
-                    gradeInputMethod = _gradeInputMethod.value,
-                    showTeachers = _showTeachers.value,
-                    showRooms = _showRooms.value,
-                    isDarkTheme = _isDarkTheme.value,
-                    useDynamicColors = _useDynamicColors.value,
-                    useAmoledTheme = _useAmoledTheme.value,
-                    customAccentColor = _customAccentColor.value.toArgb(),
-                    tasksTabEnabled = _tasksTabEnabled.value,
-                    weekTypeEvenWeeks = _weekTypeEvenWeeks.value.name,
-                    defaultSubjectAlpha = _defaultSubjectAlpha.value
-                )
+                val appData = createAppData()
+                persistenceManager.saveAppData(appData)
+                markLocalDataChanged()
+                if (_nextcloudSyncState.value.enabled && !suppressNextcloudUpload) {
+                    syncNextcloud()
+                }
                 Log.d("GradeViewModel", "Data saved successfully")
             } catch (e: Exception) {
                 Log.e("GradeViewModel", "Error saving data", e)
+            }
+        }
+    }
+
+    private fun markLocalDataChanged() {
+        syncPrefs?.edit()
+            ?.putLong(KEY_NEXTCLOUD_LOCAL_UPDATED_AT, System.currentTimeMillis())
+            ?.putBoolean(KEY_NEXTCLOUD_LOCAL_DIRTY, true)
+            ?.apply()
+    }
+
+    private fun saveNextcloudPrefs(state: NextcloudSyncState) {
+        syncPrefs?.edit()
+            ?.putBoolean(KEY_NEXTCLOUD_ENABLED, state.enabled)
+            ?.putString(KEY_NEXTCLOUD_SERVER_URL, state.serverUrl)
+            ?.putString(KEY_NEXTCLOUD_USERNAME, state.username)
+            ?.putString(KEY_NEXTCLOUD_PASSWORD, state.password)
+            ?.putLong(KEY_NEXTCLOUD_LAST_SYNC_AT, state.lastSyncAt)
+            ?.apply()
+    }
+
+    private fun updateNextcloudState(transform: (NextcloudSyncState) -> NextcloudSyncState) {
+        val newState = transform(_nextcloudSyncState.value)
+        _nextcloudSyncState.value = newState
+        saveNextcloudPrefs(newState)
+    }
+
+    fun updateNextcloudSettings(serverUrl: String, username: String, password: String) {
+        updateNextcloudState {
+            it.copy(
+                serverUrl = serverUrl,
+                username = username,
+                password = password,
+                statusMessage = null
+            )
+        }
+    }
+
+    fun connectNextcloud(serverUrl: String, username: String, password: String) {
+        updateNextcloudSettings(serverUrl, username, password)
+        if (serverUrl.isBlank() || username.isBlank() || password.isBlank()) {
+            updateNextcloudState { it.copy(enabled = false, statusMessage = "Bitte Server, Benutzername und App-Passwort ausfüllen.") }
+            return
+        }
+
+        updateNextcloudState { it.copy(enabled = true, statusMessage = "Verbinde mit Nextcloud...") }
+        syncPrefs?.edit()
+            ?.putBoolean(KEY_NEXTCLOUD_LOCAL_DIRTY, true)
+            ?.putLong(KEY_NEXTCLOUD_LOCAL_UPDATED_AT, System.currentTimeMillis())
+            ?.apply()
+        syncNextcloud()
+    }
+
+    fun disconnectNextcloud() {
+        syncPrefs?.edit()?.clear()?.apply()
+        _nextcloudSyncState.value = NextcloudSyncState(statusMessage = "Nextcloud-Sync getrennt.")
+    }
+
+    fun syncNextcloud() {
+        val manager = nextcloudSyncManager ?: return
+        val persistence = persistenceManager ?: return
+        val state = _nextcloudSyncState.value
+        if (!state.enabled || state.isSyncing) return
+        if (state.serverUrl.isBlank() || state.username.isBlank() || state.password.isBlank()) return
+
+        viewModelScope.launch {
+            updateNextcloudState { it.copy(isSyncing = true, statusMessage = "Synchronisiere...") }
+            try {
+                val localJson = persistence.encodeAppData(createAppData())
+                val result = manager.sync(
+                    credentials = NextcloudCredentials(
+                        serverUrl = state.serverUrl,
+                        username = state.username,
+                        password = state.password
+                    ),
+                    localJson = localJson,
+                    localUpdatedAt = syncPrefs?.getLong(KEY_NEXTCLOUD_LOCAL_UPDATED_AT, 0L) ?: 0L,
+                    lastRemoteModified = syncPrefs?.getLong(KEY_NEXTCLOUD_LAST_REMOTE_MODIFIED, 0L) ?: 0L,
+                    localDirty = syncPrefs?.getBoolean(KEY_NEXTCLOUD_LOCAL_DIRTY, true) ?: true
+                )
+
+                if (result.downloaded) {
+                    val remoteData = persistence.decodeAppData(result.appDataJson)
+                    suppressNextcloudUpload = true
+                    try {
+                        applyAppData(remoteData)
+                        persistence.saveAppData(remoteData)
+                    } finally {
+                        suppressNextcloudUpload = false
+                    }
+                }
+
+                val now = System.currentTimeMillis()
+                syncPrefs?.edit()
+                    ?.putLong(KEY_NEXTCLOUD_LAST_REMOTE_MODIFIED, result.remoteLastModified)
+                    ?.putLong(KEY_NEXTCLOUD_LAST_SYNC_AT, now)
+                    ?.putBoolean(KEY_NEXTCLOUD_LOCAL_DIRTY, false)
+                    ?.apply()
+
+                val message = when {
+                    result.downloaded -> "Remote-Daten übernommen."
+                    result.uploaded -> "Lokale Daten hochgeladen."
+                    else -> "Alles aktuell."
+                }
+                updateNextcloudState {
+                    it.copy(
+                        isSyncing = false,
+                        statusMessage = message,
+                        lastSyncAt = now
+                    )
+                }
+            } catch (e: Exception) {
+                Log.e("GradeViewModel", "Nextcloud sync failed", e)
+                updateNextcloudState {
+                    it.copy(
+                        isSyncing = false,
+                        statusMessage = "Sync fehlgeschlagen: ${e.localizedMessage ?: e.javaClass.simpleName}"
+                    )
+                }
             }
         }
     }
@@ -826,31 +992,9 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
         }
     }
 
-    fun loadAppData(appData: com.future.schoolplanner.data.serialization.AppData) {
+    fun loadAppData(appData: AppData) {
         viewModelScope.launch {
-            // Load data from AppData
-            _subjects.value = appData.subjects.map { it.toDomain() }
-            _schoolYears.value = appData.schoolYears.map { it.toDomain() }
-            _currentSchoolYearId.value = appData.currentSchoolYearId
-            _lessons.value = appData.lessons.map { it.toDomain() }
-            _reports.value = appData.reports.map { it.toDomain() }
-            _tasks.value = appData.tasks.map { it.toDomain() }
-
-            // Load settings
-            _gradeInputMethod.value = GradeInputMethod.valueOf(appData.settings.gradeInputMethod)
-            _showTeachers.value = appData.settings.showTeachers
-            _showRooms.value = appData.settings.showRooms
-            _isDarkTheme.value = appData.settings.isDarkTheme
-            _useDynamicColors.value = appData.settings.useDynamicColors
-            _useAmoledTheme.value = appData.settings.useAmoledTheme
-            _customAccentColor.value = Color(appData.settings.customAccentColor)
-            _tasksTabEnabled.value = appData.settings.tasksTabEnabled
-            _weekTypeEvenWeeks.value = WeekType.valueOf(appData.settings.weekTypeEvenWeeks)
-            _defaultSubjectAlpha.value = appData.settings.defaultSubjectAlpha
-
-            // Clear simulated grades
-            _simulatedGrades.value = emptyMap()
-
+            applyAppData(appData)
             isInitialized = true
             saveData()
         }
@@ -902,5 +1046,16 @@ class GradeViewModel(context: Context? = null) : ViewModel() {
             _lessons.value = emptyList()
             saveData()
         }
+    }
+
+    companion object {
+        private const val KEY_NEXTCLOUD_ENABLED = "enabled"
+        private const val KEY_NEXTCLOUD_SERVER_URL = "server_url"
+        private const val KEY_NEXTCLOUD_USERNAME = "username"
+        private const val KEY_NEXTCLOUD_PASSWORD = "password"
+        private const val KEY_NEXTCLOUD_LAST_SYNC_AT = "last_sync_at"
+        private const val KEY_NEXTCLOUD_LAST_REMOTE_MODIFIED = "last_remote_modified"
+        private const val KEY_NEXTCLOUD_LOCAL_UPDATED_AT = "local_updated_at"
+        private const val KEY_NEXTCLOUD_LOCAL_DIRTY = "local_dirty"
     }
 }

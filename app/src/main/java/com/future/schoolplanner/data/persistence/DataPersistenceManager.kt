@@ -59,16 +59,28 @@ class DataPersistenceManager(private val context: Context) {
                 )
             )
 
-            val jsonString = json.encodeToString(appData)
-            context.openFileOutput(dataFileName, Context.MODE_PRIVATE).use {
-                it.write(jsonString.toByteArray())
-            }
+            saveAppData(appData)
             Log.d("DataPersistence", "Data saved successfully")
         } catch (e: IOException) {
             Log.e("DataPersistence", "Error saving data", e)
         } catch (e: Exception) {
             Log.e("DataPersistence", "Error serializing data", e)
         }
+    }
+
+    fun saveAppData(appData: AppData) {
+        val jsonString = encodeAppData(appData)
+        context.openFileOutput(dataFileName, Context.MODE_PRIVATE).use {
+            it.write(jsonString.toByteArray(Charsets.UTF_8))
+        }
+    }
+
+    fun encodeAppData(appData: AppData): String {
+        return json.encodeToString(appData)
+    }
+
+    fun decodeAppData(jsonString: String): AppData {
+        return json.decodeFromString(jsonString)
     }
 
     fun loadAppData(): AppData? {

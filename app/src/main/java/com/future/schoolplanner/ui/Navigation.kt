@@ -22,9 +22,8 @@ import com.future.schoolplanner.data.Subject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SchoolPlannerApp() {
+fun SchoolPlannerApp(viewModel: GradeViewModel) {
     val navController = rememberNavController()
-    val viewModel: GradeViewModel = viewModel()
     val tasksTabEnabled by viewModel.tasksTabEnabled.collectAsState()
     var selectedTabIndex by remember { mutableIntStateOf(0) }
 
@@ -466,12 +465,22 @@ fun MoreTab(builder: NavGraphBuilder, navController: NavHostController, viewMode
             onNavigateToLanguageSettings = {
                 navController.navigate("languageSettings")
             },
+            onNavigateToNextcloudSettings = {
+                navController.navigate("nextcloudSettings")
+            },
             viewModel = viewModel
         )
     }
 
     builder.composable("languageSettings") {
         LanguageSettingsScreen(
+            onBack = { navController.popBackStack() },
+            viewModel = viewModel
+        )
+    }
+
+    builder.composable("nextcloudSettings") {
+        NextcloudSettingsScreen(
             onBack = { navController.popBackStack() },
             viewModel = viewModel
         )

@@ -23,6 +23,7 @@ fun AppSettingsScreen(
     onNavigateToPrivacySettings: () -> Unit,
     onNavigateToAboutScreen: () -> Unit,
     onNavigateToLanguageSettings: () -> Unit,
+    onNavigateToNextcloudSettings: () -> Unit,
     viewModel: GradeViewModel = viewModel()
 ) {
     Scaffold(
@@ -71,6 +72,14 @@ fun AppSettingsScreen(
                     title = stringResource(R.string.privacy),
                     description = stringResource(R.string.privacy_description),
                     onClick = onNavigateToPrivacySettings
+                )
+            }
+
+            item {
+                SettingsCategory(
+                    title = stringResource(R.string.nextcloud_sync),
+                    description = stringResource(R.string.nextcloud_sync_category_description),
+                    onClick = onNavigateToNextcloudSettings
                 )
             }
 
