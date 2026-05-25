@@ -156,7 +156,7 @@ fun ScheduleScreen(
                             Text("$hour.", style = MaterialTheme.typography.bodyMedium)
                         }
                         // Day cells
-                        daysOfWeek.forEachIndexed { dayIndex, _ ->
+                        for (dayIndex in daysOfWeek.indices) {
                             val day = dayIndex + 1
                             val lesson = lessons.value.find {
                                 it.dayOfWeek == day && it.hour == hour && it.weekType == selectedWeekType && it.isVisible
@@ -166,6 +166,7 @@ fun ScheduleScreen(
                                 viewModel = viewModel,
                                 onEdit = { onEditLesson(it) },
                                 onAdd = { onAddLesson(day, hour, selectedWeekType) },
+                                modifier = Modifier.weight(1f),
                                 defaultSubjectAlpha = viewModel.defaultSubjectAlpha.value
                             )
                         }
@@ -199,7 +200,6 @@ fun ScheduleCell(
     val interactionSource = remember { MutableInteractionSource() }
     Box(
         modifier = modifier
-            .width(64.dp)
             .height(60.dp)
             .border(1.dp, Color.Gray)
             .background(
