@@ -64,7 +64,7 @@
     <string name="add_lesson">Thêm tiết học</string>
     <string name="edit_lesson">Chỉnh sửa tiết học</string>
     <string name="save_lesson">Lưu tiết học</string>
-    <string name="hour_number">Số tiết (1-12)</string>
+    <string name="hour_number">Số tiết (1–12)</string>
     <string name="subject_settings">Cài đặt môn học</string>
     <string name="subject_name">Tên môn học</string>
     <string name="enter_subject_name">Vui lòng nhập tên môn học</string>
@@ -88,7 +88,7 @@
     <string name="task">Nhiệm vụ</string>
     <string name="appointment">Cuộc hẹn</string>
     <string name="due_date">Hạn chót (YYYY-MM-DD)</string>
-    <string name="due_date_placeholder">ví dụ: 2024-12-31</string>
+    <string name="due_date_placeholder">ví dụ: 2024–12–31</string>
     <string name="due_time_optional">Giờ hạn chót (HH:mm, tùy chọn)</string>
     <string name="due_time_placeholder">ví dụ: 14:30, để trống nếu cả ngày</string>
     <string name="associated_subject_optional">Môn học liên quan (tùy chọn)</string>
@@ -112,7 +112,7 @@
     <string name="import_export_title">Quản lý dữ liệu</string>
     <string name="import_export_description">Nhập và Xuất</string>
     <string name="export_data">Xuất dữ liệu</string>
-    <string name="exporting">Đang xuất...</string>
+    <string name="exporting">Đang xuất…</string>
     <string name="export_description">Dữ liệu của bạn sẽ được xuất dưới dạng tệp JSON và có thể được chia sẻ.</string>
     <string name="export_details">Tệp được xuất bao gồm tất cả các môn học, năm học, nhiệm vụ và cài đặt.</string>
     <string name="export_success">Xuất dữ liệu thành công</string>
@@ -120,7 +120,7 @@
     <string name="export_subject">Xuất dữ liệu Schoolplanner</string>
     <string name="export_chooser_title">Chọn nơi xuất dữ liệu</string>
     <string name="import_data">Nhập dữ liệu</string>
-    <string name="importing">Đang nhập...</string>
+    <string name="importing">Đang nhập…</string>
     <string name="select_file">Chọn tệp</string>
     <string name="import_description">Chọn một tệp JSON để nhập dữ liệu của bạn.</string>
     <string name="import_note">Lưu ý: Tất cả dữ liệu hiện tại sẽ bị thay thế bằng dữ liệu được nhập.</string>
@@ -191,9 +191,9 @@
     <string name="app_name_full">School Planner</string>
     <string name="version">Phiên bản: %1$s</string>
     <string name="updates">Bản cập nhật</string>
-    <string name="checking_updates">Đang kiểm tra bản cập nhật...</string>
+    <string name="checking_updates">Đang kiểm tra bản cập nhật…</string>
     <string name="latest_version">Phiên bản mới nhất: %1$s</string>
-    <string name="download_running">Đang tải xuống...</string>
+    <string name="download_running">Đang tải xuống…</string>
     <string name="update_available">Có bản cập nhật mới!</string>
     <string name="download_update">Tải bản cập nhật</string>
     <string name="version_current">Phiên bản của bạn đã được cập nhật.</string>
@@ -291,4 +291,49 @@
     <string name="current_week_schedule">Lịch học tuần này</string>
     <string name="today">Hôm nay</string>
     <string name="author">Tác giả</string>
+    <!-- Grades -->
+    <string name="tab_grades">Điểm số</string>
+    <string name="grades_title">Điểm số</string>
+    <string name="overall_average">Điểm trung bình tổng kết</string>
+    <string name="simulated_overall_average">Điểm trung bình tổng kết mô phỏng</string>
+    <string name="contains_simulated_grades">Bao gồm điểm số mô phỏng</string>
+    <string name="action_for_subject">Hành động cho</string>
+    <string name="no_grades_available">Không có điểm số nào</string>
+    <string name="grades_count">%1$d điểm</string>
+    <string name="simulated">Mô phỏng</string>
+    <string name="your_grades">Điểm của bạn:</string>
+    <string name="action_for_grade">Hành động cho điểm số</string>
+    <string name="delete_grade">Xóa điểm số</string>
+    <string name="delete_grade_confirmation">Bạn có chắc chắn muốn xóa điểm này không? Hành động này không thể hoàn tác.</string>
+    <string name="grade_simulation">Mô phỏng điểm số</string>
+    <string name="simulation_description">Mô phỏng một điểm số để xem điểm trung bình thay đổi như thế nào. Điểm mô phỏng sẽ không được lưu.</string>
+    <string name="simulate">Mô phỏng</string>
+    <string name="edit_grade">Chỉnh sửa điểm số</string>
+    <string name="add_new_grade">Thêm điểm mới</string>
+    <string name="grade_value">Giá trị điểm</string>
+    <string name="weight_optional">Hệ số (tùy chọn)</string>
+    <string name="date_optional">Ngày (tùy chọn)</string>
+    <string name="invalid_grade">Điểm không hợp lệ</string>
+    <string name="grade">Điểm</string>
+    <string name="abbreviation">Viết tắt</string>
+    <string name="enter_abbreviation">Vui lòng nhập từ viết tắt (2–3 ký tự)</string>
+    <string name="grade_example">Điểm (ví dụ: 2-)</string>
+    <string name="grades_count_total">Tổng số điểm:</string>
+    <string name="delete_all_grades">Xóa tất cả điểm số</string>
+    <string name="grade_input_method">Phương pháp nhập điểm</string>
+    <string name="select_input_method">Chọn phương pháp để nhập điểm:</string>
+    <string name="numeric">Số</string>
+    <string name="text">Văn bản</string>
+    <string name="points">Hệ điểm</string>
+    <string name="simulated_average">Điểm trung bình mô phỏng</string>
+    <string name="average">Trung bình</string>
+    <string name="absolute_grade">Điểm nguyên</string>
+    <string name="decimal_grade">Hệ thập phân</string>
+    <string name="tendency_grade">Có xu hướng (+/-)</string>
+    <string name="fifteen_points">Hệ 15 điểm</string>
+    <string name="grade_settings">Cài đặt nhập và hiển thị điểm</string>
+    <string name="weight">Hệ số:</string>
+    <string name="insert_grade">Nhập một điểm hợp lệ</string>
+    <string name="insert_points">Nhập một số điểm hợp lệ</string>
+
 </resources>

@@ -88,12 +88,14 @@
     <string name="add_lesson">Add Lesson</string>
     <string name="edit_lesson">Edit Lesson</string>
     <string name="save_lesson">Save Lesson</string>
-    <string name="hour_number">Hour Number (1-12)</string>
+    <string name="hour_number">Hour Number (1–12)</string>
     <string name="subject_settings">Subject Settings</string>
     <string name="subject_name">Subject Name</string>
-    <string name="abbreviation">Abbr.</string>
+    <string name="subject_code">Subject Code</string>
     <string name="enter_subject_name">Please enter a subject name</string>
-    <string name="enter_abbreviation">Please enter an abbreviation with 2-3 letters</string>
+    <string name="enter_subject_code">Please enter a subject code</string>
+    <string name="abbreviation">Abbr.</string>
+    <string name="enter_abbreviation">Please enter an abbreviation with 2–3 letters</string>
 
     <!-- Tasks -->
     <string name="tasks_title">Tasks</string>
@@ -112,7 +114,7 @@
     <string name="task">Task</string>
     <string name="appointment">Appointment</string>
     <string name="due_date">Due Date (YYYY-MM-DD)</string>
-    <string name="due_date_placeholder">e.g. 2024-12-31</string>
+    <string name="due_date_placeholder">e.g. 2024–12–31</string>
     <string name="due_time_optional">Due Time (HH:mm, optional)</string>
     <string name="due_time_placeholder">e.g. 14:30, leave empty for all-day</string>
     <string name="associated_subject_optional">Associated Subject (optional)</string>
@@ -137,7 +139,7 @@
     <string name="import_export_title">Manage Data</string>
     <string name="import_export_description">Import and Export</string>
     <string name="export_data">Export Data</string>
-    <string name="exporting">Exporting...</string>
+    <string name="exporting">Exporting…</string>
     <string name="export_description">Your data will be exported as a JSON file and can be shared.</string>
     <string name="export_details">The exported file contains all subjects, grades, school years, tasks and settings.</string>
     <string name="export_success">Data successfully exported</string>
@@ -145,7 +147,7 @@
     <string name="export_subject">Schoolplanner Data Export</string>
     <string name="export_chooser_title">Export Data</string>
     <string name="import_data">Import Data</string>
-    <string name="importing">Importing...</string>
+    <string name="importing">Importing…</string>
     <string name="select_file">Select File</string>
     <string name="import_description">Select a JSON file to import your data.</string>
     <string name="import_note">Note: All current data will be replaced by the imported data.</string>
@@ -216,9 +218,9 @@
     <string name="app_name_full">School Planner</string>
     <string name="version">Version: %1$s</string>
     <string name="updates">Updates</string>
-    <string name="checking_updates">Checking for updates...</string>
+    <string name="checking_updates">Checking for updates…</string>
     <string name="latest_version">Latest Version: %1$s</string>
-    <string name="download_running">Download running...</string>
+    <string name="download_running">Download running…</string>
     <string name="update_available">An update is available!</string>
     <string name="download_update">Download Update</string>
     <string name="version_current">Your version is current.</string>

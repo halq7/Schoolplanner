@@ -36,6 +36,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -184,7 +185,7 @@ fun HueSlider(
     onHueChange: (Float) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var position by remember { mutableStateOf(hue / 360f) }
+    var position by remember { mutableFloatStateOf(hue / 360f) }
 
     Box(modifier = modifier) {
         Canvas(modifier = Modifier.matchParentSize()) {
@@ -224,8 +225,8 @@ fun SaturationValuePicker(
     onHSVChange: (HSV) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var saturationPos by remember { mutableStateOf(hsv.saturation) }
-    var valuePos by remember { mutableStateOf(1f - hsv.value) }
+    var saturationPos by remember { mutableFloatStateOf(hsv.saturation) }
+    var valuePos by remember { mutableFloatStateOf(1f - hsv.value) }
 
     Box(modifier = modifier) {
         Canvas(modifier = Modifier.matchParentSize()) {

@@ -32,7 +32,7 @@ fun AddLessonScreen(
     val subjects = viewModel.subjectsForCurrentYear.collectAsState()
 
     var selectedSubjectId by remember { mutableStateOf(lessonToEdit?.subjectId ?: "") }
-    var selectedDay by remember { mutableStateOf(lessonToEdit?.dayOfWeek ?: initialDay ?: 1) }
+    var selectedDay by remember { mutableIntStateOf(lessonToEdit?.dayOfWeek ?: initialDay ?: 1) }
     var startTime by remember { mutableStateOf(lessonToEdit?.startTime ?: "08:00") }
     var endTime by remember { mutableStateOf(lessonToEdit?.endTime ?: "08:45") }
     var teacher by remember { mutableStateOf(lessonToEdit?.teacher ?: "") }

@@ -149,7 +149,8 @@ fun ScheduleTab(builder: NavGraphBuilder, navController: NavHostController, view
 
     builder.composable("editLesson/{lessonId}") { backStackEntry ->
         val lessonId = backStackEntry.arguments?.getString("lessonId") ?: ""
-        val lesson = viewModel.lessons.value.find { it.id == lessonId }
+        val lessons by viewModel.lessons.collectAsState()
+        val lesson = lessons.find { it.id == lessonId }
 
         if (lesson != null) {
             AddLessonScreen(
@@ -254,7 +255,8 @@ fun MoreTab(builder: NavGraphBuilder, navController: NavHostController, viewMode
 
     builder.composable("editSchoolYear/{schoolYearId}") { backStackEntry ->
         val schoolYearId = backStackEntry.arguments?.getString("schoolYearId") ?: ""
-        val schoolYear = viewModel.schoolYears.value.find { it.id == schoolYearId }
+        val schoolYears by viewModel.schoolYears.collectAsState()
+        val schoolYear = schoolYears.find { it.id == schoolYearId }
 
         if (schoolYear != null) {
             EditSchoolYearScreen(

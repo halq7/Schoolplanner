@@ -32,6 +32,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import java.io.File
+import androidx.core.content.ContextCompat
 import com.future.schoolplanner.BuildConfig
 
 @Serializable
@@ -55,7 +56,7 @@ fun AboutScreen(
     var latestRelease by remember { mutableStateOf<GitHubRelease?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
     var isDownloading by remember { mutableStateOf(false) }
-    var downloadProgress by remember { mutableStateOf(0f) }
+    var downloadProgress by remember { mutableFloatStateOf(0f) }
     var versionClickCount by remember { mutableIntStateOf(0) }
     var showDeveloperToast by remember { mutableStateOf(false) }
 
@@ -85,11 +86,12 @@ fun AboutScreen(
     // Register receiver when screen loads
     DisposableEffect(Unit) {
         val filter = IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            context.registerReceiver(downloadReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
-        } else {
-            context.registerReceiver(downloadReceiver, filter)
-        }
+        ContextCompat.registerReceiver(
+            context,
+            downloadReceiver,
+            filter,
+            ContextCompat.RECEIVER_EXPORTED
+        )
 
         onDispose {
             context.unregisterReceiver(downloadReceiver)
