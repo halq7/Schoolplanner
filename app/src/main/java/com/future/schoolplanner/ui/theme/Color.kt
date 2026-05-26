@@ -36,13 +36,3 @@ fun Color.blendOver(background: Color): Color {
 fun Color.getContrastingTextColor(): Color {
     return if (luminance() > 0.5f) Color.Black else Color.White
 }
-
-// Get dynamic color for grade values that works in both light and dark themes
-fun getGradeColor(grade: Double): Color {
-    return when {
-        grade <= 2.0 -> Color(0xFF4CAF50) // Green for excellent grades (1.0-2.0)
-        grade <= 3.0 -> Color(0xFFFF9800) // Orange for good grades (2.1-3.0)
-        grade <= 4.0 -> Color(0xFFFF5722) // Deep orange for satisfactory grades (3.1-4.0)
-        else -> Color(0xFFF44336) // Red for poor grades (4.1-6.0)
-    }
-}

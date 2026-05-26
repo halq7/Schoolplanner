@@ -141,8 +141,7 @@ fun EditReportScreen(
                         reportSubjects = reportSubjects.toMutableList().apply {
                             removeAt(index)
                         }
-                    },
-                    viewModel = viewModel
+                    }
                 )
             }
 
@@ -151,8 +150,7 @@ fun EditReportScreen(
                     reportSubjects = reportSubjects + ReportSubject(
                         id = UUID.randomUUID().toString(),
                         name = "",
-                        abbreviation = "",
-                        finalGrade = null,
+                        subjectCode = "",
                         isExtraSubject = true,
                         description = ""
                     )
@@ -171,8 +169,7 @@ fun EditReportScreen(
 fun EditableReportSubjectItem(
     subject: ReportSubject,
     onSubjectChange: (ReportSubject) -> Unit,
-    onRemove: () -> Unit,
-    viewModel: GradeViewModel
+    onRemove: () -> Unit
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -189,39 +186,30 @@ fun EditableReportSubjectItem(
                 modifier = Modifier.weight(1f)
             )
             OutlinedTextField(
-                value = subject.abbreviation,
-                onValueChange = { abbr ->
-                    onSubjectChange(subject.copy(abbreviation = abbr))
+                value = subject.subjectCode,
+                onValueChange = { code ->
+                    onSubjectChange(subject.copy(subjectCode = code))
                 },
-                label = { Text(stringResource(R.string.abbreviation)) },
+                label = { Text(stringResource(R.string.subject_code)) },
                 modifier = Modifier.width(80.dp)
-            )
-            OutlinedTextField(
-                value = subject.finalGrade ?: "",
-                onValueChange = { gradeStr ->
-                    onSubjectChange(subject.copy(finalGrade = gradeStr.ifEmpty { null }))
-                },
-                label = { Text(stringResource(R.string.grade)) },
-                modifier = Modifier.width(100.dp)
             )
             IconButton(onClick = onRemove) {
                 Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete))
             }
         } else {
-            // Regular subjects - editable grade field
+            // Regular subjects
             Text(
                 text = subject.name,
                 modifier = Modifier.weight(1f),
                 style = MaterialTheme.typography.bodyLarge
             )
-            OutlinedTextField(
-                value = subject.finalGrade ?: "",
-                onValueChange = { gradeStr ->
-                    onSubjectChange(subject.copy(finalGrade = gradeStr.ifEmpty { null }))
-                },
-                label = { Text(stringResource(R.string.grade)) },
-                modifier = Modifier.width(100.dp)
-            )
+            if (subject.subjectCode.isNotEmpty()) {
+                Text(
+                    text = subject.subjectCode,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         }
     }
 }

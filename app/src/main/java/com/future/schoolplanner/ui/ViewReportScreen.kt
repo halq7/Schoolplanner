@@ -123,20 +123,14 @@ fun ViewReportScreen(
                                 text = subject.name,
                                 style = MaterialTheme.typography.titleMedium
                             )
-                            if (subject.abbreviation.isNotEmpty()) {
+                            if (subject.subjectCode.isNotEmpty()) {
                                 Text(
-                                    text = subject.abbreviation,
+                                    text = subject.subjectCode,
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                         }
-
-                        Text(
-                            text = subject.finalGrade ?: "-",
-                            style = MaterialTheme.typography.headlineSmall,
-                            color = MaterialTheme.colorScheme.primary
-                        )
                     }
                 }
             }

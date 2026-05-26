@@ -60,7 +60,6 @@ fun AddReportScreen(
     var reportDate by remember { mutableStateOf("") }
     var expanded by remember { mutableStateOf(false) }
     var extraSubjects by remember { mutableStateOf<List<ReportSubject>>(emptyList()) }
-    var subjectGrades by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
 
     val subjectsForYear = remember(selectedSchoolYear, subjects.value) {
         selectedSchoolYear?.let { year ->
@@ -83,18 +82,15 @@ fun AddReportScreen(
                     IconButton(
                         onClick = {
                             selectedSchoolYear?.let { schoolYear ->
-                val reportSubjects = subjectsForYear.map { subject ->
-                    val average = viewModel.calculateAverage(subject)
-                    val finalGrade = subjectGrades[subject.id] ?: (if (average > 0) viewModel.formatGradeForReport(average) else "")
-                    ReportSubject(
-                        id = UUID.randomUUID().toString(),
-                        name = subject.name,
-                        abbreviation = subject.abbreviation,
-                        finalGrade = finalGrade,
-                        isExtraSubject = false,
-                        description = subject.description
-                    )
-                } + extraSubjects
+                                val reportSubjects = subjectsForYear.map { subject ->
+                                    ReportSubject(
+                                        id = UUID.randomUUID().toString(),
+                                        name = subject.name,
+                                        subjectCode = subject.subjectCode,
+                                        isExtraSubject = false,
+                                        description = subject.description
+                                    )
+                                } + extraSubjects
 
                                 val report = Report(
                                     id = UUID.randomUUID().toString(),
@@ -198,19 +194,10 @@ fun AddReportScreen(
                 )
                 } else {
                     subjectsForYear.forEachIndexed { index, subject ->
-                        val average = viewModel.calculateAverage(subject)
-                        val currentGradeStr = subjectGrades[subject.id] ?: (if (average > 0) viewModel.formatGradeForReport(average) else "")
                         ReportSubjectItem(
                             name = subject.name,
-                            abbreviation = subject.abbreviation,
-                            gradeStr = currentGradeStr,
-                            isExtra = false,
-                            onGradeChange = { gradeStr ->
-                                subjectGrades = subjectGrades + (subject.id to gradeStr)
-                            },
-                            onNameChange = { name ->
-                                // Regular subjects keep their original name
-                            }
+                            subjectCode = subject.subjectCode,
+                            isExtra = false
                         )
                     }
                 }
@@ -225,14 +212,8 @@ fun AddReportScreen(
                 extraSubjects.forEachIndexed { index, extraSubject ->
                     ReportSubjectItem(
                         name = extraSubject.name,
-                        abbreviation = extraSubject.abbreviation ?: "",
-                        gradeStr = extraSubject.finalGrade ?: "",
+                        subjectCode = extraSubject.subjectCode,
                         isExtra = true,
-                        onGradeChange = { gradeStr ->
-                            extraSubjects = extraSubjects.toMutableList().apply {
-                                this[index] = extraSubject.copy(finalGrade = gradeStr.ifEmpty { null })
-                            }
-                        },
                         onNameChange = { name ->
                             extraSubjects = extraSubjects.toMutableList().apply {
                                 this[index] = extraSubject.copy(name = name)
@@ -251,8 +232,7 @@ fun AddReportScreen(
                         extraSubjects = extraSubjects + ReportSubject(
                             id = UUID.randomUUID().toString(),
                             name = "",
-                            abbreviation = "",
-                            finalGrade = null,
+                            subjectCode = "",
                             isExtraSubject = true,
                             description = ""
                         )
@@ -268,14 +248,11 @@ fun AddReportScreen(
     }
 }
 
-// Version for regular subjects with string grades (tendencies)
 @Composable
 fun ReportSubjectItem(
     name: String,
-    abbreviation: String,
-    gradeStr: String,
+    subjectCode: String,
     isExtra: Boolean,
-    onGradeChange: (String) -> Unit = {},
     onNameChange: (String) -> Unit = {},
     onRemove: () -> Unit = {}
 ) {
@@ -292,89 +269,27 @@ fun ReportSubjectItem(
                 modifier = Modifier.weight(1f)
             )
             OutlinedTextField(
-                value = abbreviation,
-                onValueChange = { /* abbreviation */ },
-                label = { Text(stringResource(R.string.abbreviation)) },
-                modifier = Modifier.width(80.dp)
-            )
-            OutlinedTextField(
-                value = gradeStr,
-                onValueChange = onGradeChange,
-                label = { Text(stringResource(R.string.grade_example)) },
-                modifier = Modifier.width(100.dp)
-            )
-            IconButton(onClick = onRemove) {
-                Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete))
-            }
-        } else {
-            // Regular subjects with tendency input
-            Text(
-                text = name,
-                modifier = Modifier.weight(1f),
-                style = MaterialTheme.typography.bodyLarge
-            )
-            OutlinedTextField(
-                value = gradeStr,
-                onValueChange = onGradeChange,
-                label = { Text(stringResource(R.string.grade_example)) },
-                modifier = Modifier.width(100.dp)
-            )
-        }
-    }
-}
-
-// Version for extra subjects with double grades (legacy support)
-@Composable
-fun ReportSubjectItem(
-    name: String,
-    abbreviation: String,
-    grade: Double,
-    isExtra: Boolean,
-    onGradeChange: (Double) -> Unit = {},
-    onNameChange: (String) -> Unit = {},
-    onRemove: () -> Unit = {}
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        if (isExtra) {
-            OutlinedTextField(
-                value = name,
-                onValueChange = onNameChange,
-                label = { Text("Fachname") },
-                modifier = Modifier.weight(1f)
-            )
-            OutlinedTextField(
-                value = abbreviation,
-                onValueChange = { /* abbreviation */ },
-                label = { Text("Abk.") },
-                modifier = Modifier.width(80.dp)
-            )
-            OutlinedTextField(
-                value = if (grade > 0) "%.1f".format(grade) else "",
-                onValueChange = { value ->
-                    value.toDoubleOrNull()?.let { onGradeChange(it) }
-                },
-                label = { Text(stringResource(R.string.grade)) },
+                value = subjectCode,
+                onValueChange = { /* subjectCode */ },
+                label = { Text(stringResource(R.string.subject_code)) },
                 modifier = Modifier.width(80.dp)
             )
             IconButton(onClick = onRemove) {
                 Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete))
             }
         } else {
-            // Regular subjects - this should not be called for regular subjects anymore
             Text(
                 text = name,
                 modifier = Modifier.weight(1f),
                 style = MaterialTheme.typography.bodyLarge
             )
-            Text(
-                text = if (grade > 0) "%.1f".format(grade) else "-",
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.width(80.dp)
-            )
+            if (subjectCode.isNotEmpty()) {
+                Text(
+                    text = subjectCode,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         }
     }
 }

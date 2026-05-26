@@ -19,53 +19,6 @@ class DataPersistenceManager(private val context: Context) {
 
     private val dataFileName = "school_planner_data.json"
 
-    fun saveAppData(
-        subjects: List<Subject>,
-        schoolYears: List<SchoolYear>,
-        currentSchoolYearId: String?,
-        lessons: List<Lesson>,
-        reports: List<Report>,
-        tasks: List<Task>,
-        gradeInputMethod: GradeInputMethod,
-        showTeachers: Boolean,
-        showRooms: Boolean,
-        isDarkTheme: Boolean,
-        useDynamicColors: Boolean,
-        useAmoledTheme: Boolean,
-        customAccentColor: Int,
-        tasksTabEnabled: Boolean,
-        defaultSubjectAlpha: Float = 1.0f
-    ) {
-        try {
-            val appData = AppData(
-                subjects = subjects.map { it.toSerializable() },
-                schoolYears = schoolYears.map { it.toSerializable() },
-                currentSchoolYearId = currentSchoolYearId,
-                lessons = lessons.map { it.toSerializable() },
-                reports = reports.map { it.toSerializable() },
-                tasks = tasks.map { it.toSerializable() },
-                settings = AppSettings(
-                    gradeInputMethod = gradeInputMethod.name,
-                    showTeachers = showTeachers,
-                    showRooms = showRooms,
-                    isDarkTheme = isDarkTheme,
-                    useDynamicColors = useDynamicColors,
-                    useAmoledTheme = useAmoledTheme,
-                    customAccentColor = customAccentColor,
-                    tasksTabEnabled = tasksTabEnabled,
-                    defaultSubjectAlpha = defaultSubjectAlpha
-                )
-            )
-
-            saveAppData(appData)
-            Log.d("DataPersistence", "Data saved successfully")
-        } catch (e: IOException) {
-            Log.e("DataPersistence", "Error saving data", e)
-        } catch (e: Exception) {
-            Log.e("DataPersistence", "Error serializing data", e)
-        }
-    }
-
     fun saveAppData(appData: AppData) {
         val jsonString = encodeAppData(appData)
         context.openFileOutput(dataFileName, Context.MODE_PRIVATE).use {

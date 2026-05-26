@@ -15,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -49,18 +50,19 @@ import com.future.schoolplanner.R
 fun SubjectSettingsScreen(
     subject: Subject,
     onBack: () -> Unit,
-    onSubjectUpdated: (Subject) -> Unit
+    onSubjectUpdated: (Subject) -> Unit,
+    onDeleteSubject: () -> Unit
 ) {
     var subjectName by remember { mutableStateOf(subject.name) }
-    var abbreviation by remember { mutableStateOf(subject.abbreviation) }
+    var subjectCode by remember { mutableStateOf(subject.subjectCode) }
     var teacher by remember { mutableStateOf(subject.teacher) }
     var room by remember { mutableStateOf(subject.room) }
     var description by remember { mutableStateOf(subject.description) }
     var selectedColor by remember { mutableStateOf(subject.color) }
     var originalColor by remember { mutableStateOf(ComposeColor.Transparent) }
     var showNameError by remember { mutableStateOf(false) }
-    var showAbbreviationError by remember { mutableStateOf(false) }
     var showCustomColorDialog by remember { mutableStateOf(false) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
     // Predefined colors for subjects
     val subjectColors = listOf(
@@ -74,6 +76,29 @@ fun SubjectSettingsScreen(
         ComposeColor(0xFF8BC34A)  // Light Green
     )
 
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text(stringResource(R.string.delete_subject)) },
+            text = { Text(stringResource(R.string.delete_subject_confirmation)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onDeleteSubject()
+                        showDeleteDialog = false
+                    }
+                ) {
+                    Text(stringResource(R.string.delete), color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -84,23 +109,16 @@ fun SubjectSettingsScreen(
                     }
                 },
                 actions = {
+                    IconButton(onClick = { showDeleteDialog = true }) {
+                        Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete))
+                    }
                     IconButton(onClick = {
-                        var hasError = false
-
                         if (subjectName.isBlank()) {
                             showNameError = true
-                            hasError = true
-                        }
-
-                        if (abbreviation.length < 2 || abbreviation.length > 3) {
-                            showAbbreviationError = true
-                            hasError = true
-                        }
-
-                        if (!hasError) {
+                        } else {
                             val updatedSubject = subject.copy(
                                 name = subjectName.trim(),
-                                abbreviation = abbreviation.trim(),
+                                subjectCode = subjectCode.trim(),
                                 teacher = teacher.trim(),
                                 room = room.trim(),
                                 description = description.trim(),
@@ -143,19 +161,12 @@ fun SubjectSettingsScreen(
             )
 
             OutlinedTextField(
-                value = abbreviation,
+                value = subjectCode,
                 onValueChange = {
-                    val filtered = it.filter { char -> char.isLetter() }.take(3)
-                    abbreviation = filtered
-                    showAbbreviationError = false
+                    val filtered = it.filter { char -> char.isLetterOrDigit() }.take(5)
+                    subjectCode = filtered
                 },
-                label = { Text(stringResource(R.string.abbreviation)) },
-                isError = showAbbreviationError,
-                supportingText = {
-                    if (showAbbreviationError) {
-                        Text(stringResource(R.string.enter_abbreviation))
-                    }
-                },
+                label = { Text(stringResource(R.string.subject_code)) },
                 modifier = Modifier.fillMaxWidth()
             )
 

@@ -29,7 +29,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -287,19 +286,19 @@ fun ComposeColor.toArgbInt(): Int = ((alpha * 255).toInt() shl 24) or ((red * 25
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddSubjectScreen(
+    schoolYearId: String,
     onBack: () -> Unit,
     onSubjectAdded: (Subject) -> Unit,
     viewModel: GradeViewModel
 ) {
     var subjectName by remember { mutableStateOf("") }
-    var abbreviation by remember { mutableStateOf("") }
+    var subjectCode by remember { mutableStateOf("") }
     var teacher by remember { mutableStateOf("") }
     var room by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var selectedColor by remember { mutableStateOf(ComposeColor(0xFF4CAF50)) } // Default green
     var originalColor by remember { mutableStateOf(ComposeColor.Transparent) }
     var showNameError by remember { mutableStateOf(false) }
-    var showAbbreviationError by remember { mutableStateOf(false) }
     var showCustomColorDialog by remember { mutableStateOf(false) }
 
     // Predefined colors for subjects
@@ -356,19 +355,12 @@ fun AddSubjectScreen(
             )
 
             OutlinedTextField(
-                value = abbreviation,
+                value = subjectCode,
                 onValueChange = {
-                    val filtered = it.filter { char -> char.isLetter() }.take(3)
-                    abbreviation = filtered
-                    showAbbreviationError = false
+                    val filtered = it.filter { char -> char.isLetterOrDigit() }.take(5)
+                    subjectCode = filtered
                 },
-                label = { Text(stringResource(R.string.abbreviation)) },
-                isError = showAbbreviationError,
-                supportingText = {
-                    if (showAbbreviationError) {
-                        Text(stringResource(R.string.enter_abbreviation))
-                    }
-                },
+                label = { Text(stringResource(R.string.subject_code)) },
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -446,35 +438,20 @@ fun AddSubjectScreen(
 
             Button(
                 onClick = {
-                    var hasError = false
-
                     if (subjectName.isBlank()) {
                         showNameError = true
-                        hasError = true
-                    }
-
-                    if (abbreviation.length < 2 || abbreviation.length > 3) {
-                        showAbbreviationError = true
-                        hasError = true
-                    }
-
-                    if (!hasError) {
-                        val currentSchoolYearId = viewModel.currentSchoolYearId.value
-                        if (currentSchoolYearId != null) {
-                            val newSubject = Subject(
-                                id = UUID.randomUUID().toString(),
-                                name = subjectName.trim(),
-                                abbreviation = abbreviation.trim(),
-                                teacher = teacher.trim(),
-                                room = room.trim(),
-                                description = description.trim(),
-                                color = selectedColor,
-                                grades = emptyList(),
-                                schoolYearId = currentSchoolYearId
-                            )
-
-                            onSubjectAdded(newSubject)
-                        }
+                    } else {
+                        val newSubject = Subject(
+                            id = UUID.randomUUID().toString(),
+                            name = subjectName.trim(),
+                            subjectCode = subjectCode.trim(),
+                            teacher = teacher.trim(),
+                            room = room.trim(),
+                            description = description.trim(),
+                            color = selectedColor,
+                            schoolYearId = schoolYearId
+                        )
+                        onSubjectAdded(newSubject)
                     }
                 },
                 modifier = Modifier.fillMaxWidth()

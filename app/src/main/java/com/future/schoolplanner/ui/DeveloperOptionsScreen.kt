@@ -1,13 +1,17 @@
 package com.future.schoolplanner.ui
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
 import com.future.schoolplanner.R
@@ -19,7 +23,6 @@ fun DeveloperOptionsScreen(
     viewModel: GradeViewModel
 ) {
     var showClearSubjectsDialog by remember { mutableStateOf(false) }
-    var showClearGradesDialog by remember { mutableStateOf(false) }
     var showClearReportsDialog by remember { mutableStateOf(false) }
     var showClearSchoolYearsDialog by remember { mutableStateOf(false) }
     var showClearLessonsDialog by remember { mutableStateOf(false) }
@@ -30,145 +33,109 @@ fun DeveloperOptionsScreen(
                 title = { Text(stringResource(R.string.developer_options)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, stringResource(R.string.back))
+                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary
+                    containerColor = MaterialTheme.colorScheme.errorContainer,
+                    titleContentColor = MaterialTheme.colorScheme.onErrorContainer
                 )
             )
         }
     ) { paddingValues ->
-        LazyColumn(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-
-            item {
-                Card(
-                    modifier = Modifier.fillMaxWidth()
+            // Warning Section
+            Card(
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.errorContainer
+                )
+            ) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.debug_info),
-                            style = MaterialTheme.typography.titleLarge
-                        )
-
-                        val totalGrades = viewModel.subjects.value.sumOf { it.grades.size }
-
-                        Text(
-                            text = "${stringResource(R.string.subjects_count)} ${viewModel.subjects.value.size}",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-
-                        Text(
-                            text = "${stringResource(R.string.tab_grades)}: $totalGrades",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-
-                        Text(
-                            text = "${stringResource(R.string.reports_count)} ${viewModel.reports.value.size}",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-
-                        Text(
-                            text = "${stringResource(R.string.school_years_count)} ${viewModel.schoolYears.value.size}",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-
-                        Text(
-                            text = "${stringResource(R.string.lessons_count)} ${viewModel.lessons.value.size}",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
+                    Icon(
+                        Icons.Default.Warning,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.error
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Text(
+                        text = stringResource(R.string.dangerous_actions),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onErrorContainer
+                    )
                 }
             }
 
-            item {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.errorContainer
-                    )
+            // Stats Section
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = stringResource(R.string.debug_info),
+                    style = MaterialTheme.typography.titleMedium
+                )
+                
+                val subjectsCount = viewModel.subjects.collectAsState().value.size
+                val reportsCount = viewModel.reports.collectAsState().value.size
+                val schoolYearsCount = viewModel.schoolYears.collectAsState().value.size
+                val lessonsCount = viewModel.lessons.collectAsState().value.size
+
+                DebugInfoRow(stringResource(R.string.subjects_count), subjectsCount.toString())
+                DebugInfoRow(stringResource(R.string.reports_count), reportsCount.toString())
+                DebugInfoRow(stringResource(R.string.school_years_count), schoolYearsCount.toString())
+                DebugInfoRow(stringResource(R.string.lessons_count), lessonsCount.toString())
+            }
+
+            // Actions Section
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(
+                    onClick = { showClearSubjectsDialog = true },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.dangerous_actions),
-                            style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.onErrorContainer
-                        )
+                    Text(stringResource(R.string.delete_all_subjects))
+                }
 
-                        Button(
-                            onClick = { showClearSubjectsDialog = true },
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.error
-                            )
-                        ) {
-                            Text(stringResource(R.string.delete_all_subjects))
-                        }
+                Button(
+                    onClick = { showClearReportsDialog = true },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(stringResource(R.string.delete_all_reports))
+                }
 
-                        Button(
-                            onClick = { showClearGradesDialog = true },
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.error
-                            )
-                        ) {
-                            Text(stringResource(R.string.delete_all_grades))
-                        }
+                Button(
+                    onClick = { showClearSchoolYearsDialog = true },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(stringResource(R.string.delete_all_school_years))
+                }
 
-                        Button(
-                            onClick = { showClearReportsDialog = true },
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.error
-                            )
-                        ) {
-                            Text(stringResource(R.string.delete_all_reports))
-                        }
-
-                        Button(
-                            onClick = { showClearSchoolYearsDialog = true },
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.error
-                            )
-                        ) {
-                            Text(stringResource(R.string.delete_all_school_years))
-                        }
-
-                        Button(
-                            onClick = { showClearLessonsDialog = true },
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.error
-                            )
-                        ) {
-                            Text(stringResource(R.string.delete_all_lessons))
-                        }
-                    }
+                Button(
+                    onClick = { showClearLessonsDialog = true },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(stringResource(R.string.delete_all_lessons))
                 }
             }
         }
     }
 
-    // Confirmation dialogs
+    // Confirmation Dialogs
     if (showClearSubjectsDialog) {
         AlertDialog(
             onDismissRequest = { showClearSubjectsDialog = false },
             title = { Text(stringResource(R.string.delete_all_subjects)) },
-            text = { Text("${stringResource(R.string.delete_subject_confirmation)} ${stringResource(R.string.undone)}") },
+            text = { Text(stringResource(R.string.delete_subject_confirmation)) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -176,7 +143,7 @@ fun DeveloperOptionsScreen(
                         showClearSubjectsDialog = false
                     }
                 ) {
-                    Text(stringResource(R.string.delete))
+                    Text(stringResource(R.string.delete), color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
@@ -187,34 +154,11 @@ fun DeveloperOptionsScreen(
         )
     }
 
-    if (showClearGradesDialog) {
-        AlertDialog(
-            onDismissRequest = { showClearGradesDialog = false },
-            title = { Text(stringResource(R.string.delete_all_grades)) },
-            text = { Text("${stringResource(R.string.delete_grade_confirmation)} ${stringResource(R.string.undone)}") },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        viewModel.clearAllGrades()
-                        showClearGradesDialog = false
-                    }
-                ) {
-                    Text(stringResource(R.string.delete))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showClearGradesDialog = false }) {
-                    Text(stringResource(R.string.cancel))
-                }
-            }
-        )
-    }
-
     if (showClearReportsDialog) {
         AlertDialog(
             onDismissRequest = { showClearReportsDialog = false },
             title = { Text(stringResource(R.string.delete_all_reports)) },
-            text = { Text("${stringResource(R.string.delete_grade_confirmation)} ${stringResource(R.string.undone)}") },
+            text = { Text(stringResource(R.string.undone)) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -222,7 +166,7 @@ fun DeveloperOptionsScreen(
                         showClearReportsDialog = false
                     }
                 ) {
-                    Text(stringResource(R.string.delete))
+                    Text(stringResource(R.string.delete), color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
@@ -245,7 +189,7 @@ fun DeveloperOptionsScreen(
                         showClearSchoolYearsDialog = false
                     }
                 ) {
-                    Text(stringResource(R.string.delete))
+                    Text(stringResource(R.string.delete), color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
@@ -260,7 +204,7 @@ fun DeveloperOptionsScreen(
         AlertDialog(
             onDismissRequest = { showClearLessonsDialog = false },
             title = { Text(stringResource(R.string.delete_all_lessons)) },
-            text = { Text("${stringResource(R.string.delete_lesson_confirmation)} ${stringResource(R.string.undone)}") },
+            text = { Text(stringResource(R.string.delete_lesson_confirmation)) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -268,7 +212,7 @@ fun DeveloperOptionsScreen(
                         showClearLessonsDialog = false
                     }
                 ) {
-                    Text(stringResource(R.string.delete))
+                    Text(stringResource(R.string.delete), color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
@@ -277,5 +221,16 @@ fun DeveloperOptionsScreen(
                 }
             }
         )
+    }
+}
+
+@Composable
+fun DebugInfoRow(label: String, value: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(text = label, style = MaterialTheme.typography.bodyMedium)
+        Text(text = value, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
     }
 }

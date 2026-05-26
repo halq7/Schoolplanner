@@ -19,7 +19,6 @@ data class AppData(
 
 @Serializable
 data class AppSettings(
-    val gradeInputMethod: String = "DECIMAL",
     val showTeachers: Boolean = true,
     val showRooms: Boolean = true,
     val isDarkTheme: Boolean = true,
@@ -35,22 +34,12 @@ data class AppSettings(
 data class SerializableSubject(
     val id: String,
     val name: String,
-    val abbreviation: String = "",
+    val subjectCode: String = "",
     val teacher: String = "",
     val room: String = "",
     val description: String = "",
     val color: Int, // Store as ARGB integer
-    val grades: List<SerializableGrade> = emptyList(),
     val schoolYearId: String
-)
-
-@Serializable
-data class SerializableGrade(
-    val id: String,
-    val value: Double,
-    val weight: Double = 1.0,
-    val description: String = "",
-    val date: String = ""
 )
 
 @Serializable
@@ -102,8 +91,7 @@ data class SerializableReport(
 data class SerializableReportSubject(
     val id: String,
     val name: String,
-    val abbreviation: String = "",
-    val finalGrade: String? = null,
+    val subjectCode: String = "",
     val isExtraSubject: Boolean = false,
     val description: String = ""
 )
@@ -113,12 +101,11 @@ fun Subject.toSerializable(): SerializableSubject {
     return SerializableSubject(
         id = id,
         name = name,
-        abbreviation = abbreviation,
+        subjectCode = subjectCode,
         teacher = teacher,
         room = room,
         description = description,
         color = color.toArgb(),
-        grades = grades.map { it.toSerializable() },
         schoolYearId = schoolYearId
     )
 }
@@ -127,33 +114,12 @@ fun SerializableSubject.toDomain(): Subject {
     return Subject(
         id = id,
         name = name,
-        abbreviation = abbreviation,
+        subjectCode = subjectCode,
         teacher = teacher,
         room = room,
         description = description,
         color = Color(color),
-        grades = grades.map { it.toDomain() },
         schoolYearId = schoolYearId
-    )
-}
-
-fun Grade.toSerializable(): SerializableGrade {
-    return SerializableGrade(
-        id = id,
-        value = value,
-        weight = weight,
-        description = description,
-        date = date
-    )
-}
-
-fun SerializableGrade.toDomain(): Grade {
-    return Grade(
-        id = id,
-        value = value,
-        weight = weight,
-        description = description,
-        date = date
     )
 }
 
@@ -259,8 +225,7 @@ fun ReportSubject.toSerializable(): SerializableReportSubject {
     return SerializableReportSubject(
         id = id,
         name = name,
-        abbreviation = abbreviation,
-        finalGrade = finalGrade,
+        subjectCode = subjectCode,
         isExtraSubject = isExtraSubject,
         description = description
     )
@@ -270,8 +235,7 @@ fun SerializableReportSubject.toDomain(): ReportSubject {
     return ReportSubject(
         id = id,
         name = name,
-        abbreviation = abbreviation,
-        finalGrade = finalGrade,
+        subjectCode = subjectCode,
         isExtraSubject = isExtraSubject,
         description = description
     )

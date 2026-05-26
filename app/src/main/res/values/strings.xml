@@ -2,7 +2,6 @@
     <string name="app_name">Schoolplanner</string>
 
     <!-- Navigation -->
-    <string name="tab_grades">Điểm số</string>
     <string name="tab_schedule">Thời khóa biểu</string>
     <string name="tab_tasks">Nhiệm vụ</string>
     <string name="tab_more">Thêm</string>
@@ -27,39 +26,16 @@
     <string name="about_app_description">Thông tin về ứng dụng và phiên bản</string>
     <string name="language">Ngôn ngữ</string>
 
-    <!-- Grades -->
-    <string name="grades_title">Điểm số</string>
+    <!-- Subjects -->
     <string name="no_subjects">Không có môn học nào</string>
-    <string name="overall_average">Điểm trung bình tổng kết</string>
-    <string name="simulated_overall_average">Điểm trung bình tổng kết mô phỏng</string>
-    <string name="contains_simulated_grades">Bao gồm điểm số mô phỏng</string>
-    <string name="action_for_subject">Hành động cho</string>
-    <string name="choose_action">Chọn một hành động:</string>
     <string name="edit">Chỉnh sửa</string>
+    <string name="choose_action">Chọn một hành động:</string>
     <string name="delete">Xóa</string>
     <string name="delete_subject">Xóa môn học</string>
-    <string name="delete_subject_confirmation">Bạn có chắc chắn muốn xóa môn học này không? Tất cả điểm số cũng sẽ bị xóa. Hành động này không thể hoàn tác.</string>
+    <string name="delete_subject_confirmation">Bạn có chắc chắn muốn xóa môn học này không? Hành động này không thể hoàn tác.</string>
     <string name="cancel">Hủy</string>
-    <string name="no_grades_available">Không có điểm số nào</string>
-    <string name="grades_count">%1$d điểm</string>
-    <string name="simulated">Mô phỏng</string>
-    <string name="your_grades">Điểm của bạn:</string>
-    <string name="action_for_grade">Hành động cho điểm số</string>
-    <string name="delete_grade">Xóa điểm số</string>
-    <string name="delete_grade_confirmation">Bạn có chắc chắn muốn xóa điểm này không? Hành động này không thể hoàn tác.</string>
-    <string name="grade_simulation">Mô phỏng điểm số</string>
-    <string name="simulation_description">Mô phỏng một điểm số để xem điểm trung bình thay đổi như thế nào. Điểm mô phỏng sẽ không được lưu.</string>
-    <string name="simulate">Mô phỏng</string>
-    <string name="edit_grade">Chỉnh sửa điểm số</string>
-    <string name="add_new_grade">Thêm điểm mới</string>
-    <string name="grade_value">Giá trị điểm</string>
-    <string name="description_optional">Mô tả (tùy chọn)</string>
-    <string name="weight_optional">Hệ số (tùy chọn)</string>
-    <string name="date_optional">Ngày (tùy chọn)</string>
     <string name="save">Lưu</string>
     <string name="add">Thêm</string>
-    <string name="invalid_grade">Điểm không hợp lệ</string>
-    <string name="grade">Điểm</string>
 
     <!-- Schedule -->
     <string name="schedule_title">Thời khóa biểu</string>
@@ -91,9 +67,9 @@
     <string name="hour_number">Số tiết (1-12)</string>
     <string name="subject_settings">Cài đặt môn học</string>
     <string name="subject_name">Tên môn học</string>
-    <string name="abbreviation">Viết tắt</string>
     <string name="enter_subject_name">Vui lòng nhập tên môn học</string>
-    <string name="enter_abbreviation">Vui lòng nhập từ viết tắt (2-3 ký tự)</string>
+    <string name="subject_code">Mã môn học</string>
+    <string name="enter_subject_code">Vui lòng nhập mã môn học</string>
 
     <!-- Tasks -->
     <string name="tasks_title">Nhiệm vụ</string>
@@ -130,7 +106,6 @@
     <string name="subjects">Môn học</string>
     <string name="add_additional_subject">Thêm môn học bổ sung</string>
     <string name="subject_name_label">Tên môn học</string>
-    <string name="grade_example">Điểm (ví dụ: 2-)</string>
     <string name="no_subjects_in_report">Không có môn học nào trong báo cáo này</string>
 
     <!-- Import/Export -->
@@ -139,7 +114,7 @@
     <string name="export_data">Xuất dữ liệu</string>
     <string name="exporting">Đang xuất...</string>
     <string name="export_description">Dữ liệu của bạn sẽ được xuất dưới dạng tệp JSON và có thể được chia sẻ.</string>
-    <string name="export_details">Tệp được xuất bao gồm tất cả các môn học, điểm số, năm học, nhiệm vụ và cài đặt.</string>
+    <string name="export_details">Tệp được xuất bao gồm tất cả các môn học, năm học, nhiệm vụ và cài đặt.</string>
     <string name="export_success">Xuất dữ liệu thành công</string>
     <string name="export_error">Lỗi khi xuất: %1$s</string>
     <string name="export_subject">Xuất dữ liệu Schoolplanner</string>
@@ -157,7 +132,7 @@
     <!-- Nextcloud Sync -->
     <string name="nextcloud_sync">Đồng bộ hóa Nextcloud</string>
     <string name="nextcloud_sync_category_description">Đồng bộ hóa tất cả dữ liệu ứng dụng với máy chủ Nextcloud của bạn</string>
-    <string name="nextcloud_sync_description">Kết nối với máy chủ Nextcloud để đồng bộ hóa hai chiều tất cả các môn học, điểm số, thời khóa biểu, báo cáo, nhiệm vụ và cài đặt ứng dụng. Ứng dụng sẽ tạo thư mục Schoolplanner và lưu tệp đồng bộ tại đó.</string>
+    <string name="nextcloud_sync_description">Kết nối với máy chủ Nextcloud để đồng bộ hóa hai chiều tất cả các môn học, thời khóa biểu, báo cáo, nhiệm vụ và cài đặt ứng dụng. Ứng dụng sẽ tạo thư mục Schoolplanner và lưu tệp đồng bộ tại đó.</string>
     <string name="nextcloud_server_url">URL máy chủ</string>
     <string name="nextcloud_username">Tên đăng nhập</string>
     <string name="nextcloud_app_password">Mật khẩu ứng dụng</string>
@@ -202,7 +177,7 @@
     <string name="choose_custom_color">Chọn màu riêng</string>
     <string name="default_option">Mặc định</string>
     <string name="default_subject_transparency">Độ trong suốt mặc định cho các môn học</string>
-    <string name="transparency_description">Điều chỉnh độ trong suốt của màu môn học (trong thẻ Điểm số và Thời khóa biểu):</string>
+    <string name="transparency_description">Điều chỉnh độ trong suốt của màu môn học (trong thời khóa biểu):</string>
     <string name="transparency_percentage">Độ trong suốt: %1$d%%</string>
     <string name="transparency">Độ trong suốt</string>
     <string name="preview">Xem trước</string>
@@ -234,12 +209,10 @@
     <string name="dangerous_actions">⚠️ Những hành động này sẽ xóa dữ liệu vĩnh viễn!</string>
     <string name="debug_info">Thông tin gỡ lỗi</string>
     <string name="subjects_count">Số lượng môn học:</string>
-    <string name="grades_count_total">Tổng số điểm:</string>
     <string name="reports_count">Số lượng báo cáo:</string>
     <string name="school_years_count">Số lượng năm học:</string>
     <string name="lessons_count">Số lượng tiết học:</string>
     <string name="delete_all_subjects">Xóa tất cả môn học</string>
-    <string name="delete_all_grades">Xóa tất cả điểm số</string>
     <string name="delete_all_reports">Xóa tất cả báo cáo</string>
     <string name="delete_all_school_years">Xóa tất cả năm học</string>
     <string name="delete_all_lessons">Xóa tất cả tiết học</string>
@@ -252,6 +225,7 @@
     <string name="hue">Sắc thái</string>
     <string name="saturation_brightness">Độ bão hòa &amp; Độ sáng</string>
     <string name="add_subject">Thêm môn học</string>
+    <string name="description_optional">Mô tả (tùy chọn)</string>
 
     <!-- Add Report -->
     <string name="select_school_year">Chọn năm học</string>
@@ -264,16 +238,13 @@
     <string name="school_years_title">Năm học</string>
     <string name="add_school_year">Thêm năm học</string>
     <string name="edit_school_year">Chỉnh sửa năm học</string>
+    <string name="delete_year">Xóa năm học</string>
+    <string name="undone">Hành động này không thể hoàn tác!</string>
 
     <!-- Grade Settings -->
     <string name="current_year">Năm học hiện tại</string>
     <string name="new_year">Năm học mới</string>
     <string name="year_eg">ví dụ: 2024/2025</string>
-    <string name="grade_input_method">Phương pháp nhập điểm</string>
-    <string name="select_input_method">Chọn phương pháp để nhập điểm:</string>
-    <string name="numeric">Số</string>
-    <string name="text">Văn bản</string>
-    <string name="points">Hệ điểm</string>
 
     <!-- Languages -->
     <string name="english">Tiếng Anh</string>
@@ -283,8 +254,6 @@
     <!-- Additional -->
     <string name="save_task">Lưu nhiệm vụ</string>
     <string name="save_changes">Lưu thay đổi</string>
-    <string name="simulated_average">Điểm trung bình mô phỏng</string>
-    <string name="average">Trung bình</string>
 
     <!-- Developer Options -->
     <string name="to">đến</string>
@@ -297,10 +266,6 @@
     <string name="from">Từ</string>
     <string name="add_year">Thêm năm học</string>
     <string name="edit_year">Chỉnh sửa năm học</string>
-    <string name="absolute_grade">Điểm nguyên</string>
-    <string name="decimal_grade">Hệ thập phân</string>
-    <string name="tendency_grade">Có xu hướng (+/-)</string>
-    <string name="fifteen_points">Hệ 15 điểm</string>
     <string name="eg">ví dụ</string>
     <string name="mon">T2</string>
     <string name="tue">T3</string>
@@ -309,14 +274,8 @@
     <string name="fri">T6</string>
     <string name="no_reports">Không có báo cáo nào</string>
     <string name="unknown_year">Năm học không xác định</string>
-    <string name="delete_year">Xóa năm học</string>
-    <string name="undone">Hành động này không thể hoàn tác!</string>
-    <string name="grade_settings">Cài đặt nhập và hiển thị điểm</string>
     <string name="app_settings_description">Cài đặt cho bản thân ứng dụng</string>
     <string name="next">Tiếp theo</string>
-    <string name="weight">Hệ số:</string>
-    <string name="insert_grade">Nhập một điểm hợp lệ</string>
-    <string name="insert_points">Nhập một số điểm hợp lệ</string>
     <string name="no_years">Không có năm học nào</string>
     <string name="unknown">Không xác định</string>
     <string name="expand">Mở rộng</string>

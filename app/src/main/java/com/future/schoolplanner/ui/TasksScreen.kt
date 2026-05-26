@@ -306,7 +306,7 @@ fun TaskItem(
                     )
                     subject?.let {
                         Text(
-                            text = it.abbreviation,
+                            text = it.subjectCode,
                             style = MaterialTheme.typography.bodySmall,
                             color = it.color
                         )

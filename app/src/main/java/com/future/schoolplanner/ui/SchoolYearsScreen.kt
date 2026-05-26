@@ -1,6 +1,8 @@
 package com.future.schoolplanner.ui
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
@@ -11,6 +13,8 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.collectAsState
@@ -18,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.future.schoolplanner.data.SchoolYear
+import com.future.schoolplanner.data.Subject
 import java.util.UUID
 import androidx.compose.ui.res.stringResource
 import com.future.schoolplanner.R
@@ -28,10 +33,13 @@ fun SchoolYearsScreen(
     onBack: () -> Unit,
     onAddSchoolYear: () -> Unit,
     onEditSchoolYear: (String) -> Unit,
+    onAddSubject: (String) -> Unit,
+    onSubjectSettings: (String) -> Unit,
     viewModel: GradeViewModel
 ) {
     val schoolYears = viewModel.schoolYears.collectAsState()
     val currentSchoolYearId = viewModel.currentSchoolYearId.collectAsState()
+    val allSubjects = viewModel.subjects.collectAsState()
 
     Scaffold(
         topBar = {
@@ -71,12 +79,16 @@ fun SchoolYearsScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 items(schoolYears.value) { schoolYear ->
+                    val yearSubjects = allSubjects.value.filter { it.schoolYearId == schoolYear.id }
                     SchoolYearCard(
                         schoolYear = schoolYear,
                         isCurrent = schoolYear.id == currentSchoolYearId.value,
+                        subjects = yearSubjects,
                         onSetCurrent = { viewModel.setCurrentSchoolYear(schoolYear.id) },
                         onEdit = { onEditSchoolYear(schoolYear.id) },
-                        onDelete = { viewModel.deleteSchoolYear(schoolYear.id) }
+                        onDelete = { viewModel.deleteSchoolYear(schoolYear.id) },
+                        onAddSubject = { onAddSubject(schoolYear.id) },
+                        onSubjectSettings = onSubjectSettings
                     )
                 }
 
@@ -93,16 +105,20 @@ fun SchoolYearsScreen(
 fun SchoolYearCard(
     schoolYear: SchoolYear,
     isCurrent: Boolean,
+    subjects: List<Subject>,
     onSetCurrent: () -> Unit,
     onEdit: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    onAddSubject: () -> Unit,
+    onSubjectSettings: (String) -> Unit
 ) {
     var showDeleteDialog by remember { mutableStateOf(false) }
+    var expanded by remember { mutableStateOf(false) }
 
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            title = { Text(stringResource(R.string.add_school_year)) },
+            title = { Text(stringResource(R.string.delete_year)) },
             text = { Text("${stringResource(R.string.delete)} \"${schoolYear.name}\"? ${stringResource(R.string.undone)}" )},
             confirmButton = {
                 TextButton(
@@ -126,7 +142,7 @@ fun SchoolYearCard(
         modifier = Modifier
             .fillMaxWidth()
             .combinedClickable(
-                onClick = onSetCurrent,
+                onClick = { expanded = !expanded },
                 onLongClick = { showDeleteDialog = true }
             ),
         colors = CardDefaults.cardColors(
@@ -136,50 +152,117 @@ fun SchoolYearCard(
                 MaterialTheme.colorScheme.surfaceVariant
         )
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = schoolYear.name,
-                    style = MaterialTheme.typography.headlineSmall
-                )
-                if (schoolYear.description.isNotEmpty()) {
-                    Text(
-                        text = schoolYear.description,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = schoolYear.name,
+                            style = MaterialTheme.typography.headlineSmall
+                        )
+                        if (isCurrent) {
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Icon(
+                                imageVector = Icons.Default.Check,
+                                contentDescription = stringResource(R.string.current_year),
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                    }
+                    if (schoolYear.description.isNotEmpty()) {
+                        Text(
+                            text = schoolYear.description,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                        )
+                    }
+                }
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(onClick = onEdit) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = stringResource(R.string.edit),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    
+                    if (!isCurrent) {
+                        IconButton(onClick = onSetCurrent) {
+                            Icon(
+                                imageVector = Icons.Default.Check,
+                                contentDescription = "Set Current",
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+
+                    Icon(
+                        imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                        contentDescription = null
                     )
                 }
-                Text(
-                    text = "${stringResource(R.string.from)} ${schoolYear.startDate} ${stringResource(R.string.to)} ${schoolYear.endDate}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                )
             }
 
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(onClick = onEdit) {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = stringResource(R.string.edit),
-                        tint = MaterialTheme.colorScheme.primary
+            AnimatedVisibility(visible = expanded) {
+                Column(modifier = Modifier.padding(top = 16.dp)) {
+                    HorizontalDivider(modifier = Modifier.padding(bottom = 8.dp))
+                    Text(
+                        text = stringResource(R.string.subjects),
+                        style = MaterialTheme.typography.titleMedium
                     )
-                }
-
-                if (isCurrent) {
-                    Icon(
-                        imageVector = Icons.Default.Check,
-                        contentDescription = stringResource(R.string.current_year),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
+                    
+                    if (subjects.isEmpty()) {
+                        Text(
+                            text = stringResource(R.string.no_subjects),
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        )
+                    } else {
+                        subjects.forEach { subject ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { onSubjectSettings(subject.id) }
+                                    .padding(vertical = 8.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(12.dp)
+                                            .background(subject.color, MaterialTheme.shapes.small)
+                                    )
+                                    Spacer(modifier = Modifier.width(12.dp))
+                                    Text(subject.name)
+                                }
+                                Icon(
+                                    imageVector = Icons.Default.Edit,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(16.dp),
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    }
+                    
+                    TextButton(
+                        onClick = onAddSubject,
+                        modifier = Modifier.align(Alignment.End)
+                    ) {
+                        Icon(Icons.Default.Add, contentDescription = null)
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(stringResource(R.string.add_subject))
+                    }
                 }
             }
         }

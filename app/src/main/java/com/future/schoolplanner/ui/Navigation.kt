@@ -3,7 +3,6 @@ package com.future.schoolplanner.ui
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
@@ -28,7 +27,6 @@ fun SchoolPlannerApp(viewModel: GradeViewModel) {
     var selectedTabIndex by remember { mutableIntStateOf(0) }
 
     val baseTabs = listOf(
-        TabItem(R.string.tab_grades, Icons.Default.List),
         TabItem(R.string.tab_schedule, Icons.Default.DateRange)
     )
 
@@ -38,7 +36,7 @@ fun SchoolPlannerApp(viewModel: GradeViewModel) {
 
     val tabs = baseTabs + tasksTab + moreTab
 
-    val startRoutes = mutableListOf("subjectList", "schedule")
+    val startRoutes = mutableListOf("schedule")
     if (tasksTabEnabled) startRoutes.add("tasks")
     startRoutes.add("moreMenu")
 
@@ -74,10 +72,9 @@ fun SchoolPlannerApp(viewModel: GradeViewModel) {
     ) { paddingValues ->
         NavHost(
             navController = navController,
-            startDestination = "subjectList",
+            startDestination = "schedule",
             modifier = Modifier.padding(bottom = paddingValues.calculateBottomPadding())
         ) {
-            GradesTab(this, navController, viewModel, paddingValues)
             ScheduleTab(this, navController, viewModel, paddingValues)
             if (tasksTabEnabled) {
                 TasksTab(this, navController, viewModel, paddingValues, onAddTask = { navController.navigate("addTask") })
@@ -88,10 +85,9 @@ fun SchoolPlannerApp(viewModel: GradeViewModel) {
         LaunchedEffect(navController.currentBackStackEntryAsState().value) {
             val route = navController.currentDestination?.route
             selectedTabIndex = when {
-                route?.startsWith("subjectList") == true || route?.startsWith("gradeDetail") == true || route?.startsWith("addSubject") == true || route?.startsWith("settings") == true || route?.startsWith("subjectSettings") == true -> 0
-                route?.startsWith("schedule") == true || route?.startsWith("addLesson") == true || route?.startsWith("editLesson") == true -> 1
-                tasksTabEnabled && (route?.startsWith("tasks") == true || route?.startsWith("addTask") == true || route?.startsWith("editTask") == true) -> 2
-                else -> if (tasksTabEnabled) 3 else 2
+                route?.startsWith("schedule") == true || route?.startsWith("addLesson") == true || route?.startsWith("editLesson") == true -> 0
+                tasksTabEnabled && (route?.startsWith("tasks") == true || route?.startsWith("addTask") == true || route?.startsWith("editTask") == true) -> 1
+                else -> if (tasksTabEnabled) 2 else 1
             }
         }
     }
@@ -100,87 +96,6 @@ fun SchoolPlannerApp(viewModel: GradeViewModel) {
 
 
 data class TabItem(val titleRes: Int, val icon: androidx.compose.ui.graphics.vector.ImageVector)
-
-fun GradesTab(builder: NavGraphBuilder, navController: NavHostController, viewModel: GradeViewModel, paddingValues: androidx.compose.foundation.layout.PaddingValues) {
-    builder.composable("subjectList") {
-        SubjectListScreen(
-            onSubjectSelected = { subject ->
-                viewModel.selectSubject(subject)
-                navController.navigate("gradeDetail/${subject.id}")
-            },
-            onAddSubject = {
-                navController.navigate("addSubject")
-            },
-            onSettings = {
-                navController.navigate("settings")
-            },
-            onSubjectSettings = { subject ->
-                navController.navigate("subjectSettings/${subject.id}")
-            },
-            viewModel = viewModel
-        )
-    }
-
-    builder.composable("gradeDetail/{subjectId}") { backStackEntry ->
-        val subjectId = backStackEntry.arguments?.getString("subjectId") ?: ""
-        val subjects = viewModel.subjects.collectAsState()
-        val subject = subjects.value.find { it.id == subjectId }
-
-        val selectedSubject = viewModel.selectedSubject.collectAsState()
-        val finalSubject = subject ?: selectedSubject.value
-
-        if (finalSubject != null) {
-            GradeDetailScreen(
-                subject = finalSubject,
-                onBack = { navController.popBackStack() },
-                viewModel = viewModel
-            )
-        } else {
-            navController.navigate("subjectList") {
-                popUpTo("subjectList") { inclusive = true }
-            }
-        }
-    }
-
-    builder.composable("addSubject") {
-        AddSubjectScreen(
-            onBack = { navController.popBackStack() },
-            onSubjectAdded = { subject ->
-                viewModel.addSubject(subject)
-                navController.popBackStack()
-            },
-            viewModel = viewModel
-        )
-    }
-
-    builder.composable("settings") {
-        GradeSettingsScreen(
-            onBack = { navController.popBackStack() },
-            viewModel = viewModel
-        )
-    }
-
-    builder.composable("subjectSettings/{subjectId}") { backStackEntry ->
-        val subjectId = backStackEntry.arguments?.getString("subjectId") ?: ""
-        val subjects = viewModel.subjects.collectAsState()
-        val subject = subjects.value.find { it.id == subjectId }
-
-        if (subject != null) {
-            SubjectSettingsScreen(
-                subject = subject,
-                onBack = { navController.popBackStack() },
-                onSubjectUpdated = { updatedSubject ->
-                    viewModel.updateSubject(updatedSubject)
-                    navController.popBackStack()
-                }
-            )
-        } else {
-            navController.navigate("subjectList") {
-                popUpTo("subjectList") { inclusive = true }
-            }
-        }
-    }
-}
 
 fun ScheduleTab(builder: NavGraphBuilder, navController: NavHostController, viewModel: GradeViewModel, paddingValues: androidx.compose.foundation.layout.PaddingValues) {
     builder.composable("schedule") {
@@ -317,6 +232,12 @@ fun MoreTab(builder: NavGraphBuilder, navController: NavHostController, viewMode
             onEditSchoolYear = { schoolYearId ->
                 navController.navigate("editSchoolYear/$schoolYearId")
             },
+            onAddSubject = { schoolYearId ->
+                navController.navigate("addSubject/$schoolYearId")
+            },
+            onSubjectSettings = { subjectId ->
+                navController.navigate("subjectSettings/$subjectId")
+            },
             viewModel = viewModel
         )
     }
@@ -348,6 +269,42 @@ fun MoreTab(builder: NavGraphBuilder, navController: NavHostController, viewMode
             navController.navigate("schoolYears") {
                 popUpTo("schoolYears") { inclusive = true }
             }
+        }
+    }
+
+    builder.composable("addSubject/{schoolYearId}") { backStackEntry ->
+        val schoolYearId = backStackEntry.arguments?.getString("schoolYearId") ?: ""
+        AddSubjectScreen(
+            schoolYearId = schoolYearId,
+            onBack = { navController.popBackStack() },
+            onSubjectAdded = { subject ->
+                viewModel.addSubject(subject)
+                navController.popBackStack()
+            },
+            viewModel = viewModel
+        )
+    }
+
+    builder.composable("subjectSettings/{subjectId}") { backStackEntry ->
+        val subjectId = backStackEntry.arguments?.getString("subjectId") ?: ""
+        val subjects = viewModel.subjects.collectAsState()
+        val subject = subjects.value.find { it.id == subjectId }
+
+        if (subject != null) {
+            SubjectSettingsScreen(
+                subject = subject,
+                onBack = { navController.popBackStack() },
+                onSubjectUpdated = { updatedSubject ->
+                    viewModel.updateSubject(updatedSubject)
+                    navController.popBackStack()
+                },
+                onDeleteSubject = {
+                    viewModel.deleteSubject(subjectId)
+                    navController.popBackStack()
+                }
+            )
+        } else {
+            navController.popBackStack()
         }
     }
 
@@ -418,22 +375,12 @@ fun MoreTab(builder: NavGraphBuilder, navController: NavHostController, viewMode
     builder.composable("mainSettings") {
         MainSettingsScreen(
             onBack = { navController.popBackStack() },
-            onNavigateToGradeSettings = {
-                navController.navigate("gradeSettings")
-            },
             onNavigateToDisplaySettings = {
                 navController.navigate("displaySettings")
             },
             onNavigateToAppSettings = {
                 navController.navigate("appSettings")
             },
-            viewModel = viewModel
-        )
-    }
-
-    builder.composable("gradeSettings") {
-        GradeSettingsScreen(
-            onBack = { navController.popBackStack() },
             viewModel = viewModel
         )
     }

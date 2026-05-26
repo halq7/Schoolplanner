@@ -6,7 +6,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -20,7 +19,6 @@ import com.future.schoolplanner.R
 @Composable
 fun MainSettingsScreen(
     onBack: () -> Unit,
-    onNavigateToGradeSettings: () -> Unit,
     onNavigateToDisplaySettings: () -> Unit,
     onNavigateToAppSettings: () -> Unit,
     viewModel: GradeViewModel = viewModel()
@@ -48,15 +46,6 @@ fun MainSettingsScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-
-
-            item {
-                SettingsCategory(
-                    title = stringResource(R.string.grades_title),
-                    description = stringResource(R.string.grade_settings),
-                    onClick = onNavigateToGradeSettings
-                )
-            }
 
             item {
                 SettingsCategory(
